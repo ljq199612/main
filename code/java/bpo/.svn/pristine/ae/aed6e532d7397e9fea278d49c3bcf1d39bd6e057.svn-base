@@ -1,0 +1,17 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillTime;
+
+public interface BpoBillTimeMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoBillTime record);
+
+    int insertSelective(BpoBillTime record);
+
+    BpoBillTime selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoBillTime record);
+
+    int updateByPrimaryKey(BpoBillTime record);
+}

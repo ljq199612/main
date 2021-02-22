@@ -1,0 +1,44 @@
+import request from '@/utils/request'
+
+export function findAllModule(query) {
+  return request({
+    url: '/sysWorkModuleRel/findAll',
+    method: 'get',
+    params: query
+  })
+}
+export function insertModule(query) {
+  return request({
+    url: '/sysWorkModuleRel/insert',
+    method: 'get',
+    params: query
+  })
+}
+export function updateModule(query) {
+  return request({
+    url: '/sysWorkModuleRel/update',
+    method: 'get',
+    params: query
+  })
+}
+export function insertProOrGrp(query) {
+  return request({
+    url: '/sysWorkModuleRel/insertProOrGrp',
+    method: 'get',
+    params: query
+  })
+}
+export function updateProOrGrp(query) {
+  return request({
+    url: '/sysWorkModuleRel/updateProOrGrp',
+    method: 'get',
+    params: query
+  })
+}
+export function deleteProOrGrp(query) {
+  return request({
+    url: '/sysWorkModuleRel/deleteProOrGrp',
+    method: 'get',
+    params: query
+  })
+}

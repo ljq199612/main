@@ -1,0 +1,209 @@
+<template>
+  <CfPanel title="工作模块/工序/工作小组" class="main">
+    <el-button type="primary" style="margin:19px 0 18px;" @click="addFn">
+      新增
+    </el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="tableList"
+      class="bpoTable"
+      border
+      fit
+      :span-method="arraySpanMethod"
+    >
+      <el-table-column align="center" label="序号" width="80">
+        <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="工作模块编码" min-width="80" prop="workModuleCode" />
+      <el-table-column align="left" label="工作模块" min-width="80" prop="workModuleName" />
+      <el-table-column align="left" label="工序编码" min-width="80" prop="processCode" />
+      <el-table-column align="left" label="工序" min-width="80" prop="processName" />
+      <el-table-column align="left" label="工作小组编码" min-width="80" prop="code" />
+      <el-table-column align="left" label="工作小组" min-width="80" prop="name" />
+      <el-table-column align="left" label="工作小组操作" min-width="80">
+        <template slot-scope="scope">{{ scope.row.remark }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="工序操作" width="200">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="updateAddForm(scope.row)">增加工作小组</el-button>
+          <el-button v-if="scope.row.status!='deleted'" type="danger" @click="delAddForm(scope.row,'deleted')">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column align="left" label="工作模块操作" width="120">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="updateAddForm(scope.row)">增加工序</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 新增表格弹框 -->
+    <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="page.pageNum" :limit.sync="page.pageSize" @pagination="getList" />
+  </CfPanel>
+</template>
+<script>
+import { findAllModule } from '@/api/workSequenceTeam'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination'
+export default {
+  name: 'WorkSequenceTeam',
+  components: {
+    CfPanel,
+    Pagination
+  },
+  data() {
+    return {
+      listLoading: false,
+      page: {
+        pageNum: 1,
+        pageSize: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      total: 1,
+      tableList: [],
+      rowSpanV1: [], // 一级合并数据
+      rowSpanV2: [], // 二级合并数据
+      dialogFormVisible: false,
+      addForm: {
+        code: '',
+        name: ''
+      },
+      currentRow: null // 修改表格当前行数据
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    addFn() {},
+    getList() {
+      this.listLoading = true
+      findAllModule({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.tableList = this.iterateList(data.list || [])
+        this.rowSpanV1 = this.calcRowSpan(this.tableList, 'id')
+        this.rowSpanV2 = this.calcRowSpan(this.tableList, 'sysProcessVosId')
+        console.log(this.tableList, this.rowSpanV1, this.rowSpanV2)
+        this.total = data.total || 0
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 计算表格合并数据
+    calcRowSpan(list, key) {
+      let pos = 0
+      const rowSpan = []
+      list.forEach((item, index) => {
+        if (index === 0) {
+          rowSpan.push(1)
+          pos = 0
+        } else {
+          if (list[index][key] === list[index - 1][key]) {
+            rowSpan[pos] += 1
+            rowSpan.push(0)
+          } else {
+            rowSpan.push(1)
+            pos = index
+          }
+        }
+      })
+      return rowSpan
+    },
+    // 迭代数组汇总各级属性
+    iterateList(list) {
+      const arr = []
+      list.forEach((item) => {
+        const obj = {} // 保存一级属性
+        Object.keys(item).forEach((key) => {
+          // sysProcessVos数组
+          if (Array.isArray(item[key])) {
+            if (item[key].length === 0 || !item[key]) {
+              const cacheObj = Object.assign({}, obj)
+              arr.push(cacheObj)
+            } else {
+              item[key].forEach((item1) => {
+                // 保存二级属性
+                const obj1 = {}
+                Object.keys(item1).forEach((key1) => {
+                  // bpoWorkGroupList数组
+                  if (Array.isArray(item1[key1])) {
+                    if (item1[key1].length === 0 || !item1[key1]) {
+                      const cacheObj = Object.assign({}, obj1, obj)
+                      arr.push(cacheObj)
+                    } else {
+                      item1[key1].forEach((item2) => {
+                        // 保存三级属性
+                        const obj2 = {}
+                        Object.keys(item2).forEach((key2) => {
+                          switch (key1) {
+                            case 'id':
+                              obj2['bpoWorkGroupListId'] = item2[key2]
+                              break
+                            case 'type':
+                              obj2['bpoWorkGroupListType'] = item2[key2]
+                              break
+                            case 'parentId':
+                              obj2['bpoWorkGroupListParentId'] = item2[key2]
+                              break
+                            default:
+                              obj2[key2] = item2[key2]
+                          }
+                        })
+                        const cacheObj = Object.assign({}, obj2, obj1, obj)
+                        arr.push(cacheObj)
+                      })
+                    }
+                  } else {
+                    switch (key1) {
+                      case 'id':
+                        obj1['sysProcessVosId'] = item1[key1]
+                        break
+                      case 'type':
+                        obj1['sysProcessVosType'] = item1[key1]
+                        break
+                      case 'parentId':
+                        obj1['sysProcessVosParentId'] = item1[key1]
+                        break
+                      default:
+                        obj1[key1] = item1[key1]
+                    }
+                  }
+                })
+              })
+            }
+          } else {
+            obj[key] = item[key]
+          }
+        })
+      })
+      return arr
+    },
+    // 合并表格列
+    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex < 3 || columnIndex === 9) {
+        const _row = this.rowSpanV1[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      } else if (/3|4|8/.test(columnIndex)) {
+        const _row = this.rowSpanV2[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      }
+    },
+    confirmAddForm() {},
+    cancelAddForm() {}
+  }
+}
+</script>

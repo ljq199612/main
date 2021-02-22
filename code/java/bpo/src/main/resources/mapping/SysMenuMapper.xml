@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysMenuMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysMenu" >
+    <id column="menu_id" property="menuId" jdbcType="INTEGER" />
+    <result column="menu_name" property="menuName" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="INTEGER" />
+    <result column="router_name" property="routerName" jdbcType="VARCHAR" />
+    <result column="menu_type" property="menuType" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="perms" property="perms" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    menu_id, menu_name, parent_id, order_num, router_name, menu_type, status, perms, 
+    create_time, update_time, remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_menu
+    where menu_id = #{menuId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_menu
+    where menu_id = #{menuId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysMenu" >
+    insert into sys_menu (menu_id, menu_name, parent_id, 
+      order_num, router_name, menu_type, 
+      status, perms, create_time, 
+      update_time, remark)
+    values (#{menuId,jdbcType=INTEGER}, #{menuName,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER}, 
+      #{orderNum,jdbcType=INTEGER}, #{routerName,jdbcType=VARCHAR}, #{menuType,jdbcType=CHAR}, 
+      #{status,jdbcType=INTEGER}, #{perms,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysMenu" >
+    insert into sys_menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="menuId != null" >
+        menu_id,
+      </if>
+      <if test="menuName != null" >
+        menu_name,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="routerName != null" >
+        router_name,
+      </if>
+      <if test="menuType != null" >
+        menu_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="perms != null" >
+        perms,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="menuId != null" >
+        #{menuId,jdbcType=INTEGER},
+      </if>
+      <if test="menuName != null" >
+        #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="routerName != null" >
+        #{routerName,jdbcType=VARCHAR},
+      </if>
+      <if test="menuType != null" >
+        #{menuType,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="perms != null" >
+        #{perms,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysMenu" >
+    update sys_menu
+    <set >
+      <if test="menuName != null" >
+        menu_name = #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="routerName != null" >
+        router_name = #{routerName,jdbcType=VARCHAR},
+      </if>
+      <if test="menuType != null" >
+        menu_type = #{menuType,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="perms != null" >
+        perms = #{perms,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where menu_id = #{menuId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysMenu" >
+    update sys_menu
+    set menu_name = #{menuName,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      order_num = #{orderNum,jdbcType=INTEGER},
+      router_name = #{routerName,jdbcType=VARCHAR},
+      menu_type = #{menuType,jdbcType=CHAR},
+      status = #{status,jdbcType=INTEGER},
+      perms = #{perms,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where menu_id = #{menuId,jdbcType=INTEGER}
+  </update>
+
+  <select id="getMenuPerms" resultType="string">
+    SELECT
+      sys_menu.perms
+    FROM
+      sys_menu,
+      sys_company_role_user company_role_user,
+      sys_company company,
+      sys_org org,
+      sys_org_role_menu org_role_menu
+    WHERE
+      company_role_user.company_id = company.id
+      AND company.org_type = org.id
+      AND org.id = org_role_menu.org_id
+      AND company_role_user.role_id = org_role_menu.role_id
+      AND sys_menu.menu_id = org_role_menu.menu_id
+      AND sys_menu.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND company_role_user.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND org_role_menu.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND company_role_user.user_id = #{userId}
+  </select>
+
+  <select id="getMenuByUserId" resultMap="BaseResultMap">
+    SELECT
+      sys_menu.menu_id, sys_menu.menu_name, sys_menu.parent_id, sys_menu.order_num, sys_menu.router_name, sys_menu.menu_type, sys_menu.status, sys_menu.perms,
+      sys_menu.create_time, sys_menu.update_time, sys_menu.remark
+    FROM
+      sys_menu,
+      sys_company_role_user company_role_user,
+      sys_company company,
+      sys_org_role_menu org_role_menu
+    WHERE
+      company_role_user.company_id = company.id
+      AND company.org_type = org_role_menu.org_id
+      AND company_role_user.role_id = org_role_menu.role_id
+      AND sys_menu.menu_id = org_role_menu.menu_id
+      AND sys_menu.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND company_role_user.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND org_role_menu.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND company_role_user.user_id = #{userId}
+  </select>
+
+  <select id="getAllMenu" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_menu
+    WHERE
+    status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+</mapper>

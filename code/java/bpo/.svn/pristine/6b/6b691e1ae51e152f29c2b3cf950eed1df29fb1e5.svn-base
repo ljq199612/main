@@ -1,0 +1,570 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.controller.BpoEvaluationResultParam;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.BpoEvaluationParam;
+import com.rz.iot.bpo.model.param.BpoPerformanceEvaluationParam;
+import com.rz.iot.bpo.model.param.BpoPerformanceLevelParam;
+import com.rz.iot.bpo.model.show.*;
+import com.rz.iot.bpo.service.EvaluationService;
+import com.rz.iot.bpo.service.SupplierPerformanceEvaluationService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.rz.iot.bpo.common.constant.DictDataConstants.DELETE_STATUS;
+import static com.rz.iot.bpo.common.constant.ResultConstants.REQUEST_SUCCESS;
+
+/**
+ * 描述 : TODO
+ * 作者 : qin xian
+ * 创建时间 : 2020/7/3 0003 15:52
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+public class SupplierPerformanceEvaluationServiceImpl implements SupplierPerformanceEvaluationService {
+
+    @Resource
+    BpoPerformanceEvaluationMapper performanceEvaluationMapper;
+    @Resource
+    private BpoPerformanceLevelMapper performanceLevelMapper;
+    @Resource
+    private EvaluationService evaluationService;
+    @Resource
+    private BpoEvaluationResultMapper evaluationResultMapper;
+    @Resource
+    private BpoEvaluationItemMapper bpoEvaluationItemMapper;
+    @Resource
+    private BpoEvaluationContentMapper bpoEvaluationContentMapper;
+    @Resource
+    private BpoEvaluationStandardMapper bpoEvaluationStandardMapper;
+    @Resource
+    private BpoEvaluationResultRecordMapper bpoEvaluationResultRecordMapper;
+
+    @Override
+    public Result<BpoPerformanceEvaluationShow> getDetail(Integer supplierInfoId) {
+        if (supplierInfoId == null)
+            return Result.requestParamError();
+
+        BpoPerformanceEvaluationShow info = performanceEvaluationMapper.selectBysupplierInfoId(supplierInfoId);
+
+        return Result.success(info);
+    }
+
+    @Override
+    public Result<BpoPerformanceLevelShow> getLevel(Integer supplierInfoId) {
+        if (supplierInfoId == null)
+            return Result.requestParamError();
+
+        BpoPerformanceLevelShow info = performanceLevelMapper.selectBySupplierInfoId(supplierInfoId);
+
+        return Result.success(info);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addEvaluationStandards(BpoPerformanceEvaluationParam info) {
+        Result result = handleAddEvaluationStandardsParam(info);
+        if (result != null)
+            return result;
+
+        performanceEvaluationMapper.insertSelective(info);
+
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addLevel(List<BpoPerformanceLevelParam> list) {
+        for (BpoPerformanceLevelParam info : list) {
+            Result result = handelAddLevelParam(info);
+            if (result != null) {
+                return result;
+            }
+        }
+        for (BpoPerformanceLevel info : list) {
+            performanceLevelMapper.insertSelective(info);
+        }
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteEvaluationStandards(Integer id) {
+        //复用
+        return evaluationService.deleteEvaluationStandards(id);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteLevel(Integer id) {
+        //复用
+        return evaluationService.deleteLevel(id);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateEvaluationStandards(BpoPerformanceEvaluationParam info) {
+        Result result = handleUpdateEvaluationStandardsParam(info);
+        if (result != null) {
+            return result;
+        }
+        performanceEvaluationMapper.updateByPrimaryKeySelective(info);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateLevel(BpoPerformanceLevelParam info) {
+        Result result = handleUpdateLevelParam(info);
+        if (result != null) {
+            return result;
+        }
+        performanceLevelMapper.updateByPrimaryKeySelective(info);
+        return Result.success();
+    }
+
+    @Override
+    public Result getResult(BpoEvaluationResultParam info) {
+        if (info.getSupplierInfoId() == null && info.getEvaluationTime() == null) {
+            return Result.requestParamError();
+        }
+        BpoEvaluationResult bpoEvaluationResultShow = evaluationResultMapper.getResult(info);
+        Result<BpoEvaluationResult> result = new Result<>(REQUEST_SUCCESS);
+        result.setData(bpoEvaluationResultShow);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addResult(BpoEvaluationResultParam info) {
+        Result result = handleAddResultParam(info);
+        if (result != null) {
+            return result;
+        }
+        evaluationResultMapper.insertSelective(info);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteResult(Integer id) {
+        //复用
+        return evaluationService.deleteResult(id);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateResult(BpoEvaluationResultParam info) {
+        Result result = handleUpdateResultParam(info);
+        if (result != null) {
+            return result;
+        }
+        evaluationResultMapper.updateByPrimaryKeySelective(info);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addEvaluationDetail(BpoEvaluationParam info) {
+//        Integer projectId = info.getProjectId();
+        Integer supplierInfoId = info.getSupplierInfoId();
+        List<BpoEvaluationItem> bpoEvaluationItemList = info.getBpoEvaluationItemList();
+        for (BpoEvaluationItem bpoEvaluationItem : bpoEvaluationItemList) {
+//            bpoEvaluationItem.setProjectId(projectId);
+            bpoEvaluationItem.setSupplierInfoId(supplierInfoId);
+            if (bpoEvaluationItem.getId() == null) {
+                bpoEvaluationItemMapper.insertSelective(bpoEvaluationItem);
+            }
+            Integer bpoEvaluationItemId = bpoEvaluationItem.getId();
+            List<BpoEvaluationContent> bpoEvaluationContentList = bpoEvaluationItem.getBpoEvaluationContentList();
+            for (BpoEvaluationContent bpoEvaluationContent : bpoEvaluationContentList) {
+                if (bpoEvaluationContent.getId() == null) {
+                    bpoEvaluationContent.setEvaluationItemId(bpoEvaluationItemId);
+                    bpoEvaluationContentMapper.insertSelective(bpoEvaluationContent);
+                }
+                Integer bpoEvaluationContentId = bpoEvaluationContent.getId();
+                List<BpoEvaluationStandard> bpoEvaluationStandardList = bpoEvaluationContent.getBpoEvaluationStandardList();
+                for (BpoEvaluationStandard bpoEvaluationStandard : bpoEvaluationStandardList) {
+                    bpoEvaluationStandard.setEvaluationContentId(bpoEvaluationContentId);
+                    bpoEvaluationStandardMapper.insertSelective(bpoEvaluationStandard);
+                }
+            }
+        }
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateEvaluationDetail(BpoEvaluationParam info) {
+        //复用
+        return evaluationService.updateEvaluationDetail(info);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteEvaluationDetail(Integer id, Integer type) {
+        //复用
+        return evaluationService.deleteEvaluationDetail(id,type);
+    }
+
+    @Override
+    public Result<BpoEvaluationShow> getEvaluationDetail(Integer supplierInfoId) {
+
+        BpoEvaluationShow info = bpoEvaluationItemMapper.findEvaluationShowBySupplierInfoId(supplierInfoId);
+        Result<BpoEvaluationShow> result = new Result<>(REQUEST_SUCCESS);
+        result.setData(info);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addEvaluationScoringResult(BpoEvaluationParam info) {
+        List<BpoEvaluationItem> bpoEvaluationItemList = info.getBpoEvaluationItemList();
+        String resultRecordDate = info.getResultRecordDate();
+//        Integer projectId = null;
+        Integer supplierInfoId = null;
+        List<BpoEvaluationResultRecord> bpoEvaluationResultRecords = new ArrayList<>();
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+        BigDecimal resultScore = new BigDecimal("0");
+        //生成考核结果
+        for (BpoEvaluationItem bpoEvaluationItem : bpoEvaluationItemList) {
+            String evaluationItemName = bpoEvaluationItem.getEvaluationItemName();
+            Integer weight = bpoEvaluationItem.getWeight();
+//            projectId = bpoEvaluationItem.getProjectId();
+            supplierInfoId = bpoEvaluationItem.getSupplierInfoId();
+            Integer bpoEvaluationItemId = bpoEvaluationItem.getId();
+            List<BpoEvaluationContent> bpoEvaluationContentList = bpoEvaluationItem.getBpoEvaluationContentList();
+            for (BpoEvaluationContent bpoEvaluationContent : bpoEvaluationContentList) {
+                Integer bpoEvaluationContentId = bpoEvaluationContent.getId();
+                String evaluationContentName = bpoEvaluationContent.getEvaluationContentName();
+                List<BpoEvaluationStandard> bpoEvaluationStandardList = bpoEvaluationContent.getBpoEvaluationStandardList();
+                for (BpoEvaluationStandard bpoEvaluationStandard : bpoEvaluationStandardList) {
+                    Integer singleWeight = bpoEvaluationStandard.getSingleWeight();
+                    String evaluationStandardName = bpoEvaluationStandard.getEvaluationStandardName();
+                    Integer score = bpoEvaluationStandard.getScore();
+                    Integer scoreType = bpoEvaluationStandard.getScoreType();
+                    Integer singleScore = bpoEvaluationStandard.getSingleScore();
+                    Integer evaluationStandardId = bpoEvaluationStandard.getId();
+                    Integer upperLimit = bpoEvaluationStandard.getUpperLimit();
+                    ////判断考核结果是否存在,存在就更新,不存在添加
+                    BpoEvaluationResultRecord bpoEvaluationResultRecord =
+                            bpoEvaluationResultRecordMapper.findRecord(bpoEvaluationItemId, evaluationStandardId, bpoEvaluationContentId,resultRecordDate);
+                    boolean isAdd = false;
+                    if (bpoEvaluationResultRecord == null) {
+                        bpoEvaluationResultRecord = new BpoEvaluationResultRecord();
+                        isAdd = true;
+                    }
+//                    bpoEvaluationResultRecord.setProjectId(projectId);
+                    bpoEvaluationResultRecord.setSupplierInfoId(supplierInfoId);
+                    bpoEvaluationResultRecord.setWeight(weight);
+                    bpoEvaluationResultRecord.setSingleWeight(singleWeight);
+                    bpoEvaluationResultRecord.setEvaluationContentId(bpoEvaluationContentId);
+                    bpoEvaluationResultRecord.setEvaluationContentName(evaluationContentName);
+                    bpoEvaluationResultRecord.setEvaluationItemId(bpoEvaluationItemId);
+                    bpoEvaluationResultRecord.setEvaluationItemName(evaluationItemName);
+                    bpoEvaluationResultRecord.setEvaluationStandardId(evaluationStandardId);
+                    bpoEvaluationResultRecord.setEvaluationStandardName(evaluationStandardName);
+                    bpoEvaluationResultRecord.setScore(score);
+                    bpoEvaluationResultRecord.setScoreType(scoreType);
+                    bpoEvaluationResultRecord.setSingleScore(singleScore);
+                    bpoEvaluationResultRecord.setEvaluationTime(resultRecordDate);
+                    bpoEvaluationResultRecord.setUpperLimit(upperLimit);
+                    bpoEvaluationResultRecord.setUserId(userId);
+                    BigDecimal b1 = new BigDecimal(String.valueOf(singleWeight * score));
+                    BigDecimal b2 = new BigDecimal("0.01");
+                    BigDecimal multiply = b1.multiply(b2);
+                    bpoEvaluationResultRecord.setWeightedScore(multiply.toString());
+                    resultScore = resultScore.add(multiply);
+
+                    if (isAdd){
+                        bpoEvaluationResultRecords.add(bpoEvaluationResultRecord);
+                    }else {
+                        bpoEvaluationResultRecordMapper.updateByPrimaryKeySelective(bpoEvaluationResultRecord);
+                    }
+                }
+            }
+        }
+        //查询考核结果,判断更新和添加
+        //Integer resultId = bpoEvaluationResultRecordMapper.findResultIdBYProjectIdAndTime(projectId, resultRecordDate);
+        Integer resultId = bpoEvaluationResultRecordMapper.findResultIdBYSupplierInfoIdAndTime(supplierInfoId, resultRecordDate);
+        if (resultId == null) {
+            BpoEvaluationResult bpoEvaluationResult = new BpoEvaluationResult();
+//            bpoEvaluationResult.setProjectId(projectId);
+            bpoEvaluationResult.setSupplierInfoId(supplierInfoId);
+            bpoEvaluationResult.setUserId(userId);
+            bpoEvaluationResult.setGrade(resultScore.toString());
+            evaluationResultMapper.insertSelective(bpoEvaluationResult);
+            resultId = bpoEvaluationResult.getId();
+        } else {
+            List<BpoEvaluationResultRecord> recordByResultId = bpoEvaluationResultRecordMapper.findRecordByResultId(resultId);
+            resultScore = new BigDecimal("0");
+            for (BpoEvaluationResultRecord bpoEvaluationResultRecord : recordByResultId) {
+                resultScore = resultScore.add(new BigDecimal(bpoEvaluationResultRecord.getWeightedScore()));
+            }
+            BpoEvaluationResult bpoEvaluationResult = new BpoEvaluationResult();
+            bpoEvaluationResult.setId(resultId);
+//            bpoEvaluationResult.setProjectId(projectId);
+            bpoEvaluationResult.setSupplierInfoId(supplierInfoId);
+            bpoEvaluationResult.setUserId(userId);
+            bpoEvaluationResult.setGrade(resultScore.toString());
+            evaluationResultMapper.updateByPrimaryKeySelective(bpoEvaluationResult);
+        }
+        //最后添加结果
+        for (BpoEvaluationResultRecord bpoEvaluationResultRecord : bpoEvaluationResultRecords) {
+//            bpoEvaluationResultRecordMapper.findRecord(evaluationItemId, evaluationStandardId, evaluationContentId);
+            bpoEvaluationResultRecord.setResultId(resultId);
+            bpoEvaluationResultRecordMapper.insertSelective(bpoEvaluationResultRecord);
+        }
+        return Result.success();
+    }
+
+    @Override
+    public Result updateEvaluationScoringResult(BpoEvaluationParam info) {
+        List<BpoEvaluationItem> bpoEvaluationItemList = info.getBpoEvaluationItemList();
+        String resultRecordDate = info.getResultRecordDate();
+        Integer resultId = null;
+        for (BpoEvaluationItem bpoEvaluationItem : bpoEvaluationItemList) {
+            String evaluationItemName = bpoEvaluationItem.getEvaluationItemName();
+            Integer weight = bpoEvaluationItem.getWeight();
+//            Integer projectId = bpoEvaluationItem.getProjectId();
+            Integer supplierInfoId = bpoEvaluationItem.getSupplierInfoId();
+            Integer bpoEvaluationItemId = bpoEvaluationItem.getId();
+            List<BpoEvaluationContent> bpoEvaluationContentList = bpoEvaluationItem.getBpoEvaluationContentList();
+            for (BpoEvaluationContent bpoEvaluationContent : bpoEvaluationContentList) {
+                Integer bpoEvaluationContentId = bpoEvaluationContent.getId();
+                String evaluationContentName = bpoEvaluationContent.getEvaluationContentName();
+                List<BpoEvaluationStandard> bpoEvaluationStandardList = bpoEvaluationContent.getBpoEvaluationStandardList();
+                for (BpoEvaluationStandard bpoEvaluationStandard : bpoEvaluationStandardList) {
+                    Integer singleWeight = bpoEvaluationStandard.getSingleWeight();
+                    String evaluationStandardName = bpoEvaluationStandard.getEvaluationStandardName();
+                    Integer score = bpoEvaluationStandard.getScore();
+                    Integer scoreType = bpoEvaluationStandard.getScoreType();
+                    Integer singleScore = bpoEvaluationStandard.getSingleScore();
+                    Integer evaluationStandardId = bpoEvaluationStandard.getId();
+                    BpoEvaluationResultRecord bpoEvaluationResultRecord = new BpoEvaluationResultRecord();
+                    Integer recordId = bpoEvaluationStandard.getRecordId();
+                    bpoEvaluationResultRecord.setId(recordId);
+//                    bpoEvaluationResultRecord.setProjectId(projectId);
+                    bpoEvaluationResultRecord.setSupplierInfoId(supplierInfoId);
+                    bpoEvaluationResultRecord.setWeight(weight);
+                    bpoEvaluationResultRecord.setSingleWeight(singleWeight);
+                    bpoEvaluationResultRecord.setEvaluationContentId(bpoEvaluationContentId);
+                    bpoEvaluationResultRecord.setEvaluationContentName(evaluationContentName);
+                    bpoEvaluationResultRecord.setEvaluationItemId(bpoEvaluationItemId);
+                    bpoEvaluationResultRecord.setEvaluationItemName(evaluationItemName);
+                    bpoEvaluationResultRecord.setEvaluationStandardId(evaluationStandardId);
+                    bpoEvaluationResultRecord.setEvaluationStandardName(evaluationStandardName);
+                    bpoEvaluationResultRecord.setScore(score);
+                    bpoEvaluationResultRecord.setScoreType(scoreType);
+                    bpoEvaluationResultRecord.setSingleScore(singleScore);
+                    bpoEvaluationResultRecord.setEvaluationTime(resultRecordDate);
+                    BigDecimal b1 = new BigDecimal(String.valueOf(singleWeight * score));
+                    BigDecimal b2 = new BigDecimal("0.01");
+                    BigDecimal multiply = b1.multiply(b2);
+                    bpoEvaluationResultRecord.setWeightedScore(multiply.toString());
+                    if (resultId == null) {
+                        resultId = bpoEvaluationResultRecordMapper.findResultIdByRecordId(recordId);
+                    }
+                    bpoEvaluationResultRecordMapper.updateByPrimaryKeySelective(bpoEvaluationResultRecord);
+                }
+            }
+        }
+        List<BpoEvaluationResultRecord> bpoEvaluationResultRecords = bpoEvaluationResultRecordMapper.findRecordByResultId(resultId);
+        BigDecimal resultScore = new BigDecimal("0");
+        for (BpoEvaluationResultRecord bpoEvaluationResultRecord : bpoEvaluationResultRecords) {
+            resultScore = resultScore.add(new BigDecimal(bpoEvaluationResultRecord.getWeightedScore()));
+        }
+        BpoEvaluationResult bpoEvaluationResult = new BpoEvaluationResult();
+        bpoEvaluationResult.setId(resultId);
+        bpoEvaluationResult.setGrade(resultScore.toString());
+        evaluationResultMapper.updateByPrimaryKeySelective(bpoEvaluationResult);
+        return Result.success();
+    }
+
+    @Override
+    public Result getResultList(BpoEvaluationResultShow info, Page<BpoEvaluationResultShow> page) {
+        PageHelper.startPage (page.getPageNum (),page.getPageSize ());
+
+        List<BpoEvaluationResultShow> list = evaluationResultMapper.getSupplierResultList(info);
+
+        PageInfo<BpoEvaluationResultShow> pageInfo = new PageInfo<> (list);
+        page.setList (list);
+        page.setTotal (pageInfo.getTotal ());
+        page.setPages (pageInfo.getPages ());
+        return Result.success(page);
+    }
+
+    private Result handleAddEvaluationStandardsParam(BpoPerformanceEvaluationParam bpoPerformanceEvaluationParam) {
+        bpoPerformanceEvaluationParam.setId(null);
+        Integer supplierInfoId = bpoPerformanceEvaluationParam.getSupplierInfoId();
+        if (supplierInfoId == null) {
+            return Result.requestParamError("supplierInfoId is null");
+        }
+        String linkRate = bpoPerformanceEvaluationParam.getLinkRate();
+        if (StringUtils.isEmpty(linkRate)) {
+            return Result.requestParamError("linkRate is null");
+        }
+        String guaranteeRate = bpoPerformanceEvaluationParam.getGuaranteeRate();
+        if (StringUtils.isEmpty(guaranteeRate)) {
+            return Result.requestParamError("guaranteeRate is null");
+        }
+        return null;
+    }
+
+    private Result handelAddLevelParam(BpoPerformanceLevelParam bpoPerformanceLevelParam) {
+        bpoPerformanceLevelParam.setId(null);
+
+        String performanceLevel = bpoPerformanceLevelParam.getPerformanceLevel();
+        if (StringUtils.isEmpty(performanceLevel)) {
+            return Result.requestParamError("performanceLevel is null");
+        }
+        Integer upperLimit = bpoPerformanceLevelParam.getUpperLimit();
+        if (upperLimit == null) {
+            return Result.requestParamError("upperLimit is null");
+        }
+        Integer lowerLimit = bpoPerformanceLevelParam.getLowerLimit();
+        if (lowerLimit == null) {
+            return Result.requestParamError("lowerLimit is null");
+        }
+        String feeExpendRateMinimum = bpoPerformanceLevelParam.getFeeExpendRateMinimum();
+        if (StringUtils.isEmpty(feeExpendRateMinimum)) {
+            return Result.requestParamError("feeExpendRateMinimum is null");
+        }
+        Integer increase = bpoPerformanceLevelParam.getIncrease();
+        if (increase == null) {
+            return Result.requestParamError("increase is null");
+        }
+        Integer levelProjectId = bpoPerformanceLevelParam.getProjectId();
+        if (levelProjectId == null) {
+            return Result.requestParamError("levels ProjectId is null");
+        }
+        Integer supplierInfoId = bpoPerformanceLevelParam.getSupplierInfoId();
+        if (supplierInfoId == null){
+            return Result.requestParamError("levels supplierInfoId is null");
+        }
+        return null;
+    }
+
+    private Result handleUpdateEvaluationStandardsParam(BpoPerformanceEvaluationParam bpoPerformanceEvaluationParam) {
+        Integer id = bpoPerformanceEvaluationParam.getId();
+        if (id == null) {
+            return Result.requestParamError("id is null");
+        }
+        Integer supplierInfoId = bpoPerformanceEvaluationParam.getSupplierInfoId();
+        if (supplierInfoId == null) {
+            return Result.requestParamError("supplierInfoId is null");
+        }
+        String linkRate = bpoPerformanceEvaluationParam.getLinkRate();
+        if (StringUtils.isEmpty(linkRate)) {
+            return Result.requestParamError("linkRate is null");
+        }
+        String guaranteeRate = bpoPerformanceEvaluationParam.getGuaranteeRate();
+        if (StringUtils.isEmpty(guaranteeRate)) {
+            return Result.requestParamError("guaranteeRate is null");
+        }
+        return null;
+    }
+
+    private Result handleUpdateLevelParam(BpoPerformanceLevelParam bpoPerformanceLevelParam) {
+        Integer id = bpoPerformanceLevelParam.getId();
+        if (id == null) {
+            return Result.requestParamError("id is null");
+        }
+        String performanceLevel = bpoPerformanceLevelParam.getPerformanceLevel();
+        if (StringUtils.isEmpty(performanceLevel)) {
+            return Result.requestParamError("performanceLevel is null");
+        }
+        Integer upperLimit = bpoPerformanceLevelParam.getUpperLimit();
+        if (upperLimit == null) {
+            return Result.requestParamError("upperLimit is null");
+        }
+        Integer lowerLimit = bpoPerformanceLevelParam.getLowerLimit();
+        if (lowerLimit == null) {
+            return Result.requestParamError("lowerLimit is null");
+        }
+        String feeExpendRateMinimum = bpoPerformanceLevelParam.getFeeExpendRateMinimum();
+        if (StringUtils.isEmpty(feeExpendRateMinimum)) {
+            return Result.requestParamError("feeExpendRateMinimum is null");
+        }
+        Integer increase = bpoPerformanceLevelParam.getIncrease();
+        if (increase == null) {
+            return Result.requestParamError("increase is null");
+        }
+        Integer supplierInfoId = bpoPerformanceLevelParam.getSupplierInfoId();
+        if (supplierInfoId == null) {
+            return Result.requestParamError("levels supplierInfoId is null");
+        }
+        return null;
+    }
+
+    private Result handleAddResultParam(BpoEvaluationResultParam bpoEvaluationResultParam) {
+        bpoEvaluationResultParam.setId(null);
+        Integer supplierInfoId = bpoEvaluationResultParam.getSupplierInfoId();
+        if (supplierInfoId == null) {
+            return Result.requestParamError("supplierInfoId is null");
+        }
+        String grade = bpoEvaluationResultParam.getGrade();
+        if (StringUtils.isEmpty(grade)) {
+            return Result.requestParamError("grade is null");
+        }
+        Integer userId = bpoEvaluationResultParam.getUserId();
+        if (userId == null) {
+            return Result.requestParamError("userId is null");
+        }
+        Integer status = bpoEvaluationResultParam.getStatus();
+        if (status == null) {
+            return Result.requestParamError("status is null");
+        }
+        String evaluationTime = bpoEvaluationResultParam.getEvaluationTime();
+        if (StringUtils.isEmpty(evaluationTime)) {
+            return Result.requestParamError("evaluationTime is null");
+        }
+        return null;
+    }
+
+    private Result handleUpdateResultParam(BpoEvaluationResultParam bpoEvaluationResultParam) {
+        Integer id = bpoEvaluationResultParam.getId();
+        if (id == null) {
+            return Result.requestParamError("id is null");
+        }
+        Integer supplierInfoId = bpoEvaluationResultParam.getSupplierInfoId();
+        if (supplierInfoId == null) {
+            return Result.requestParamError("supplierInfoId is null");
+        }
+        String grade = bpoEvaluationResultParam.getGrade();
+        if (StringUtils.isEmpty(grade)) {
+            return Result.requestParamError("grade is null");
+        }
+        Integer userId = bpoEvaluationResultParam.getUserId();
+        if (userId == null) {
+            return Result.requestParamError("userId is null");
+        }
+        Integer status = bpoEvaluationResultParam.getStatus();
+        if (status == null) {
+            return Result.requestParamError("status is null");
+        }
+        String evaluationTime = bpoEvaluationResultParam.getEvaluationTime();
+        if (StringUtils.isEmpty(evaluationTime)) {
+            return Result.requestParamError("evaluationTime is null");
+        }
+        return null;
+    }
+}

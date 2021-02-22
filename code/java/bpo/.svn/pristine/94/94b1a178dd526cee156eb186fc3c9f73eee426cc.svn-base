@@ -1,0 +1,345 @@
+<template>
+  <div class="form main">
+    <CfPanel :title="title" :back-to="backTo">
+      <el-form ref="addModify_from" class="bpoForm" :model="addModify_from" :rules="rules" label-width="120px" :label-position="label_position" :disabled="disabled">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="归属地：" prop="region">
+              <el-cascader
+                ref="myCascader"
+                v-model="addModify_from.region"
+                class="half"
+                :placeholder="ownership"
+                :props="provincialCityFormat"
+                :options="dropDownBox_from.provincialCity"
+                @active-item-change="queryRegion"
+                @change="queryRegionb"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="场地类型：" prop="type">
+              <el-select v-model="addModify_from.type" class="half" placeholder="请选择场地类型">
+                <el-option
+                  v-for="(item,index) in dropDownBox_from.site_type"
+                  :key="index"
+                  :label="item.dictLabel"
+                  :value="item.dictValue"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属大区：" prop="regionName">
+              <el-input v-model="addModify_from.regionName" class="half" placeholder="请输入场地所属大区名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属业务区：" prop="businessName">
+              <el-input v-model="addModify_from.businessName" class="half" placeholder="请输入场地所属业务区名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="场地名称：" prop="transferName">
+              <el-input v-model="addModify_from.transferName" class="half" placeholder="请输入场地名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="场地编号：" prop="transferCode">
+              <el-input v-model="addModify_from.transferCode" class="half" placeholder="请输入场地编码" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="负责人：" prop="linkMan">
+              <el-input v-model="addModify_from.linkMan" class="half" placeholder="负责人" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系方式：" prop="phone">
+              <el-input v-model="addModify_from.phone" class="half" placeholder="请输入场地负责人联系方式" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否启用：" prop="status">
+              <el-radio-group v-model="addModify_from.status" class="half" fill="#FF6B00">
+                <el-radio :label="1">启用</el-radio>
+                <el-radio :label="2">禁用</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：" prop="remark">
+              <el-input v-model="addModify_from.remark" type="textarea" class="half" :autosize="{ minRows:12, maxRows: 20}" placeholder="请输入备注信息" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item class="bpoButtonGroup">
+          <el-button type="primary" size="medium" @click="submit('addModify_from')">提交</el-button>
+          <el-button size="medium" @click="backTo">关闭</el-button>
+        </el-form-item>
+      </el-form>
+    </CfPanel>
+  </div>
+</template>
+
+<script type="text/javascript">
+// 请求方法加载
+import { getAllProvince, getCity, getDistrict, findStationType, insert, findDetail, update } from '@/api/systemManage/siteManage/siteManage'
+// 整体页面加载
+import CfPanel from '@/components/Panel'
+// 验证规则
+import siteVerification from './siteVerification'
+export default {
+  name: 'NewSite',
+  components: { CfPanel },
+  data() {
+    return {
+      // title
+      title: this.$route.query.id ? '修改场地' : '增加场地',
+      // label以左边排列right
+      label_position: 'right',
+      // 初始化增加场地下拉框数据
+      addModify_from: {
+        status: 1
+      },
+      dropDownBox_from: {
+        site_type: [], // 场地类型数据
+        provincialCity: [] // 省市区数据
+      },
+      // 设置省市区格式
+      provincialCityFormat: {
+        label: 'name',
+        value: 'code',
+        children: 'children'
+      },
+      // 设置验证规则
+      rules: siteVerification,
+      // 设置
+      Add_modify: this.$route.query.id,
+      disabled: this.$route.query.disabled,
+      ownership: '请选择'
+    }
+  },
+  created() {
+    // 获取全部的省
+    this.getAllProvince()
+    // 获取场地类型列表
+    this.findStationType()
+    // 获取场地详情  当this.$route.query.id为true时
+    if (this.Add_modify) {
+      this.findDetail(this.Add_modify)
+    }
+    if (this.disabled) {
+      this.title = '场地详情'
+    }
+  },
+  mounted() {
+
+  },
+  methods: {
+    // 增加与修改场地
+    submit(e) {
+      this.$refs['addModify_from'].validate((valid) => {
+        if (valid) {
+          this.addModify_from.provinceId = this.addModify_from.region[0]
+          this.addModify_from.cityId = this.addModify_from.region[1]
+          this.addModify_from.districtId = this.addModify_from.region[2]
+          const addModify_from = {
+            provinceId: this.addModify_from.provinceId, // 省id
+            provinceName: this.addModify_from.provinceName, // 省名称
+            cityId: this.addModify_from.cityId, // 市id
+            cityName: this.addModify_from.cityName, // 市名称
+            districtId: this.addModify_from.districtId, // 区id
+            districtName: this.addModify_from.districtName, // 区名称
+            type: this.addModify_from.type, // 场地类型
+            regionName: this.addModify_from.regionName, // 场地所属大区名称
+            businessName: this.addModify_from.businessName, // 场地所属业务区名称
+            transferName: this.addModify_from.transferName, // 场地名称
+            transferCode: this.addModify_from.transferCode, // 场地编码
+            linkMan: this.addModify_from.linkMan, // 负责人
+            phone: this.addModify_from.phone, // 负责人手机号
+            remark: this.addModify_from.remark, // 备注
+            status: this.addModify_from.status
+          }
+          if (this.Add_modify) {
+            this.update(addModify_from)
+          } else {
+            this.insert(addModify_from)
+          }
+        }
+      })
+    },
+    // 取消
+    backTo() {
+      this.$router.go(-1)
+    },
+    // 新增场地
+    insert(addModify_from) {
+      insert({
+        ...addModify_from
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 20000) {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '新增成功！',
+            type: 'success'
+          })
+          this.$router.go(-1)
+        } else {
+          this.$notify({
+            title: '失败',
+            duration: '2000',
+            message: res.data.message,
+            type: 'error'
+          })
+        }
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 修改场地
+    update(addModify_from) {
+      update({
+        id: this.addModify_from.id,
+        ...addModify_from
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 20000) {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '修改成功！',
+            type: 'success'
+          })
+          this.$router.go(-1)
+        } else {
+          this.$notify({
+            title: '失败',
+            duration: '2000',
+            message: res.data.message,
+            type: 'error'
+          })
+        }
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 场地详情
+    findDetail(id) {
+      findDetail({ id }).then((res) => {
+        console.log(res)
+        const list = res.data.data
+        const region = [res.data.data.provinceId, res.data.data.cityId, res.data.data.districtId]
+        this.ownership = res.data.data.provinceName + '/' + res.data.data.cityName + '/' + res.data.data.districtName
+        this.$set(list, 'transferCode', res.data.data.code)
+        this.$set(list, 'transferName', res.data.data.name)
+        this.$set(list, 'region', region)
+        this.addModify_from = list
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 动态设置省市区
+    queryRegionb() {
+      this.addModify_from.provinceName = this.$refs.myCascader.getCheckedNodes()[0].pathLabels[0]
+      this.addModify_from.cityName = this.$refs.myCascader.getCheckedNodes()[0].pathLabels[1]
+      this.addModify_from.districtName = this.$refs.myCascader.getCheckedNodes()[0].pathLabels[2]
+    },
+    // // 动态获取市 区
+    queryRegion(e) {
+      if (e.length === 1) {
+        this.getCity(e[0])
+      } else if (e.length === 2) {
+        this.getDistrict(e[1])
+      }
+      if (this.addModify_from.length >= 3) {
+        this.addModify_from.provinceId = this.addModify_from[0]
+        this.addModify_from.cityId = this.addModify_from[1]
+        this.addModify_from.districtId = this.addModify_from[2]
+      }
+    },
+    // 获取全部的省
+    getAllProvince() {
+      getAllProvince({
+      }).then((res) => {
+        const list = res.data.data
+        list.map(item => {
+          this.$set(item, 'children', [])
+        })
+        this.dropDownBox_from.provincialCity = list
+        // console.log(this.addModify_from.provincialCity)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 根据code获取市
+    getCity(code) {
+      getCity({ code }).then((res) => {
+        const list = res.data.data
+        // console.log(list)
+        list.map(item => {
+          // console.log(item)
+          this.$set(item, 'children', [])
+        })
+        this.dropDownBox_from.provincialCity.map((item, i) => {
+          // console.log(item.code)
+          if (item.code === code) {
+            item.children = list
+          }
+        })
+        // console.log(this.addModify_from.provincialCity)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 根据code获取区
+    getDistrict(code) {
+      getDistrict({ code }).then((res) => {
+        const list = res.data.data
+        this.dropDownBox_from.provincialCity.map((item, i) => {
+          item.children.map((item, i) => {
+            if (item.code === code) {
+              item.children = list
+            }
+          })
+        })
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 获取场地类型列表
+    findStationType() {
+      findStationType({}).then((res) => {
+        this.dropDownBox_from.site_type = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    }
+  }
+}
+</script>
+<style lang="scss">
+</style>

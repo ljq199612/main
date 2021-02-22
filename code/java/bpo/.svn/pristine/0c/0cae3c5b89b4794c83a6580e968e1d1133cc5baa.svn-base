@@ -1,0 +1,93 @@
+package com.rz.iot.bpo.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.model.BpoSupplierInfo;
+import com.rz.iot.bpo.model.BpoTransferStation;
+import com.rz.iot.bpo.model.SysCompany;
+import com.rz.iot.bpo.model.show.BpoPartyAListShow;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.*;
+import com.rz.iot.bpo.model.show.*;
+
+import java.util.List;
+
+public interface ProjectService {
+    Result<BpoProjectDetailShow> detail(int id);
+
+    Result<ProjectConfigParam> addProjectConfig(ProjectConfigParam configParam);
+
+    Result addProjectBasicInformation(ProjectBasicInformationParam projectBasicInformationParam);
+
+    Result addFeeRulePartyA(List<BpoFeeRuleParam> bpoFeeRuleParamList);
+
+
+//    Result addFeeRulePartyB(List<BpoFeeRuleParam> bpoFeeRuleParamList);
+
+    Result createProject();
+
+    Result<ProjectConfigShow> getProjectConfig(int id);
+
+    Result<ProjectComputationalFeeRuleShow> getComputationalFeeRule(int id);
+
+    Result updateProductPrice(List<ProductPriceParam> productPriceParamList);
+
+    Result updateFeeRule(List<FeeRuleParam> updateProductPriceParamList);
+
+    Result<BpoProjectCache> getCache();
+
+    Result addFeeRule(List<FeeRuleParam> addProductPriceParamList);
+
+    Result addProductPrice(List<ProductPriceParam> addProductPriceParamList);
+
+    Result deleteFeeRule(int id, int projectId);
+
+    Result deleteProductPrice(int[] id);
+
+    Result<BpoPartyAListShow> getPartyAList();
+
+    Result<BpoContractInfoShow> getContractList(int partyAId);
+
+    Result<BpoSupplierShow> getSupplierList();
+
+    Result addProjectSupplier(ProjectSupplierParam projectSupplierParam);
+
+    Result<BpoSupplierListRelatedShow> getSupplierListRelatedByProjectId(int projectId);
+
+    Result<List<SysCompany>> getSupplierListUnrelated(int projectId);
+
+    Result<NameOrCodeExistsShow> isNameOrCodeExists(String name,String code);
+
+    Result<SysCompany> getUserCompany();
+
+    Result getProjectSnToCreate(BpoProjectSnParam bpoProjectSnParam);
+
+    Result<List<BpoTransferStation>> getTransferStationByDistrictId(String areaId);
+
+    Result<BpoContractInfoShow> getContractListByPartyAAndPartyB(int partyAId, int partyBId);
+
+    Result<BpoProjectDetailAllShow> detailAll(int id);
+
+    Result updateProjectLink(ProjectBasicInformationParam projectBasicInformationParam);
+
+    Result addSupplier(BpoSupplierInfo supplierInfo);
+
+    Result updateSupplier(ProjectSupplierParam projectSupplierParam);
+
+    Result deleteSupplier(int[] projectSupplierParam);
+
+    Result addCreatedProjectConfig(CreatedProjectConfigParam configParam);
+
+    Result deleteCreatedProjectConfig(CreatedProjectConfigParam configParam);
+
+    Result updateCreatedProjectConfig(CreatedProjectConfigParam configParam);
+
+    Result<List<BpoProjectDetailListShow>> getProjectDetailList(Integer transferStationId);
+
+    Result getAllByLoginUserId();
+
+    Result getList(BpoProjectListShow param, Page<BpoProjectListShow> page);
+
+    Result delProject(Integer projectId);
+
+}

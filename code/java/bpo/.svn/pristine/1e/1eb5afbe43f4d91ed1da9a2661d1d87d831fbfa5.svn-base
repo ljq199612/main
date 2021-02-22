@@ -1,0 +1,70 @@
+
+<template>
+  <el-scrollbar wrap-class="scrollbar-wrapper">
+    <el-menu
+      :default-active="$route.path"
+      :collapse="isCollapse"
+      :background-color="variables.menuBg"
+      :text-color="variables.menuText"
+      :active-text-color="variables.menuActiveText"
+      :collapse-transition="false"
+      mode="vertical"
+      unique-opened="true"
+    >
+      <div class="logo-con">
+        <img src="@/assets/logo.png" class="logo" alt="君润">
+        <img src="@/assets/logo-mini.png" class="logo-mini" alt="君润">
+      </div>
+      <sidebar-item
+        v-for="route in permission_routes"
+        :key="route.path"
+        :item="route"
+        :base-path="route.path"
+      />
+    </el-menu>
+  </el-scrollbar>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+import SidebarItem from './SidebarItem'
+import variables from '@/styles/variables.scss'
+
+export default {
+  components: { SidebarItem },
+  computed: {
+    ...mapGetters(['permission_routes', 'sidebar']),
+    variables() {
+      return variables
+    },
+    isCollapse() {
+      return !this.sidebar.opened
+    }
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+.logo-con {
+  height: 64px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.logo-con img {
+  height: 44px;
+  width: auto;
+  display: none;
+  margin: 0 auto;
+}
+.openSidebar .logo-con .logo {
+  display: block;
+}
+.hideSidebar .logo-con {
+  padding: 10px 5px;
+  .logo-mini {
+    display: block;
+    height: 40px;
+  }
+}
+</style>

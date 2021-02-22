@@ -1,0 +1,35 @@
+package com.rz.iot.bpo.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillDayShow;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillMonthShow;
+
+import java.util.List;
+
+public interface BpoBillSupplierService {
+
+    /**
+     * 查询供应商所有日账单
+     * @param entity
+     * @param params
+     * @return
+     */
+    List<BpoBillDayShow> selectAllDay(BaseEntity entity, BillSelectParam params);
+
+    /**
+     * 查询供应商所有月账单
+     * @param entity
+     * @param params
+     * @return
+     */
+    List<BpoBillMonthShow> selectAllMonth(BaseEntity entity, BillSelectParam params);
+
+    /**
+     * 根据供应商日账单表id，获取此账单下的员工明细账单
+     * @param id
+     * @return
+     */
+    BpoBillDayShow findDayDetail(Integer id);
+
+}

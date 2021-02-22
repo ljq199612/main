@@ -1,0 +1,53 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillDayShow;
+import com.rz.iot.bpo.service.BpoBillPayableSupplierService;
+import com.rz.iot.bpo.service.BpoBillReceivableService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * @program: bpo-preview
+ * @description: 账单应收
+ * @author: YangShun
+ * @create: 2020-07-28 17:09
+ **/
+@RestController
+@RequestMapping("BpoBillReceivable")
+public class BpoBillReceivableController {
+
+    @Resource
+    private BpoBillReceivableService bpoBillReceivableService;
+
+    @Resource
+    private BpoBillPayableSupplierService payableSupplierService;
+
+    @GetMapping("findAllMonth")
+    public Result findAllMonth(BillSelectParam params){
+        List<BpoBillDayShow> bpoBillDayShows = payableSupplierService.selectAllDay(new BaseEntity(),params);
+        return Result.success(bpoBillDayShows);
+    }
+
+    @GetMapping("findAllDay")
+    public Result findAllDay(BillSelectParam params){
+        return bpoBillReceivableService.finaAllDay (new BaseEntity (),params);
+    }
+
+    @GetMapping("findDetail")
+    public Result findDetail(Integer id){
+        return bpoBillReceivableService.findDetailDays (id);
+    }
+
+    public Result startCheck(){
+        return null;
+    }
+
+    
+}

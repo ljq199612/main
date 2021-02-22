@@ -1,0 +1,76 @@
+import request from '@/utils/request'
+
+// 条件查询
+export function selectCustomer(query) {
+  return request({
+    url: '/customer/selectCustomerByCondition',
+    method: 'get',
+    params: query
+  })
+}
+// 新增客户
+export function addCustomer(data) {
+  return request({
+    url: '/customer/addCustomer',
+    method: 'post',
+    data
+  })
+}
+
+// 更新客户信息（post）
+export function updateCustomer(data) {
+  return request({
+    url: '/customer/updateCustomer',
+    method: 'post',
+    data
+  })
+}
+
+// 提供获取当前所属的组织架构以及下级
+export function findCanControl(query) {
+  return request({
+    url: '/customer/findCanControl',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询用户部门对应的所有客户以及部门下属所有客户
+export function getDetailById(query) {
+  return request({
+    url: '/customer/getDetailById',
+    method: 'get',
+    params: query
+  })
+}
+
+// 删除一条客户信息
+export function deleteCustomer(query) {
+  return request({
+    url: '/customer/deleteCustomer',
+    method: 'get',
+    params: query
+  })
+}
+
+// 通过id和项目获取单条客户信息
+export function getCustomerById(query) {
+  return request({
+    url: '/customer/getCustomerById',
+    method: 'get',
+    params: query
+  })
+}
+
+// 客户分类 获取
+export function findCustomerTypes(query) {
+  return request({
+    url: '/customer/findType',
+    method: 'get',
+    params: query
+  })
+}
+
+// 下载合同
+// 操作日志-导出
+export const downloadContract = `${process.env.BASE_API}/customer/download`

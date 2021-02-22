@@ -1,0 +1,206 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.SysDept;
+import com.rz.iot.bpo.model.show.*;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.SysOrgRoleMenu;
+import com.rz.iot.bpo.model.param.SysPerParam;
+import com.rz.iot.bpo.model.param.SysRolePerParam;
+import com.rz.iot.bpo.model.show.bpoPerson.SysDeptShow;
+import com.rz.iot.bpo.service.SysPerService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 描述 : 系统权限业务实现
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/22 11:32
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+public class SysPerServiceImpl implements SysPerService {
+    @Resource
+    private SysCompanyRoleUserMapper sysCompanyRoleUserMapper;
+    @Resource
+    private SysOrgRoleMenuMapper sysOrgRoleMenuMapper;
+    @Resource
+    private SysUserModuleRelMapper sysUserModuleRelMapper;
+    @Resource
+    private SysDeptMapper sysDeptMapper;
+
+    /**
+     * 查询所有用户角色类型组织类型
+     * @param sysPerParam 查询参数
+     * @return
+     */
+    @Override
+    public List<SysPerShow> findAllUserRolePer(SysPerParam sysPerParam) {
+        List<SysPerShow> list = sysCompanyRoleUserMapper.findAllUserRolePer(sysPerParam);
+        if(list != null && list.size() > 0){
+            for(SysPerShow sysPerShow : list){
+                SysDept sysDept = sysDeptMapper.selectByPrimaryKey(sysPerShow.getDeptId());
+
+                SysDeptShow sysDeptShow = sysDeptMapper.upFindOrgByDeptId(sysDept.getDeptId(),sysDept.getIsTop());
+                sysPerShow.setSysDeptShow(sysDeptShow);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 新增菜单权限
+     * @param sysRolePerParam
+     * @return
+     */
+    @Override
+    public Result insertMenuPer(SysRolePerParam sysRolePerParam) {
+        if(sysRolePerParam == null || sysRolePerParam.getOrgId() == null || sysRolePerParam.getRoleId() == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+
+        // 获取所有菜单id
+        List<Integer> menuIds = sysRolePerParam.getMenuIds();
+
+        sysOrgRoleMenuMapper.insertMenuPer(sysRolePerParam.getOrgId(),sysRolePerParam.getRoleId(),menuIds);
+
+        return Result.success(null,"新增菜单成功");
+    }
+
+    /**
+     * 删除菜单权限
+     * @param sysPerParam
+     * @return
+     */
+    @Override
+    public Result deleteMenuPer(SysRolePerParam sysPerParam) {
+        // 获取所有菜单id
+        List<Integer> menuIds = sysPerParam.getMenuIds();
+
+        sysOrgRoleMenuMapper.updateMenuPer(sysPerParam.getOrgId(),sysPerParam.getRoleId(),menuIds);
+
+        return Result.success(null,"删除菜单成功");
+    }
+
+    /**
+     * 新增数据权限
+     * @param sysDataPerShow
+     * @return
+     */
+    @Override
+    public Result insertDataPer(List<SysDataPerShow> sysDataPerShow) {
+        sysUserModuleRelMapper.insertDataPer(sysDataPerShow);
+        return Result.success(null,"新增数据权限成功");
+    }
+
+    /**
+     * 删除数据权限
+     * @param sysDataPerShow
+     * @return
+     */
+    @Override
+    public Result deleteDataPer(List<SysDataPerShow> sysDataPerShow) {
+        sysUserModuleRelMapper.delete(sysDataPerShow);
+        return Result.success(null,"删除数据权限成功");
+    }
+
+    /**
+     * 数据权限详情
+     * @param sysPerParam
+     * @return
+     */
+    @Override
+    public Result dataDetail(SysPerParam sysPerParam) {
+        // 设置基本数据,组织,角色,用户
+        SysPerDetailShow sysPerDetailShow = new SysPerDetailShow();
+        sysPerDetailShow.setUserId(sysPerParam.getUserId());
+        sysPerDetailShow.setUsername(sysPerParam.getUsername());
+        sysPerDetailShow.setRoleId(sysPerParam.getRoleId());
+        sysPerDetailShow.setRoleName(sysPerParam.getRoleName());
+        sysPerDetailShow.setOrgId(sysPerParam.getOrgId());
+        sysPerDetailShow.setOrgName(sysPerParam.getOrgName());
+
+        // 部门id
+        Integer deptId = sysPerParam.getDeptId();
+        SysDept sysDept = sysDeptMapper.selectByPrimaryKey(deptId);
+
+        SysDeptShow sysDeptShow = sysDeptMapper.upFindOrgByDeptId(deptId,sysDept.getIsTop());
+        sysPerDetailShow.setSysDeptShow(sysDeptShow);
+
+        // 设置数据权限
+        // 拥有权限
+        List<SysDataPerShow> data = sysUserModuleRelMapper.findDataPerByOrgRoleUser(sysPerParam);
+        sysPerDetailShow.setData(data);
+
+        // 未拥有权限
+        List<SysDataPerShow> unData = sysUserModuleRelMapper.findUnDataPerByOrgRoleUser(sysPerParam);
+        sysPerDetailShow.setUnData(unData);
+        return Result.success(sysPerDetailShow);
+    }
+
+    /**
+     * 查询系统菜单权限
+     * @param sysPerParam
+     * @return
+     */
+    @Override
+    public Result menuDetail(SysPerParam sysPerParam) {
+
+        // 定义结果集
+        SysMenuDetailShow sysMenuDetailShow = new SysMenuDetailShow();
+
+        //
+        sysMenuDetailShow.setRoleName(sysPerParam.getRoleName());
+        sysMenuDetailShow.setOrgName(sysPerParam.getOrgName());
+
+        SysOrgRoleMenu sysOrgRoleMenu = new SysOrgRoleMenu();
+        sysOrgRoleMenu.setOrgId(sysPerParam.getOrgId());
+        sysOrgRoleMenu.setRoleId(sysPerParam.getRoleId());
+
+        // 如果新增时.获取所有菜单权限,则拥有菜单权限为空
+        List<SysMenuShow> menuShow = new ArrayList<>();
+        List<SysMenuShow> unMenuShow;
+        if(sysPerParam.getRoleId() != null && sysPerParam.getOrgId() != null){
+            // 单个详情
+            menuShow = sysOrgRoleMenuMapper.findMenuPerByOrgRole(sysOrgRoleMenu);
+            unMenuShow = sysOrgRoleMenuMapper.findUnMenuPerByOrgRole(sysOrgRoleMenu);
+        }else {
+            // 新增时,查询所有菜单
+            unMenuShow = sysOrgRoleMenuMapper.getAllMenuChildren();
+        }
+        sysMenuDetailShow.setMenuShow(menuShow);
+
+        sysMenuDetailShow.setUnMenuShow(unMenuShow);
+        return Result.success(sysMenuDetailShow);
+    }
+
+    /**
+     * 查询菜单中未关联组织中的角色
+     * @param orgKey
+     * @return
+     */
+    @Override
+    public Result findUnRelRoleByOrgKey(String orgKey) {
+        List<Map<String,Object>> map = sysOrgRoleMenuMapper.findUnRelRoleByOrgKey(orgKey);
+        return Result.success(map);
+    }
+
+    /**
+     * 查询所有角色菜单权限
+     * @param sysPerMenuShow
+     * @return
+     */
+    @Override
+    public List<SysPerMenuShow> findMenuAll(SysPerMenuShow sysPerMenuShow) {
+        List<SysPerMenuShow> list = sysOrgRoleMenuMapper.findMenuAll(sysPerMenuShow);
+        return list;
+    }
+}

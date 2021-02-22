@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoWorkModelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoWorkModel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sys_work_module_rel_id" property="sysWorkModuleRelId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="module_code" property="moduleCode" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, sys_work_module_rel_id, project_id, model_name, status, module_code, sort, create_time,
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_work_model
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_work_model
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoWorkModel" >
+    insert into bpo_work_model (id, sys_work_module_rel_id, project_id,
+      model_name, status, module_code,
+      sort, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{sysWorkModuleRelId,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER},
+      #{modelName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{moduleCode,jdbcType=VARCHAR},
+      #{sort,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoWorkModel" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into bpo_work_model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sysWorkModuleRelId != null" >
+        sys_work_module_rel_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="modelName != null" >
+        model_name,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="moduleCode != null" >
+        module_code,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sysWorkModuleRelId != null" >
+        #{sysWorkModuleRelId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="modelName != null" >
+        #{modelName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="moduleCode != null" >
+        #{moduleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoWorkModel" >
+    update bpo_work_model
+    <set >
+      <if test="sysWorkModuleRelId != null" >
+        sys_work_module_rel_id = #{sysWorkModuleRelId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="modelName != null" >
+        model_name = #{modelName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="moduleCode != null" >
+        module_code = #{moduleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoWorkModel" >
+    update bpo_work_model
+    set sys_work_module_rel_id = #{sysWorkModuleRelId,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=INTEGER},
+      model_name = #{modelName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      module_code = #{moduleCode,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

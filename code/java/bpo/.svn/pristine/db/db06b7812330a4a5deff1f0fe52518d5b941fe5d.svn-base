@@ -1,0 +1,136 @@
+<template>
+  <el-dialog
+    class="bpoDialog addModuleDialog"
+    title="添加工作模块"
+    :visible="addModuleDialogVisible"
+    :before-close="close"
+  >
+    <el-form
+      ref="addModuleDialogForm"
+      label-width="90px"
+      :model="addModuleDialogForm"
+      :rules="addModuleDialogRules"
+    >
+      <el-form-item
+        v-for="(value, name) in addModuleDialogForm"
+        :key="name"
+        label="模块名称："
+        :prop="name"
+      >
+        <el-input v-model="addModuleDialogForm[name]" />
+        <span
+          v-if="name === 'sysModules0'"
+          class="moduleBtn"
+          @click="addModuleItem"
+        ><i class="el-icon-circle-plus" /></span>
+        <span
+          v-else
+          class="moduleBtn"
+          @click="removeModuleItem(name)"
+        ><i class="el-icon-remove" /></span>
+      </el-form-item>
+      <el-form-item class="bpoButtonGroup pull-right">
+        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button @click="close">关闭</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
+</template>
+
+<script>
+import { caculateObjectLength } from './../utils/utils'
+export default {
+  props: {
+    // 新增模块弹窗
+    addModuleDialogVisible: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      // 新增模块弹窗数据
+      addModuleDialogForm: {
+        sysModules0: ''
+      },
+      // 新增模块弹窗校验规则
+      addModuleDialogRules: {
+        sysModules0: {
+          required: true,
+          message: '请输入模块名称',
+          trigger: 'blur'
+        }
+      }
+    }
+  },
+  methods: {
+    /**
+     * 工作模块弹窗，新增模块项
+     */
+    addModuleItem() {
+      // 生成模块字段
+      const index = caculateObjectLength(this.addModuleDialogForm)
+      const name = 'sysModules' + index
+      this.$set(this.addModuleDialogForm, name, '')
+      // 生成校验规则
+      const ruleItem = {
+        required: true,
+        message: '请输入模块名称',
+        trigger: 'blur'
+      }
+      this.$set(this.addModuleDialogRules, name, ruleItem)
+    },
+    /**
+     * 工作模块弹窗，删除模块项
+     */
+    removeModuleItem(name) {
+      const addModuleDialogForm = JSON.parse(
+        JSON.stringify(this.addModuleDialogForm)
+      )
+      delete addModuleDialogForm[name]
+      this.$set(this, 'addModuleDialogForm', addModuleDialogForm)
+    },
+    submit() {
+      this.$refs['addModuleDialogForm'].validate((valid) => {
+        if (valid) {
+          const arr = []
+          // 构建脑图数据
+          for (const key in this.addModuleDialogForm) {
+            if (this.addModuleDialogForm.hasOwnProperty(key)) {
+              arr.push({
+                name: this.addModuleDialogForm[key],
+                id: this.addModuleDialogForm[key],
+                level: 1 // 第一级数据
+              })
+            }
+          }
+          this.$emit('addModule', arr)
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    close() {
+      this.$emit('hideAddModuleDialog')
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+// 添加模块弹窗
+.addModuleDialog {
+  .el-dialog {
+    width: 500px;
+  }
+  .el-form-item__content {
+    display: flex;
+  }
+  .moduleBtn {
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 22px;
+  }
+}
+</style>

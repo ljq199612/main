@@ -1,0 +1,377 @@
+<template>
+  <CfPanel :title="title" :back-to="backTo" class="main">
+    <el-form
+      ref="addForm"
+      class="bpoForm"
+      :model="addForm"
+      label-width="180px"
+      :rules="addFormRules"
+    >
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="项目名称" prop="name">
+            <el-select v-model="addForm.projectId" :disabled="isUpdate" placeholder="请选择项目" class="half">
+              <el-option v-for="(item,index) in projectOptions" :key="index" :label="item.projectName" :value="item.projectId" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="项目编号" prop="creditCode">
+            <el-input v-model="addForm.creditCode" disabled placeholder="请输入项目编号" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="场地" prop="legalName">
+            <el-select v-model="addForm.dictId" disabled placeholder="请选择场地" class="half">
+              <el-option v-for="(item,index) in siteOptions" :key="index" :label="item.dictName" :value="item.dictId" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="供应商" prop="linkMan">
+            <el-select v-model="addForm.dictId" :disabled="!addForm.projectId" placeholder="请选择供应商" class="half">
+              <el-option v-for="(item,index) in siteOptions" :key="index" :label="item.dictName" :value="item.dictId" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="考核周期" prop="linkManPhone">
+            <el-date-picker
+              v-model="evaluationTime"
+              class="half"
+              type="month"
+              placeholder="请选择考核周期"
+              value-format="yyyy-MM"
+              :disabled="isUpdate"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="费用支付比例(Q)" prop="belogGroupName">
+            <el-input v-model="QValue" disabled placeholder="请输入费用支付比例" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="绩效考核后的应付款(T)(元)" prop="groupId">
+            <el-input v-model="TValue" disabled placeholder="请输入绩效考核后的应付款" class="half" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+
+    <div class="page-body-title">考核打分
+      <el-button type="primary" icon="icon-export" style="float:right;margin-right:80px;margin-top: -10px" @click="exportBtn">
+        导出
+      </el-button>
+      <span class="expland-tool" @click="toggleDetail">默认收起</span>
+    </div>
+    <el-table
+      :data="tableData"
+      class="bpoTable"
+      fit
+    >
+      <el-table-column align="center" type="index" label="序号" width="80" />
+      <el-table-column show-overflow-tooltip align="left" label="纬度" min-width="80" prop="name">
+        <template slot-scope="scope">{{ scope.row.evaluationItemName }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="分纬度" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="考核指标" min-width="80" prop="belogGroupName">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="right" label="单项权重" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.singleWeight }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="指标说明" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="计分标准" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="单项扣/加分" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.singleScore }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="right" label="单项得分" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="right" label="加权后得分" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="right" label="最终得分" min-width="80" prop="creditCode">
+        <template slot-scope="scope">{{ scope.row.a }}</template>
+      </el-table-column>
+    </el-table>
+
+    <div class="page-body-title">费用支付比例<span class="expland-tool" @click="toggleDetail">默认收起</span></div>
+    <template v-for="(reteItem, index) in rateList">
+      <el-form
+        :key="index"
+        ref="reteItem"
+        size="mini"
+        class="rate-form"
+        inline
+        :model="reteItem"
+        label-width="120px"
+        :rules="addFormRules"
+      >
+        <el-form-item label="评定等级：" prop="creditCode">
+          <el-input v-model="reteItem.performanceLevel" disabled placeholder="请输入评定等级" />
+        </el-form-item>
+        <el-form-item label="分数：" prop="legalName">
+          <el-input v-model="reteItem.lowerLimit" disabled placeholder="请输入分数下限值" />
+        </el-form-item>
+        <el-form-item>
+          ~
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="reteItem.upperLimit" disabled placeholder="请输入分数上限值" />
+        </el-form-item>
+        <el-form-item label="支付比例(Q):" prop="linkMan">
+          <el-input v-model="reteItem.feeExpendRateMinimum" disabled placeholder="请输入挂钩比例" />
+        </el-form-item>
+      </el-form>
+    </template>
+
+    <div class="page-body-title">考核计算<span class="expland-tool" @click="toggleDetail">默认收起</span></div>
+    <el-form
+      ref="calcForm"
+      class="bpoForm"
+      :model="calcForm"
+      label-width="180px"
+      :rules="addFormRules"
+    >
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="保证金(D)">
+            <el-input v-model="calcForm.cashDeposit" disabled placeholder="请输入保证金" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="保证金比例(Pd)(%)">
+            <el-input v-model="calcForm.guaranteeRate" disabled placeholder="请输入保证金比例" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="劳务费用(L)(元)">
+            <el-input v-model="calcForm.laborCost" disabled placeholder="请输入劳务费用" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="挂钩比例(P)(%)">
+            <el-input v-model="calcForm.linkRate" disabled placeholder="请输入挂钩比例" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="计算公式">
+            <el-input
+              v-model="calcFormula"
+              class="half"
+              type="textarea"
+              :rows="4"
+              placeholder="请输入计算公式"
+              autocomplete="off"
+              disabled
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="考核额度(K)(元)">
+            <el-input v-model="assessmentQuota" disabled placeholder="请输入考核额度" class="half" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-form-item class="bpoButtonGroup">
+        <el-button type="primary" size="medium" @click="submit">提交</el-button>
+        <el-button size="medium" plain @click="backTo">关闭</el-button>
+      </el-form-item>
+    </el-form></CfPanel>
+</template>
+<script>
+// 备注：劳务费用(L)(元)通过财务管理接口获取，暂缺
+import { getAssessmentDetail, getLevel, getEvaluationDetail, getbySupplierInfoId, getResult } from '@/api/supplierManage'
+import CfPanel from '@/components/Panel'
+
+export default {
+  name: '',
+  components: {
+    CfPanel
+  },
+  data() {
+    return {
+      isUpdate: Boolean(this.$route.query.supplierInfoId), // 修改考核
+      supplierInfoId: this.$route.query.supplierInfoId,
+      evaluationTime: '',
+      addForm: {},
+      rateList: [], // 费用支付比例列表
+      calcForm: {
+        cashDeposit: '',
+        guaranteeRate: '',
+        laborCost: '100',
+        linkRate: '',
+        assessmentQuota: '', // 考核额度
+        calcFormula: '' // 计算公式
+      },
+      addFormRules: {
+        name: { required: true, message: '请输入甲方名称', trigger: 'blur' },
+        // creditCode: { required: true, message: '请输入统一社会信用代码', trigger: 'blur' },
+        legalName: { required: false, message: '请输入法人代表', trigger: 'blur' },
+        linkMan: { required: true, message: '请输入联系人', trigger: 'blur' },
+        linkManPhone: { required: true, message: '请输入联系方式', trigger: 'blur' }
+      },
+      tableData: [],
+      detailData: {}, // 详情数据
+      projectOptions: [],
+      siteOptions: [],
+      isViewDetail: false
+    }
+  },
+  computed: {
+    title() {
+      return this.isUpdate ? '修改考核' : '新增考核'
+    },
+    assessmentQuota() {
+      if (this.isUpdate) {
+        return this.detailData.assessmentQuota
+      }
+      const { laborCost, linkRate, cashDeposit, guaranteeRate } = this.calcForm
+      const L = laborCost || 0
+      const P = parseFloat(linkRate) / 100 || 0
+      const D = cashDeposit || 0
+      const Pd = parseFloat(guaranteeRate) / 100 || 0
+      const ret = (L * P) + (D * Pd)
+      return (ret || 0).toFixed(2)
+    },
+    calcFormula() {
+      return '请将参数代入公式中计算：\n考核额度(K)(元) K = L*P + D*Pd\n绩效考核后的应付款(T)(元) T = L*(1-P) + K*Q - D*Pd'
+    },
+    QValue() {
+      const ret = 0
+      return `${ret}%`
+    },
+    TValue() {
+      const { laborCost, linkRate, cashDeposit, guaranteeRate } = this.calcForm
+      const L = laborCost || 0
+      const P = parseInt(linkRate) / 100 || 0
+      const D = cashDeposit || 0
+      const Pd = parseInt(guaranteeRate) / 100 || 0
+      const K = this.assessmentQuota
+      const Q = parseFloat(this.QValue) / 100 || 0
+      const ret = L * (1 - P) + (K * Q) - (D * Pd)
+      return (ret || 0).toFixed(2)
+    }
+  },
+  created() {
+    if (this.isUpdate) {
+      // 修改考核，顶部表单除了Q和T值、考核计算有详情接口获取
+      // 费用支付比例、考核计算获取接口与新增相同，考核额度K可以直接取详情接口
+      this.getResult()
+    }
+    this.getAssessmentDetail()
+    this.getEvaluationDetail()
+    this.getLevel()
+    this.getbySupplierInfoId()
+  },
+  methods: {
+    backTo() {
+      this.$router.go(-1)
+    },
+    // 考核计算信息获取
+    getAssessmentDetail() {
+      getAssessmentDetail({
+        supplierInfoId: this.supplierInfoId
+      }).then((res) => {
+        const data = res.data.data || {}
+        this.calcForm.linkRate = data.linkRate
+        this.calcForm.guaranteeRate = data.guaranteeRate
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 费用支付比例列表
+    getLevel() {
+      getLevel({
+        supplierInfoId: this.supplierInfoId
+      }).then((res) => {
+        const data = res.data.data || []
+        this.rateList = data.performanceLevelList
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 展开收起详情
+    toggleDetail() {},
+    // 获取考核打分列表
+    getEvaluationDetail() {
+      getEvaluationDetail({
+        supplierInfoId: this.supplierInfoId
+      }).then((res) => {
+        const data = res.data.data || []
+        this.tableData = data.bpoEvaluationItemList
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    getbySupplierInfoId() {
+      getbySupplierInfoId({
+        supplierInfoId: this.supplierInfoId
+      }).then((res) => {
+        const data = res.data.data || []
+        // 获取考核计算保证金
+        this.calcForm.cashDeposit = data.cashDeposit
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 获取考核结果
+    getResult() {
+      getResult({
+        supplierInfoId: this.supplierInfoId
+      }).then((res) => {
+        const data = res.data.data || []
+        this.detailData = data
+        this.calcForm = data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    exportBtn() {},
+    submit() {}
+  }
+}
+</script>
+<style lang="scss">
+.addassessment-form{
+  .el-form{
+    font-size: 0;
+  }
+  .el-form-item{
+    width: 49%;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 0;
+    .el-input{
+      width: 360px;
+    }
+  }
+}
+.body-footer{
+  margin-top: 26px;
+  padding-bottom: 20px;
+}
+</style>

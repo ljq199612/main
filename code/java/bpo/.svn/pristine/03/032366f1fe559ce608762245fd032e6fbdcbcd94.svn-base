@@ -1,0 +1,21 @@
+import { checkPhone } from '@/utils/validate'
+
+export default {
+  orgType: [{ required: true, message: '请选择组织类型' }], // 组织类型
+  companyName: [{ required: true, message: '请填写组织名称' }], // 组织名称
+  nickName: [{ required: true, message: '请填写组织简称' }], // 组织名称
+  companyCode: [{ required: true, message: '请填写组织编码' }], // 组织代码
+  creditCode: [{ required: true, message: '请填写社会信用统一代码' }], // 社会信用统一代码
+  contacts: [{ required: true, message: '请填写联系人' }], // 联系人
+  legalMan: [{ required: true, message: '请填写法人' }], // 法人
+  address: [{ required: true, message: '请填写联系地址' }], // 地址
+  clientType: [{ required: true, message: '请填写客户类型' }], // 客户类型
+  phone: [{ required: true, message: '请填写联系方式' },
+    {
+      required: true,
+      validator: checkPhone,
+      message: '联系电话格式不正确，请输入正确的中国大陆手机号或本地固定电话',
+      trigger: 'blur'
+    }
+  ]
+}

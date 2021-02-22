@@ -1,0 +1,158 @@
+import request from '@/utils/request'
+// import qs from 'qs'
+/**
+ * 数据权限-查询所有
+ */
+export function findAll(params) {
+  return request({
+    url: '/sysPer/findAll',
+    method: 'post',
+    params: params
+  })
+}
+
+/**
+ * 菜单权限-查询所有
+ */
+export function findMenuAll(params) {
+  return request({
+    url: '/sysPer/findMenuAll',
+    method: 'post',
+    params: params
+  })
+}
+
+/**
+ * 查询用户拥有的菜单权限接口
+ * @param {Number}        params.pageNum 当前页码
+ * @param {String|Number} params.userId  用户id
+ */
+export function menuOwned(data) {
+  return request({
+    url: '/sysPer/findMenuPerByOrgRole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 查询用户未拥有的菜单权限接口
+ * @param {Number}        params.pageNum 当前页码
+ * @param {String|Number} params.userId  用户id
+ */
+export function menuNotOwned(data) {
+  return request({
+    url: '/sysPer/findUnMenuPerByOrgRole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 为用户添加菜单权限接口
+ * @param {String|Number}        params.userId  用户id
+ * @param {Array<String|Number>} params.menuIds 菜单id数组
+ */
+export function addMenu(data) {
+  return request({
+    url: '/sysPer/insertMenuPer',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除用户菜单权限接口
+ * @param {String|Number}        params.userId  用户id
+ * @param {Array<String|Number>} params.menuIds 菜单id数组
+ */
+export function delMenu(data) {
+  return request({
+    url: '/sysPer/deleteMenuPer',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 查询用户拥有的数据权限接口
+ * @param {Number}        params.pageNum 当前页码
+ * @param {String|Number} params.userId  用户id
+ */
+export function dataOwned(params) {
+  return request({
+    url: '/permission/dataOwned',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 查询用户没有的数据权限接口
+ * @param {Number}        params.pageNum 当前页码
+ * @param {String|Number} params.userId  用户id
+ */
+export function dataNotOwned(params) {
+  return request({
+    url: '/permission/dataNotOwned',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 给用户添加数据权限接口
+ * @param {String|Number} params.userId                         用户id
+ * @param {Array<Object>} params.businesses                     业务数组
+ * @param {String|Number} params.businesses[index].businessType 业务类型
+ * @param {String|Number} params.businesses[index].businessId   业务id
+ */
+export function addData(data) {
+  return request({
+    url: '/sysPer/insertDataPer',
+    method: 'post',
+    data: data // qs.stringify({ ...data })
+  })
+}
+
+/**
+ * 删除用户数据权限接口
+ * @param {String|Number} params.userId                         用户id
+ * @param {Array<Object>} params.businesses                     业务数组
+ * @param {String|Number} params.businesses[index].businessType 业务类型
+ * @param {String|Number} params.businesses[index].businessId   业务id
+ */
+export function delData(data) {
+  return request({
+    url: '/sysPer/deleteDataPer',
+    method: 'post',
+    data: data
+  })
+}
+
+export function dataDetail(data) {
+  return request({
+    url: '/sysPer/dataDetail',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 菜单权限-编辑详情
+ **/
+export function menuDetail(data) {
+  return request({
+    url: '/sysPer/menuDetail',
+    method: 'post',
+    params: data
+  })
+}
+
+export function findUnRelRole(params) {
+  return request({
+    url: '/sysPer/findUnRelRole',
+    method: 'post',
+    params: params
+  })
+}

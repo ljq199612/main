@@ -1,0 +1,96 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.aspectj.DataScopeAspect;
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.DataScope;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.BpoClassesGenerateMapper;
+import com.rz.iot.bpo.mapper.BpoProjectMapper;
+import com.rz.iot.bpo.mapper.BpoTransferStationMapper;
+import com.rz.iot.bpo.mapper.SysDeptMapper;
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+import com.rz.iot.bpo.model.BpoProject;
+import com.rz.iot.bpo.model.BpoTransferStation;
+import com.rz.iot.bpo.model.show.personClass.BpoPersonArrangeShow;
+import com.rz.iot.bpo.service.BpoClassesGenerateService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 描述 : 人员安排业务实现
+ * 作者 : Rycony
+ * 创建时间 : 2020/7/29 11:52
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+public class BpoClassesGenerateServiceImpl implements BpoClassesGenerateService {
+    @Resource
+    private BpoClassesGenerateMapper mapper;
+    @Resource
+    private BpoTransferStationMapper stationMapper;
+    @Resource
+    private BpoProjectMapper projectMapper;
+
+    @Override
+    @DataScope(level = DataScopeAspect.DATA_SCOPE_DEPT)
+    public List<BpoPersonArrangeShow> findAll(Integer stationId,Integer projectId) {
+        // 获取当前用户
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+
+        List<BpoPersonArrangeShow> list =  mapper.findAll(new BaseEntity(),stationId,projectId,userId);
+        return list;
+    }
+
+    /**
+     * 查询所有场地信息
+     * @return
+     */
+    @Override
+    @DataScope(level = DataScopeAspect.DATA_SCOPE_DEPT)
+    public Result findStations() {
+        List<BpoTransferStation> list = stationMapper.findAllByLoginUserId(new BaseEntity());
+        return Result.success(list);
+    }
+
+    /**
+     * 根据场地对应项目信息
+     * @param stationId 场地id
+     * @return
+     */
+    @Override
+    public Result findProjects(Integer stationId) {
+        // 获取当前用户
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+
+        // 获取项目信息
+        List<Map<String,Object>> list = projectMapper.findProjectByStationId(userId,stationId);
+        return Result.success(list);
+    }
+
+    /**
+     * 人员安排详情
+     * @param classId
+     * @return
+     */
+    @Override
+    public Result findArrangeDetail(Integer classId) {
+        if(classId == null){
+            return Result.error(ResultConstants.REQUEST_SUCCESS);
+        }
+
+        // 定义结果集
+
+
+        // 获取班次详情
+        BpoClassesGenerate bpoClassesGenerate = mapper.selectByPrimaryKey(classId);
+        return null;
+    }
+}

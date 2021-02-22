@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.WorkflowNodeInstanceMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.WorkflowNodeInstance" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="instance_id" property="instanceId" jdbcType="INTEGER" />
+    <result column="node_id" property="nodeId" jdbcType="INTEGER" />
+    <result column="assignee_role" property="assigneeRole" jdbcType="VARCHAR" />
+    <result column="assignee_user_id" property="assigneeUserId" jdbcType="INTEGER" />
+    <result column="assignee_name" property="assigneeName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, instance_id, node_id, assignee_role, assignee_user_id, assignee_name, status, 
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from workflow_node_instance
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from workflow_node_instance
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.WorkflowNodeInstance" >
+    insert into workflow_node_instance (id, name, instance_id, 
+      node_id, assignee_role, assignee_user_id, 
+      assignee_name, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{instanceId,jdbcType=INTEGER}, 
+      #{nodeId,jdbcType=INTEGER}, #{assigneeRole,jdbcType=VARCHAR}, #{assigneeUserId,jdbcType=INTEGER}, 
+      #{assigneeName,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.WorkflowNodeInstance" >
+    insert into workflow_node_instance
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="instanceId != null" >
+        instance_id,
+      </if>
+      <if test="nodeId != null" >
+        node_id,
+      </if>
+      <if test="assigneeRole != null" >
+        assignee_role,
+      </if>
+      <if test="assigneeUserId != null" >
+        assignee_user_id,
+      </if>
+      <if test="assigneeName != null" >
+        assignee_name,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="instanceId != null" >
+        #{instanceId,jdbcType=INTEGER},
+      </if>
+      <if test="nodeId != null" >
+        #{nodeId,jdbcType=INTEGER},
+      </if>
+      <if test="assigneeRole != null" >
+        #{assigneeRole,jdbcType=VARCHAR},
+      </if>
+      <if test="assigneeUserId != null" >
+        #{assigneeUserId,jdbcType=INTEGER},
+      </if>
+      <if test="assigneeName != null" >
+        #{assigneeName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.WorkflowNodeInstance" >
+    update workflow_node_instance
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="instanceId != null" >
+        instance_id = #{instanceId,jdbcType=INTEGER},
+      </if>
+      <if test="nodeId != null" >
+        node_id = #{nodeId,jdbcType=INTEGER},
+      </if>
+      <if test="assigneeRole != null" >
+        assignee_role = #{assigneeRole,jdbcType=VARCHAR},
+      </if>
+      <if test="assigneeUserId != null" >
+        assignee_user_id = #{assigneeUserId,jdbcType=INTEGER},
+      </if>
+      <if test="assigneeName != null" >
+        assignee_name = #{assigneeName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.WorkflowNodeInstance" >
+    update workflow_node_instance
+    set name = #{name,jdbcType=VARCHAR},
+      instance_id = #{instanceId,jdbcType=INTEGER},
+      node_id = #{nodeId,jdbcType=INTEGER},
+      assignee_role = #{assigneeRole,jdbcType=VARCHAR},
+      assignee_user_id = #{assigneeUserId,jdbcType=INTEGER},
+      assignee_name = #{assigneeName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByInfoId" resultMap="BaseResultMap">
+    select wni.*
+    from workflow_node_instance wni
+    left join workflow_info wi on wni.instance_id = wi.instance_id
+    where wi.info_id = #{infoId,jdbcType=INTEGER}
+    and wi.type = #{type,jdbcType=TINYINT}
+    and wni.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@WORKFLOW_STATUS_ONGOING}
+  </select>
+
+  <select id="selectByNodeId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from workflow_node_instance
+    where node_id = #{nodeId,jdbcType=INTEGER}
+    and instance_id = #{instanceId,jdbcType=INTEGER}
+  </select>
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoOutputDetailEmployeeMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoOutputDetailEmployee" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="output_detail_id" property="outputDetailId" jdbcType="INTEGER"/>
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="total_productive_hours" property="totalProductiveHours" jdbcType="REAL" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="output" property="output" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="BpoOutputDetailEmployeeMap" type="com.rz.iot.bpo.model.show.BpoOutput.BpoOutputDetailEmployeeShow" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="total_productive_hours" property="totalProductiveHours" jdbcType="REAL" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="output" property="output" jdbcType="INTEGER" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="work_no" property="workNo" jdbcType="VARCHAR" />
+    <result column="model_name" property="workModelName" jdbcType="VARCHAR" />
+    <result column="group_name" property="workGroupName" jdbcType="VARCHAR" />
+    <result column="process_name" property="processName" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="lower_limit" property="lowerLimit" jdbcType="INTEGER" />
+    <result column="upper_limit" property="upperLimit" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, output_detail_id, person_id, total_productive_hours, price, output, create_time, update_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_output_detail_employee
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_output_detail_employee
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoOutputDetailEmployee" >
+    insert into bpo_output_detail_employee (id, output_detail_id, person_id, total_productive_hours,
+      price, output, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{outputDetailId,jdbcType=INTEGER}, #{personId,jdbcType=INTEGER}, #{totalProductiveHours,jdbcType=REAL},
+      #{price,jdbcType=DECIMAL}, #{output,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoOutputDetailEmployee" >
+    insert into bpo_output_detail_employee
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="outputDetailId != null" >
+        output_detail_id,
+      </if>
+      <if test="personId != null" >
+        person_id,
+      </if>
+      <if test="totalProductiveHours != null" >
+        total_productive_hours,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="output != null" >
+        output,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="outputDetailId != null" >
+        #{outputDetailId,jdbcType=INTEGER},
+      </if>
+      <if test="personId != null" >
+        #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="totalProductiveHours != null" >
+        #{totalProductiveHours,jdbcType=REAL},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="output != null" >
+        #{output,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoOutputDetailEmployee" >
+    update bpo_output_detail_employee
+    <set >
+      <if test="outputDetailId != null" >
+        output_detail_id = #{outputDetailId,jdbcType=INTEGER},
+      </if>
+      <if test="personId != null" >
+        person_id = #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="totalProductiveHours != null" >
+        total_productive_hours = #{totalProductiveHours,jdbcType=REAL},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="output != null" >
+        output = #{output,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoOutputDetailEmployee" >
+    update bpo_output_detail_employee
+    set output_detail_id = #{outputDetailId,jdbcType=INTEGER},
+      person_id = #{personId,jdbcType=INTEGER},
+      total_productive_hours = #{totalProductiveHours,jdbcType=REAL},
+      price = #{price,jdbcType=DECIMAL},
+      output = #{output,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getEmployeeDetailList"
+          resultMap="BpoOutputDetailEmployeeMap">
+    SELECT
+    bode.id,
+	bode.total_productive_hours,
+	bode.price,
+	bode.output,
+	bps.person_name,
+	bps.work_no,
+	bwm.model_name,
+	bwg.group_name,
+	bpc.process_name,
+	bpd.product_name,
+	bpp.lower_limit,
+	bpp.upper_limit
+    FROM
+	bpo_output_detail_employee bode
+	LEFT JOIN bpo_output_detail bod ON bode.output_detail_id = bod.id
+	LEFT JOIN bpo_output bo ON bod.output_id = bo.id
+	LEFT JOIN bpo_transfer_station bts ON bo.transfer_station_id = bts.id
+	LEFT JOIN bpo_project bpj ON bo.project_id = bpj.id
+	LEFT JOIN bpo_supplier bsl ON bo.supplier_id = bsl.id
+	LEFT JOIN bpo_person bps ON bode.person_id = bps.id
+	LEFT JOIN bpo_work_model bwm ON bod.work_model_id = bwm.id
+	LEFT JOIN bpo_work_group bwg ON bod.work_group_id = bwg.id
+	LEFT JOIN bpo_process bpc ON bod.process_id = bpc.id
+	LEFT JOIN bpo_product bpd ON bod.product_id = bpd.id
+	LEFT JOIN bpo_product_price bpp ON bod.product_price_id = bpp.id
+  </select>
+</mapper>

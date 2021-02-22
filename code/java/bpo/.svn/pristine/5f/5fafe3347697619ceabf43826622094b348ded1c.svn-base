@@ -1,0 +1,23 @@
+package com.rz.iot.bpo.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillReconciliationShow;
+
+public interface BpoBillReceivableService {
+    Result findAllMonth(BaseEntity entity, BillSelectParam param);
+
+    Result finaAllDay(BaseEntity entity,BillSelectParam param);
+
+    Result findDetailDays(Integer id);
+
+    Result createCheck(Integer monthId);
+
+    BpoBillReconciliationShow getCheckMessage(Integer monthId);
+
+    Result startCheck(BpoBillReconciliationShow bpoBillMonthShow);
+
+    Result saveMessage(BpoBillReconciliationTimeDetailed detailed);
+}

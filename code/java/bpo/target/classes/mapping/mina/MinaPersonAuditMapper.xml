@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaPersonAuditMapper">
+    <update id="updateParam" parameterType="com.rz.iot.bpo.mina.model.param.MinaAuditParam">
+        update bpo_person
+        <set>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone},
+            </if>
+            <if test="workNo!=null and workNo!=''">
+                work_no = #{workNo},
+            </if>
+            <if test="companyId!=null and companyId!=''">
+                company_id = #{companyId},
+            </if>
+            <if test="deptId!=null and deptId!=''">
+                dept_id = #{deptId},
+            </if>
+            <if test="type!=null and type!='' ">
+                person_type = #{type},
+            </if>
+            <if test="projectId!=null and projectId!=''">
+                project_id = #{projectId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findAll" resultType="com.rz.iot.bpo.mina.model.show.MinaPersonShow">
+        select person.id as id,person.person_name as personName,
+        person.id_card as idCard,person.sex as sex,nation.nation as nation ,
+        person.birth as birthday ,person.id_card_address as idCardAddress,
+        person.phone as phone ,trans.name as transName ,person.person_type as personType,person.create_time as createTime
+        from bpo_person person
+        left join sys_nation nation ON nation.id = person.nation
+        LEFT JOIN bpo_project project  on project.id = person.project_id
+        LEFT JOIN bpo_transfer_station trans on trans.id = project.transfer_station_id
+        LEFT JOIN sys_dept dept on dept.dept_id = person.dept_id
+        where person.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NOT_VERIFY_STATUS}
+        <if test="entity.dataScope!=null">
+            and ${entity.dataScope}
+        </if>
+        <if test="select!=null and select!=''">
+            and person.person_name like concat('%',concat(#{select},'%'))
+        </if>
+        union
+        select person.id as id,person.person_name as personName,person.age as age
+        person.id_card as idCard,person.sex as sex,nation.nation as nation ,
+        person.birth as birthday ,person.id_card_address as idCardAddress,
+        person.phone as phone ,trans.name as transName ,person.person_type as personType,person.create_time as createTime
+        from bpo_person person
+        left join sys_nation nation ON nation.id = person.nation
+        LEFT JOIN bpo_project project  on project.id = person.project_id
+        LEFT JOIN bpo_transfer_station trans on trans.id = project.transfer_station_id
+        LEFT JOIN sys_dept dept on dept.dept_id = person.dept_id
+        where person.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NOT_VERIFY_STATUS}
+        <if test="entity.dataScope!=null">
+            and ${entity.dataScope}
+        </if>
+        <if test="select!=null and select!=''">
+            and person.id_card like concat('%',concat(#{select},'%'))
+        </if>
+
+    </select>
+
+    <select id="getDetail" resultType="com.rz.iot.bpo.mina.model.show.MinaPersonShow">
+        select person.id as id,person.person_name as personName,
+        person.id_card as idCard,person.sex as sex,nation.nation as nation ,
+        person.birth as birthday ,person.id_card_address as idCardAddress,
+        person.phone as phone ,trans.name as transName ,person.age as age
+        from bpo_person person
+        left join sys_nation nation ON nation.id = person.nation
+        LEFT JOIN bpo_project project  on project.id = person.project_id
+        LEFT JOIN bpo_transfer_station trans on trans.id = project.transfer_station_id
+        where person.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NOT_VERIFY_STATUS}
+        and person.id = #{id}
+    </select>
+
+    <resultMap id="BaseMap" type="com.rz.iot.bpo.mina.model.show.MinaDeptShow">
+        <result property="deptId" column="deptId"/>
+        <result property="deptName" column="deptName"/>
+        <result property="isTop" column="isTop"/>
+        <result property="parentId" column="parentId"/>
+        <result property="descendants" column="descendants"/>
+        <association property="company" column="deptId" select="com.rz.iot.bpo.mina.mapper.MinaPersonAuditMapper.getCompany"/>
+    </resultMap>
+
+    <select id="getDept" resultType="com.rz.iot.bpo.mina.model.show.MinaDeptShow" resultMap="BaseMap">
+        select dept.dept_id as deptId,dept.dept_name as deptName, dept.top_id as topId ,dept.parent_id as parentId,
+        dept.descendants as descendants,dept.is_top as isTop
+        from sys_dept dept where dept.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+
+    <!--通过deptId查询对应公司-->
+    <select id="getCompany" resultType="com.rz.iot.bpo.model.SysCompany">
+        select company.id as id ,company.company_name as companyName from sys_company company where company.id =
+        (SELECT parent_id from sys_dept where dept_id=(select top_id from sys_dept where dept_id = #{deptId}))
+    </select>
+
+    <select id="">
+
+    </select>
+    <select id="getProject" resultType="com.rz.iot.bpo.model.BpoProject" >
+        SELECT project.id as id,project.project_name as projectName from
+        bpo_project project
+        LEFT JOIN sys_user_module_rel module on module.module_id = project.id
+        and module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        where 1=1
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+
+
+</mapper>

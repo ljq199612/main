@@ -1,0 +1,236 @@
+<template>
+  <CfPanel title="客户管理" class="main">
+    <el-form :inline="true" :model="queryForm" class="bpoFormInline">
+      <el-form-item label="客户归属：">
+        <el-select v-model="queryForm.deptId" placeholder="请选择客户归属部门" @change="submit">
+          <el-option v-for="(item,index) in depOptions" :key="index" :label="item.deptName" :value="item.deptId" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="客户类型：">
+        <el-select v-model="queryForm.type" placeholder="请选择客户类型" @change="submit">
+          <el-option v-for="(item,index) in typeOptions" :key="index" :label="item.dictLabel" :value="item.dictValue" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="客户名称：">
+        <el-input v-model.trim="queryForm.name" placeholder="请输入客户名称" @keyup.13.native="submit" />
+      </el-form-item>
+      <el-form-item label="场地名称：">
+        <el-input v-model.trim="queryForm['transferStation.name']" placeholder="请输入场地名称" @keyup.13.native="submit" />
+      </el-form-item>
+      <el-form-item label="项目名称：">
+        <el-input v-model.trim="queryForm['project.projectName']" placeholder="请输入项目名称" @keyup.13.native="submit" />
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <el-button type="primary" class="el-icon-plus" @click="addFn">
+      新增
+    </el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="tableList"
+      class="bpoTable"
+      fit
+    >
+      <el-table-column align="center" label="编号" type="index" width="80" />
+      <el-table-column show-overflow-tooltip align="left" label="客户名称" min-width="80" prop="company.companyName" />
+      <el-table-column show-overflow-tooltip align="center" label="客户编码" min-width="80" prop="company.companyCode" />
+      <el-table-column show-overflow-tooltip align="center" label="客户类型" min-width="80" prop="type">
+        <template slot-scope="scope">
+          {{ scope.row.type|filterType }}
+        </template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="客户归属" min-width="80" prop="deptName" />
+      <el-table-column show-overflow-tooltip align="left" label="场地名称" min-width="80">
+        <template slot-scope="scope">
+          {{ scope.row.transferStation ? scope.row.transferStation.name : '' }}
+        </template>
+      </el-table-column>
+      <el-table-column show-overflow-tooltip align="left" label="项目名称" min-width="80">
+        <template slot-scope="scope">
+          {{ scope.row.project ? scope.row.project.projectName : '' }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="200">
+        <template slot-scope="scope">
+          <el-button type="text" style="color:#FF6B00" @click="assignAccount(scope.row)">分配账号</el-button>
+          <el-button type="text" style="color:#4794F7" @click="viewDetail(scope.row)">详情</el-button>
+          <el-button type="text" style="color:#19D185" @click="updateForm(scope.row)">修改</el-button>
+          <el-button v-if="scope.row.status!='deleted'" type="text" style="color:#F52222" @click="delForm(scope.row)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="page.pageNum" :limit.sync="page.pageSize" @pagination="getList" />
+  </CfPanel>
+</template>
+<script>
+import { selectCustomer, deleteCustomer, findCustomerTypes, findCanControl } from '@/api/clientMgt'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination'
+import { typeMap } from '../constant'
+
+export default {
+  name: 'EmployerManage',
+  components: {
+    CfPanel,
+    Pagination
+  },
+  filters: {
+    filterType(type) {
+      if (typeMap[type]) {
+        return typeMap[type]
+      }
+      return ''
+    }
+  },
+  data() {
+    return {
+      listLoading: false,
+      depOptions: [], // 客户归属部门
+      typeOptions: [],
+      page: {
+        pageNum: 1,
+        pageSize: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      total: 0,
+      queryForm: {
+        deptId: '',
+        type: '',
+        name: '',
+        'project.projectName': '',
+        'transferStation.name': ''
+      },
+      tableList: [],
+      dialogFormVisible: false,
+      isViewDetail: false, // 查看详情
+      currentRow: null
+    }
+  },
+  created() {
+    this.findCanControl()
+    this.getTypeOptions()
+    this.getList()
+  },
+  methods: {
+    findCanControl() {
+      findCanControl({}).then((res) => {
+        this.depOptions = res.data.data || []
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    getTypeOptions() {
+      findCustomerTypes({}).then((res) => {
+        this.typeOptions = res.data.data || []
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    getList() {
+      this.listLoading = true
+      selectCustomer({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...this.queryForm
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.tableList = data.list || []
+        this.total = data.total || 0
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    reset() {
+      this.page.pageNum = 1
+      this.queryForm.customerName = ''
+      this.queryForm.name = ''
+      this.queryForm.belogGroupName = ''
+      this.getList()
+    },
+    submit() {
+      this.page.pageNum = 1
+      this.getList()
+    },
+    addFn() {
+      this.$router.push({
+        name: 'AddClient',
+        query: {
+          type: 1
+        }
+      })
+    },
+    // 分配账号
+    assignAccount() {
+      this.$router.push({ name: 'userInfo' })
+    },
+    // 设置弹框表单
+    initAddForm(row, isView) {
+      Object.keys(this.addForm).forEach((key) => {
+        if (row[key]) {
+          this.addForm[key] = row[key]
+        } else if (isView) {
+          this.addForm[key] = '暂无信息'
+        }
+      })
+    },
+    delForm(row) {
+      this.$confirm('此操作将永久删除该类型数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteCustomer(row.id)
+      }).catch(() => {})
+    },
+    deleteCustomer(id) {
+      deleteCustomer({
+        id
+      }).then((res) => {
+        this.$message({
+          type: 'success',
+          message: res.data.message || '删除成功'
+        })
+        this.submit()
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '删除失败'
+        })
+      })
+    },
+    updateForm(row) {
+      this.$router.push({ name: 'UpdateClient', query: {
+        type: 2,
+        id: row.orgId,
+        projectId: row.project.id
+      }})
+    },
+    viewDetail(row) {
+      this.$router.push({ name: 'ClientDetail', query: {
+        id: row.orgId,
+        projectId: row.project.id
+      }})
+    }
+  }
+}
+</script>

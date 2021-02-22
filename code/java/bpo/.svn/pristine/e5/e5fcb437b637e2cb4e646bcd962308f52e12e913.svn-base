@@ -1,0 +1,550 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.Constants;
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.PicUtils;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.aspectj.DataScopeAspect;
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.DataScope;
+import com.rz.iot.bpo.framework.redis.RedisCache;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.SysCompanyParam;
+import com.rz.iot.bpo.model.show.SysCompanyShow;
+import com.rz.iot.bpo.service.SysCompanyService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 描述 : 组织业务实现
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/21 12:53
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+public class SysCompanyServiceImpl implements SysCompanyService {
+    @Resource
+    private SysCompanyMapper sysCompanyMapper;
+    @Resource
+    private SysCompanyRoleUserMapper companyRoleUserMapper;
+    @Resource
+    private SysCompanyFileMapper sysCompanyFileMapper;
+    @Resource
+    private PicUtils picUtils;
+    @Resource
+    private BpoMainSupplierInfoMapper mainSupplierInfoMapper;
+    @Resource
+    private SysRoleMapper sysRoleMapper;
+    @Resource
+    private SysDeptUserRelMapper sysDeptUserRelMapper;
+    @Resource
+    private SysDeptSubRelMapper sysDeptSubRelMapper;
+    @Resource
+    private BpoCustomerInfosMapper bpoCustomerInfosMapper;
+    @Resource
+    private RedisCache redisCache;
+    @Resource
+    private BpoSupplierMapper bpoSupplierMapper;
+    @Resource
+    private SysDeptMapper sysDeptMapper;
+
+    /**
+     * 查询组织-分页
+     * @param sysCompanyShow 组织参数
+     * @return
+     */
+    @Override
+    @DataScope
+    public List<SysCompanyShow> findAll(SysCompanyShow sysCompanyShow) {
+        List<SysCompanyShow> list = sysCompanyMapper.findAll(sysCompanyShow);
+        return list;
+    }
+
+    /**
+     * 新增组织
+     * @param param 组织参数
+     * @return
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result insert(SysCompanyParam param) {
+        if(param.getCompanyCode() != null && isExistCode(param))
+            return Result.error(ResultConstants.SYS_TYPE_SAME);
+
+        // 组织类型
+        Integer orgId = param.getOrgId();
+
+        // 状态:1.启用 2.禁用
+        Integer status = param.getStatus();
+        // 名称: 客户/主体供应商/供应商名称
+        String companyName = param.getCompanyName();
+        // 编码: 客户/主体供应商/供应商编码
+        String companyCode = param.getCompanyCode();
+        // 简称: 客户/主体供应商/供应商简称
+        String nickName = param.getNickName();
+        // 联系人: 客户/主体供应商/供应商联系人
+        String contacts = param.getContacts();
+        // 联系方式: 客户/主体供应商/供应商联系方式
+        String phone = param.getPhone();
+        if(orgId == null)
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+
+        // 公司
+        SysCompany sysCompany = new SysCompany();
+        sysCompany.setOrgType(orgId);
+        sysCompany.setStatus(status);
+        sysCompany.setCompanyName(companyName);
+        sysCompany.setCompanyCode(companyCode);
+        sysCompany.setNickName(nickName);
+        sysCompany.setContacts(contacts);
+        sysCompany.setPhone(phone);
+
+        // 新增公司
+        sysCompanyMapper.insertSelective(sysCompany);
+
+        // 更新营业执照
+        updateComFile(sysCompany.getId(),param.getBusinessUrl());
+
+        /**
+         * 新增详情信息以及部门与组织之间的关联关系
+         * 1.超级管理员用户,新增客户和供应商信息以及主体供应商信息,只是没有关联关系,需要在具体的客户或者供应商中指定是那个部门的
+         * 超级管理员:
+         *      1.新增主体供应商,需要生成同名的一个对应的部门,
+         *      2.新增客户和供应商,没有任何其他关联关系操作(只是单纯的新增了一个组织)
+         * 2.主体管理员:
+         *      1.新增客户、供应商,与当前用户所在部门产生关联关系,即部门-客户/供应商之间的关系
+         *      2.不能新增主体供应商
+         */
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+
+        // 通过用户查询对应角色admin
+        SysRole sysRole = sysRoleMapper.findRoleByUserId(userId);
+
+        SysDept userDeptDetail = new SysDept();
+        if(sysRole.getId() != DictDataConstants.SYS_ROLE_ADMIN){
+            // 通过用户查询部门的详细信息
+            userDeptDetail = sysDeptMapper.findByUserId(userId);
+        }
+
+
+        if(orgId == DictDataConstants.SYS_ORG_JF){
+            // 客户
+            // 客户类型
+            String clientType = param.getClientType();
+            if(sysRole.getId() != DictDataConstants.SYS_ROLE_ADMIN){
+                // 新增部门与数据关联关系
+
+                // 新增部门与数据关联表
+                SysDeptSubRel sysDeptSubRel = new SysDeptSubRel();
+                sysDeptSubRel.setDeptId(userDeptDetail.getDeptId());
+                sysDeptSubRel.setSubId(sysCompany.getId());
+                sysDeptSubRel.setSubType(DictDataConstants.DEPT_SUB_REL_CUSTOM);
+                sysDeptSubRelMapper.insertSelective(sysDeptSubRel);
+            }
+
+            // 新增客户表
+            BpoCustomerInfos bpoCustomerInfos = new BpoCustomerInfos();
+            bpoCustomerInfos.setOrgId(sysCompany.getId());
+            bpoCustomerInfos.setType(clientType);
+            bpoCustomerInfosMapper.insertSelective(bpoCustomerInfos);
+        }else if(orgId == DictDataConstants.SYS_ORG_YF){
+            // 主体供应商
+            BpoMainSupplierInfo bpoMainSupplierInfo = new BpoMainSupplierInfo();
+            bpoMainSupplierInfo.setCompanyId(sysCompany.getId());
+
+            bpoMainSupplierInfo.setBelongBusiness(param.getBelongBusiness());
+            bpoMainSupplierInfo.setAddress(param.getAddress());
+            bpoMainSupplierInfo.setCreditCode(param.getCreditCode());
+            try {
+                bpoMainSupplierInfo.setFoundTime(new SimpleDateFormat("yyyy-MM-dd").parse(param.getFoundTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            bpoMainSupplierInfo.setLegalMan(param.getLegalMan());
+            bpoMainSupplierInfo.setManageScope(param.getManageScope());
+            bpoMainSupplierInfo.setRegisterFund(param.getRegisterFund());
+            bpoMainSupplierInfo.setScale(param.getScale());
+            bpoMainSupplierInfo.setRemark(param.getRemark());
+
+            mainSupplierInfoMapper.insertSelective(bpoMainSupplierInfo);
+
+
+            //创建主体供应商时插入数据到部门表
+            SysDept dept = new SysDept ();
+            dept.setDeptCode (bpoMainSupplierInfo.getCreditCode ());
+            dept.setDeptName (sysCompany.getCompanyName ());
+            dept.setParentId (sysCompany.getId ());
+            dept.setLeader (bpoMainSupplierInfo.getLegalMan ());
+            dept.setPhone (sysCompany.getPhone ());
+            dept.setStatus (sysCompany.getStatus ());
+            dept.setCreateName (SecurityUtils.getUsername ());
+            dept.setIsTop (1);
+            sysDeptMapper.insertSelective (dept);
+            dept.setDescendants (dept.getDeptId ().toString ());
+            dept.setTopId (dept.getDeptId ());
+            // 更新当前部门的
+            sysDeptMapper.updateByPrimaryKeySelective (dept);
+
+            // 根据切面接口数据过滤,主体供应商需要添加下属部门,类型为主体供应商本身
+            SysDeptSubRel sysDeptUserRel = new SysDeptSubRel();
+            sysDeptUserRel.setSubId(sysCompany.getId());
+            sysDeptUserRel.setDeptId(dept.getDeptId());
+            sysDeptUserRel.setSubType(DictDataConstants.DEPT_SUB_REL_MAIN_SUPPLIER);
+            sysDeptSubRelMapper.insertSelective(sysDeptUserRel);
+        }else {
+            /**
+             * 创建供应商也需要创建对应的部门
+             * 即供应商为顶级部门,通过部门与下属之间关系关联
+             * 供应商可以创建自己的部门组织架构
+             */
+            //创建主体供应商时插入数据到部门表
+            SysDept dept = new SysDept ();
+            dept.setDeptName(companyName);
+            dept.setParentId(sysCompany.getId());
+            dept.setIsTop(1);
+            dept.setStatus(DictDataConstants.NORMAL_STATUS);
+            sysDeptMapper.insertSelective(dept);
+
+            // 供应商详情
+            if(sysRole.getId() != DictDataConstants.SYS_ROLE_ADMIN){
+                // 新增部门与数据关联关系
+                // 通过用户查询部门
+                SysDeptUserRel sysDeptUserRel = sysDeptUserRelMapper.findByUserId(userId);
+
+                // 新增部门与数据关联表
+                SysDeptSubRel sysDeptSubRel = new SysDeptSubRel();
+                sysDeptSubRel.setDeptId(sysDeptUserRel.getDeptId());
+                sysDeptSubRel.setSubId(dept.getDeptId());
+                sysDeptSubRel.setSubType(DictDataConstants.DEPT_SUB_REL_SUPPLIER);
+                sysDeptSubRelMapper.insertSelective(sysDeptSubRel);
+            }
+
+            // 更改topId以及子级列表id
+            dept.setTopId(dept.getTopId());
+            dept.setDescendants("" + dept.getDeptId());
+            sysDeptMapper.updateByPrimaryKey(dept);
+
+            BpoSupplier bpoSupplier = new BpoSupplier();
+            bpoSupplier.setCompanyId(sysCompany.getId());
+            bpoSupplierMapper.insertSelective(bpoSupplier);
+
+            // 当前用户部门添加子级部门
+            String append = "," + dept.getDeptId();
+            sysDeptMapper.updateParent(userDeptDetail.getDeptId(),append);
+
+
+            // 根据切面接口数据过滤,添加供应商需要添加下属部门,类型为供应商
+            SysDeptSubRel sysDeptUserRel = new SysDeptSubRel();
+            sysDeptUserRel.setSubId(sysCompany.getId());
+            sysDeptUserRel.setDeptId(dept.getDeptId());
+            sysDeptUserRel.setSubType(DictDataConstants.DEPT_SUB_REL_SUPPLIER);
+            sysDeptSubRelMapper.insertSelective(sysDeptUserRel);
+        }
+
+        return Result.success();
+    }
+
+    /**
+     * 更改组织
+     * @param param 组织参数
+     * @return
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result update(SysCompanyParam param) {
+       if(param.getId() == null || param.getCompanyCode() == null){
+           return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+       }
+       if(isExistCode(param)){
+           return Result.error(ResultConstants.SYS_TYPE_SAME);
+       }
+
+        // 创建新增对象
+        SysCompany sysCompany = new SysCompany();
+        // 注入输入参数
+        sysCompany.setId(param.getId());
+        sysCompany.setOrgType(param.getOrgId());
+        sysCompany.setStatus(param.getStatus());
+        sysCompany.setCompanyName(param.getCompanyName());
+        sysCompany.setCompanyCode(param.getCompanyCode());
+        sysCompany.setNickName(param.getNickName());
+        sysCompany.setContacts(param.getContacts());
+        sysCompany.setPhone(param.getPhone());
+
+        sysCompanyMapper.updateByPrimaryKeySelective(sysCompany);
+
+        // 更新营业执照
+        updateComFile(param.getId(),param.getBusinessUrl());
+
+        if(param.getOrgId() == DictDataConstants.SYS_ORG_JF){
+            // 客户
+            // 客户类型
+            String clientType = param.getClientType();
+
+            BpoCustomerInfos bpoCustomerInfos = new BpoCustomerInfos();
+            bpoCustomerInfos.setOrgId(param.getId());
+            bpoCustomerInfos.setType(clientType);
+            bpoCustomerInfosMapper.updateByCompanyId(bpoCustomerInfos);
+        }else if(param.getOrgId() == DictDataConstants.SYS_ORG_YF){
+            // 主体供应商
+            BpoMainSupplierInfo bpoMainSupplierInfo = new BpoMainSupplierInfo();
+            bpoMainSupplierInfo.setCompanyId(sysCompany.getId());
+
+            bpoMainSupplierInfo.setBelongBusiness(param.getBelongBusiness());
+            bpoMainSupplierInfo.setAddress(param.getAddress());
+            bpoMainSupplierInfo.setCreditCode(param.getCreditCode());
+            try {
+                bpoMainSupplierInfo.setFoundTime(new SimpleDateFormat("yyyy-MM-dd").parse(param.getFoundTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            bpoMainSupplierInfo.setScale(param.getScale());
+            bpoMainSupplierInfo.setBelongBusiness(param.getBelongBusiness());
+            bpoMainSupplierInfo.setLegalMan(param.getLegalMan());
+            bpoMainSupplierInfo.setManageScope(param.getManageScope());
+            bpoMainSupplierInfo.setRegisterFund(param.getRegisterFund());
+            bpoMainSupplierInfo.setRemark(param.getRemark());
+
+            mainSupplierInfoMapper.updateByPrimaryKeySelectiveByCompanyId(bpoMainSupplierInfo);
+        }
+        return Result.success();
+    }
+
+    /**
+     * 删除组织
+     * @param sysCompany 组织参数
+     * @return
+     */
+    @Override
+    public Result delete(SysCompany sysCompany) {
+        if(sysCompany == null && sysCompany.getId() == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+        sysCompanyMapper.deleteByPrimaryKey(sysCompany.getId());
+        return Result.success(null,"删除组织成功");
+    }
+
+    /**
+     * 根据orgKey查询所有组织
+     * @param orgType
+     * @return
+     */
+    @Override
+    @DataScope
+    public Result findAllComByKey(Integer orgType,BaseEntity baseEntity) {
+        List<SysCompany> list = sysCompanyMapper.findAllComByKey(orgType);
+        return Result.success(list);
+    }
+
+    /**
+     * 查询所有公司
+     * @return
+     */
+    @Override
+    public Result<List<SysCompany>> findAll() {
+        List<SysCompany> allByName = sysCompanyMapper.findAlls ();
+        Result<List<SysCompany>> result = new Result<> (ResultConstants.REQUEST_SUCCESS);
+        result.setData (allByName);
+        return result;
+    }
+
+    @Override
+    public Result getInfoByType(Integer id,Integer type) {
+        Map<String,Object> result = new HashMap<>();
+        if (type.equals(1)) {
+            Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+            id = companyRoleUserMapper.selectCompanyIdByUserId(userId);
+        }
+        result = sysCompanyMapper.selectInfoById(id);
+//        if (type == 2 && id != null) {
+//            result = sysCompanyMapper.selectInfoById(id);
+//        } else if (type == 3 && id != null) {
+//            result = sysCompanyMapper.selectInfoById(id);
+//        } else {
+//            Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+//            id = companyRoleUserMapper.selectCompanyIdByUserId(userId);
+//            result = sysCompanyMapper.selectInfoById(id);
+//        }
+        return Result.success(result);
+    }
+
+    /**
+     * 上传公司营业执照
+     * @param files
+     * @return
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result uploadFileUrl(MultipartFile[] files) {
+        // 定义一个文件集合
+        List<SysCompanyFile> list = new ArrayList<>();
+
+        // 上传至文件服务器
+        Map<String,String> map = picUtils.upload(files);
+
+        // 获取url以及文件名称
+        List<Map<String,String>> urlFileNames = new ArrayList<>();
+        for(int i = 0;i < files.length;i++){
+            SysCompanyFile companyFile = new SysCompanyFile();
+            companyFile.setFileUrl(map.get("url" + i));
+            companyFile.setUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+            companyFile.setFileName(files[i].getOriginalFilename());
+            list.add(companyFile);
+
+            Map<String,String> tempMap = new HashMap<>();
+            tempMap.put("url",map.get("url" + i));
+            tempMap.put("fileName",files[i].getOriginalFilename());
+            urlFileNames.add(tempMap);
+        }
+        sysCompanyFileMapper.insertFileList(list);
+        return Result.success(urlFileNames);
+    }
+
+    /**
+     * 查询公司详情
+     * @param companyId 公司id
+     * @return
+     */
+    @Override
+    public Result detail(Integer companyId) {
+        if(companyId == null)
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        SysCompanyParam sysCompanyParam = sysCompanyMapper.detail(companyId);
+
+        Integer orgId = sysCompanyParam.getOrgId();
+        if(orgId == DictDataConstants.SYS_ORG_JF){
+            String clientType = bpoCustomerInfosMapper.findTypeByCompanyId(companyId);
+            sysCompanyParam.setClientType(clientType);
+
+        }else if(orgId == DictDataConstants.SYS_ORG_YF){
+            BpoMainSupplierInfo bpoMainSupplierInfo = mainSupplierInfoMapper.findByCompanyId(companyId);
+
+            // 设置相应参数
+            if(bpoMainSupplierInfo != null){
+                sysCompanyParam.setAddress(bpoMainSupplierInfo.getAddress());
+                sysCompanyParam.setBelongBusiness(bpoMainSupplierInfo.getBelongBusiness());
+                sysCompanyParam.setCreditCode(bpoMainSupplierInfo.getCreditCode());
+                sysCompanyParam.setFoundTime(new SimpleDateFormat("yyyy-MM-dd").format(bpoMainSupplierInfo.getFoundTime()));
+                sysCompanyParam.setLegalMan(bpoMainSupplierInfo.getLegalMan());
+                sysCompanyParam.setManageScope(bpoMainSupplierInfo.getManageScope());
+                sysCompanyParam.setRemark(bpoMainSupplierInfo.getRemark());
+                sysCompanyParam.setRegisterFund(bpoMainSupplierInfo.getRegisterFund());
+                sysCompanyParam.setScale(bpoMainSupplierInfo.getScale());
+            }
+        }
+
+        // 获取营业执照
+        List<Map<String,String>>  list = sysCompanyFileMapper.getUrlByCompanyId(companyId);
+        sysCompanyParam.setBusinessUrl(list);
+        return Result.success(sysCompanyParam);
+    }
+
+
+    /**
+     * 删除营业执照
+     * @param fileUrl 营业执照文件
+     * @return
+     */
+    @Override
+    public Result deleteFileUrl(String fileUrl) {
+        if(fileUrl != null){
+                // 删除文件
+                picUtils.delete(fileUrl);
+
+                // 根据url更改对应营业执照状态
+                sysCompanyFileMapper.updateStatusByUrl(DictDataConstants.DELETE_STATUS,fileUrl);
+        }
+        return Result.success();
+    }
+
+    /**
+     * 下载营业执照
+     * @param url 文件url
+     * @return
+     */
+    @Override
+    public Result downloadFileUrl(String fileName,String url,HttpServletResponse response) {
+        if(url == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+        picUtils.downloadFile(url,response,fileName);
+        return Result.success();
+    }
+
+    /**
+     * 获取所属行业
+     * @return
+     */
+    @Override
+    public Result findBelongBusiness() {
+        // 获取redis中数据
+        Map<String,Map<String,SysDictData>> map = redisCache.getCacheMap(Constants.SYS_DICT_TYPE);
+        Map<String,SysDictData> dataMap =  map.get(Constants.SYS_BELONG_BUSINESS);
+
+        return Result.success(dataMap);
+    }
+
+    /**
+     * 更改组织状态
+     * @param sysCompanyParam 请求参数
+     * @return
+     */
+    @Override
+    public Result updateStatus(SysCompanyParam sysCompanyParam) {
+        if(sysCompanyParam.getId() == null || sysCompanyParam.getStatus() == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+
+        sysCompanyMapper.updateStatus(sysCompanyParam.getId(),sysCompanyParam.getStatus());
+        return Result.success();
+    }
+
+    /**
+     * 新增判断编码是否已经存在
+     */
+    public boolean isExistCode(SysCompanyParam param){
+        SysCompany findSysCompany = sysCompanyMapper.isExistCode(param);
+        boolean flag = false;
+        if(findSysCompany != null){
+            flag = true;
+        }
+        return flag;
+    }
+
+    /**
+     * 更新营业执照所属公司
+     */
+    public void updateComFile(Integer companyId,List<Map<String,String>> businessUrl){
+        List<SysCompanyFile> list = new ArrayList<>();
+        if(businessUrl != null && businessUrl.size() > 0){
+            // 获取当前操作人员
+            for(Map<String,String> map : businessUrl){
+                SysCompanyFile sysCompanyFile = new SysCompanyFile();
+                sysCompanyFile.setCompanyId(companyId);
+                sysCompanyFile.setFileUrl(map.get("url"));
+                list.add(sysCompanyFile);
+            }
+
+            // 更新营业执照
+            sysCompanyFileMapper.updateRel(list);
+        }
+    }
+}

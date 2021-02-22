@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.BpoClassesGroupRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.BpoClassesGroupRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="class_sn" property="classSn" jdbcType="VARCHAR" />
+    <result column="work_group_id" property="workGroupId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="class_generate_id" property="classGenerateId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, class_sn, work_group_id, status, create_time, update_time, class_generate_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_classes_group_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_classes_group_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.BpoClassesGroupRel" >
+    insert into bpo_classes_group_rel (id, project_id, class_sn, 
+      work_group_id, status, create_time, 
+      update_time, class_generate_id)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, #{classSn,jdbcType=VARCHAR}, 
+      #{workGroupId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{classGenerateId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.mina.model.BpoClassesGroupRel" >
+    insert into bpo_classes_group_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="classSn != null" >
+        class_sn,
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="classGenerateId != null" >
+        class_generate_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="classSn != null" >
+        #{classSn,jdbcType=VARCHAR},
+      </if>
+      <if test="workGroupId != null" >
+        #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="classGenerateId != null" >
+        #{classGenerateId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.mina.model.BpoClassesGroupRel" >
+    update bpo_classes_group_rel
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="classSn != null" >
+        class_sn = #{classSn,jdbcType=VARCHAR},
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id = #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="classGenerateId != null" >
+        class_generate_id = #{classGenerateId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.BpoClassesGroupRel" >
+    update bpo_classes_group_rel
+    set project_id = #{projectId,jdbcType=INTEGER},
+      class_sn = #{classSn,jdbcType=VARCHAR},
+      work_group_id = #{workGroupId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      class_generate_id = #{classGenerateId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

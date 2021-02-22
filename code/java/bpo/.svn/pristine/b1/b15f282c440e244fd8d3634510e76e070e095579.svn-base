@@ -1,0 +1,50 @@
+import request from '@/utils/request'
+import { getToken } from '@/utils/auth'
+
+// 系统日志
+export function findSysInfo(params) {
+  return request({
+    url: '/sysLog/findSysInfo',
+    method: 'get',
+    params: params
+  })
+}
+
+// 操作日志-导出
+export const exportOpeLog = `${process.env.BASE_API}/sysLog/exportOpeLog?X-Token=${getToken()}`
+
+// 操作日志-详情
+export function findOptDetail(params) {
+  return request({
+    url: '/sysLog/findOptDetail',
+    method: 'get',
+    params: params
+  })
+}
+// 操作日志-查询所有日志-分页
+export function findAllOpt(params) {
+  return request({
+    url: '/sysLog/findAllOpt',
+    method: 'get',
+    params: params
+  })
+}
+// 获取用户类型
+export function findUserRole(params) {
+  return request({
+    url: '/sysLog/findUserRole',
+    method: 'get',
+    params: params
+  })
+}
+
+// 登录日志-查询所有-分页
+export function findAllLogin(params) {
+  return request({
+    url: '/sysLog/findAllLogin',
+    method: 'get',
+    params: params
+  })
+}
+// 登录日志-导出
+export const exportLoginLog = `${process.env.BASE_API}/sysLog/exportLoginLog?X-Token=${getToken()}`

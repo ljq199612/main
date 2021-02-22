@@ -1,0 +1,35 @@
+package com.rz.iot.bpo.mina.model.param;
+
+import com.rz.iot.bpo.mina.model.MinaClassesFromExternal;
+import com.rz.iot.bpo.mina.model.MinaClassesGenerate;
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.models.auth.In;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Description: 排班参数
+ * @Author: LiuJiaqi
+ * @Create: 2020-07-23
+ **/
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class MinaClassesGenerateParam extends MinaClassesGenerate {
+
+    @ApiModelProperty(value = "场地名称", example = "xx中转场", hidden = true, allowEmptyValue = true)
+    private String transferStationName;
+
+    @ApiModelProperty(value = "场地ID", example = "2", hidden = true, allowEmptyValue = true)
+    private String transferStationId;
+
+    @ApiModelProperty(value = "工作小组ID", example = "XX 组", hidden = true, allowEmptyValue = true)
+    private List<Integer> workGroupIds;
+
+    @ApiModelProperty(value = "排班列表")
+    private List<MinaClassesGenerate> minaClassesGenerateList;
+
+}

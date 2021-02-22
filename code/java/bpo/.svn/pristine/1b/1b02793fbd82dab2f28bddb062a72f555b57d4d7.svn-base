@@ -1,0 +1,5 @@
+module.exports = {
+  NODE_ENV: '"development"',
+  ENV_CONFIG: '"dev"',
+  BASE_API: '"http://www.rzwl-iot.com:3000/mock/33/bpo"'
+}

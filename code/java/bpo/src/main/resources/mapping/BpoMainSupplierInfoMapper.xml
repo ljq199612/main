@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoMainSupplierInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoMainSupplierInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="belong_business" property="belongBusiness" jdbcType="INTEGER" />
+    <result column="legal_man" property="legalMan" jdbcType="VARCHAR" />
+    <result column="credit_code" property="creditCode" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="found_time" property="foundTime" jdbcType="TIMESTAMP" />
+    <result column="scale" property="scale" jdbcType="INTEGER" />
+    <result column="register_fund" property="registerFund" jdbcType="VARCHAR" />
+    <result column="manage_scope" property="manageScope" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, belong_business, legal_man, credit_code, company_id, found_time, `scale`, register_fund,
+    manage_scope, address, remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_main_supplier_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_main_supplier_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoMainSupplierInfo" >
+    insert into bpo_main_supplier_info (id, belong_business, legal_man, 
+      credit_code, company_id, found_time,
+      scale, register_fund, manage_scope, 
+      address, remark)
+    values (#{id,jdbcType=INTEGER}, #{belongBusiness,jdbcType=INTEGER}, #{legalMan,jdbcType=VARCHAR}, 
+      #{creditCode,jdbcType=VARCHAR}, #{companyId,jdbcType=INTEGER}, #{foundTime,jdbcType=TIMESTAMP}, 
+      #{scale,jdbcType=INTEGER}, #{registerFund,jdbcType=VARCHAR}, #{manageScope,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoMainSupplierInfo" >
+    insert into bpo_main_supplier_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="belongBusiness != null" >
+        belong_business,
+      </if>
+      <if test="legalMan != null" >
+        legal_man,
+      </if>
+      <if test="creditCode != null" >
+        credit_code,
+      </if>
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="foundTime != null" >
+        found_time,
+      </if>
+      <if test="scale != null" >
+        scale,
+      </if>
+      <if test="registerFund != null" >
+        register_fund,
+      </if>
+      <if test="manageScope != null" >
+        manage_scope,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="belongBusiness != null" >
+        #{belongBusiness,jdbcType=INTEGER},
+      </if>
+      <if test="legalMan != null" >
+        #{legalMan,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCode != null" >
+        #{creditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="foundTime != null" >
+        #{foundTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="scale != null" >
+        #{scale,jdbcType=INTEGER},
+      </if>
+      <if test="registerFund != null" >
+        #{registerFund,jdbcType=VARCHAR},
+      </if>
+      <if test="manageScope != null" >
+        #{manageScope,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoMainSupplierInfo" >
+    update bpo_main_supplier_info
+    <set >
+      <if test="belongBusiness != null" >
+        belong_business = #{belongBusiness,jdbcType=INTEGER},
+      </if>
+      <if test="legalMan != null" >
+        legal_man = #{legalMan,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCode != null" >
+        credit_code = #{creditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="foundTime != null" >
+        found_time = #{foundTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="scale != null" >
+        scale = #{scale,jdbcType=INTEGER},
+      </if>
+      <if test="registerFund != null" >
+        register_fund = #{registerFund,jdbcType=VARCHAR},
+      </if>
+      <if test="manageScope != null" >
+        manage_scope = #{manageScope,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeySelectiveByCompanyId" parameterType="com.rz.iot.bpo.model.BpoMainSupplierInfo" >
+    update bpo_main_supplier_info
+    <set >
+      <if test="belongBusiness != null" >
+        belong_business = #{belongBusiness,jdbcType=INTEGER},
+      </if>
+      <if test="legalMan != null" >
+        legal_man = #{legalMan,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCode != null" >
+        credit_code = #{creditCode,jdbcType=VARCHAR},
+      </if>
+      <if test="foundTime != null" >
+        found_time = #{foundTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="scale != null" >
+        scale = #{scale,jdbcType=INTEGER},
+      </if>
+      <if test="registerFund != null" >
+        register_fund = #{registerFund,jdbcType=VARCHAR},
+      </if>
+      <if test="manageScope != null" >
+        manage_scope = #{manageScope,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where  company_id = #{companyId,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoMainSupplierInfo" >
+    update bpo_main_supplier_info
+    set belong_business = #{belongBusiness,jdbcType=INTEGER},
+      legal_man = #{legalMan,jdbcType=VARCHAR},
+      credit_code = #{creditCode,jdbcType=VARCHAR},
+      company_id = #{companyId,jdbcType=INTEGER},
+      found_time = #{foundTime,jdbcType=TIMESTAMP},
+      scale = #{scale,jdbcType=INTEGER},
+      register_fund = #{registerFund,jdbcType=VARCHAR},
+      manage_scope = #{manageScope,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findByCompanyId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from
+    bpo_main_supplier_info
+    where company_id = #{value}
+  </select>
+</mapper>

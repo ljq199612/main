@@ -1,0 +1,199 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.BpoAttendanceInfoParam;
+import com.rz.iot.bpo.model.show.BpoAttendanceInfoShow;
+import com.rz.iot.bpo.service.BpoAttendanceInfoService;
+import com.rz.iot.bpo.service.WorkflowInstanceService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class BpoAttendanceInfoServiceImpl implements BpoAttendanceInfoService {
+
+    @Resource
+    private BpoAttendanceInfoMapper attendanceInfoMapper;
+
+    @Resource
+    private BpoAttendanceRecordMapper attendanceRecordMapper;
+
+    @Resource
+    private BpoPersonMapper personMapper;
+
+    @Resource
+    private BpoAttendanceAuditRecordMapper attendanceAuditRecordMapper;
+
+    @Resource
+    private WorkflowNodeInstanceMapper nodeInstanceMapper;
+
+    @Resource
+    private WorkflowInstanceService instanceService;
+
+    @Override
+    public List<BpoAttendanceInfoShow> findAll(Map<String, Object> params) {
+        if (!DictDataConstants.CONFIRMED.equals(params.get("approvalType"))) {
+            Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+            params.put("userId",userId);
+        }
+        List<BpoAttendanceInfoShow> list = attendanceInfoMapper.getAll(params);
+        return list;
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void confirm(BpoAttendanceInfoParam attendanceInfoParam) {
+        SysUser user = SecurityUtils.getLoginUser().getUser();
+        BpoPerson person = personMapper.selectByUserId(user.getUserId());
+        if (person == null) {
+            throw new RuntimeException("该账号未关联人员，无法操作");
+        }
+
+        BpoAttendanceInfo attendanceInfo = attendanceInfoMapper.selectByPrimaryKey(attendanceInfoParam.getId());
+        if (attendanceInfo == null) {
+            return;
+        }
+
+        //更新考勤信息
+        BpoAttendanceInfo record = new BpoAttendanceInfo();
+        record.setId(attendanceInfoParam.getId());
+//        record.setAttendanceHours(attendanceInfoParam.getAttendanceHours());
+//        record.setWageHours(attendanceInfoParam.getWageHours());
+//        record.setOvertimeHours(attendanceInfoParam.getOvertimeHours());
+        record.setApprovalWageHours(attendanceInfoParam.getApprovalWageHours());
+        record.setRemark(attendanceInfoParam.getRemark());
+        record.setApprovalStatus(attendanceInfoParam.getApprovalStatus());
+        record.setApprovalTime(new Date());
+        record.setApprovalUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+        if (attendanceInfoParam.getType() == 1) {
+            if (!attendanceInfo.getRecordApprovalStatus().equals(DictDataConstants.PENDING_REVIEW)) {
+                throw new RuntimeException("该考勤记录已审核！");
+            }
+            record.setRecordApprovalStatus(DictDataConstants.PENDING_CONFIRM);
+        } else if (attendanceInfoParam.getType() == 2) {
+            if (!attendanceInfo.getRecordApprovalStatus().equals(DictDataConstants.PENDING_CONFIRM)
+                || !attendanceInfo.getRecordApprovalStatus().equals(DictDataConstants.COMPLAIN))
+            {
+                throw new RuntimeException("该考勤记录已确认！");
+            }
+            record.setRecordApprovalStatus(DictDataConstants.CONFIRMED);
+        } else {
+            //审核类型错误
+            throw new RuntimeException("非法操作！");
+        }
+        attendanceInfoMapper.updateByPrimaryKeySelective(record);
+
+        generateAuditRecord(
+                attendanceInfoParam.getId(),
+                person.getId(),
+                person.getPersonName(),
+                attendanceInfoParam.getRemark(),
+                attendanceInfoParam.getApprovalStatus(),
+                new Byte(attendanceInfoParam.getType().toString()),
+                attendanceInfoParam.getApprovalWageHours());
+
+        //流程审核
+        generateWorkflow(attendanceInfo.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void oneKeyConfirm(Integer[] ids,Integer type) {
+        SysUser user = SecurityUtils.getLoginUser().getUser();
+        BpoPerson person = personMapper.selectByUserId(user.getUserId());
+        if (person == null) {
+            throw new RuntimeException("该账号未关联人员，无法操作");
+        }
+        for (Integer id:ids) {
+            BpoAttendanceInfo attendanceInfo = attendanceInfoMapper.selectByPrimaryKey(id);
+            if (attendanceInfo == null || !attendanceInfo.getRecordStatus().equals(DictDataConstants.ATTENDANCE_NORMAL)) {
+                continue;
+            }
+            BpoAttendanceInfo record = new BpoAttendanceInfo();
+            record.setId(attendanceInfo.getId());
+            if (type == 1) {
+                if (!attendanceInfo.getRecordApprovalStatus().equals(DictDataConstants.PENDING_REVIEW)) {
+                    continue;
+                }
+                record.setRecordApprovalStatus(DictDataConstants.PENDING_CONFIRM);
+                record.setApprovalWageHours(attendanceInfo.getWageHours());
+                record.setApprovalStatus(DictDataConstants.ATTENDANCE_NORMAL);
+            } else if (type == 2) {
+                if (!attendanceInfo.getRecordApprovalStatus().equals(DictDataConstants.PENDING_CONFIRM)
+                    || !attendanceInfo.getRecordApprovalStatus().equals(DictDataConstants.COMPLAIN)
+                ) {
+                    continue;
+                }
+                record.setRecordApprovalStatus(DictDataConstants.CONFIRMED);
+            } else {
+                continue;
+            }
+            attendanceInfoMapper.updateByPrimaryKeySelective(record);
+
+            //考勤审核记录
+            generateAuditRecord(
+                    record.getId(),
+                    person.getId(),
+                    person.getPersonName(),
+                    "一键审核/确认",
+                    DictDataConstants.ATTENDANCE_NORMAL,
+                    new Byte(type.toString()),
+                    record.getApprovalWageHours());
+
+            //流程
+            generateWorkflow(record.getId());
+        }
+    }
+
+    private void generateAuditRecord(Integer attendanceInfoId,Integer personId,String personName,String remark,Byte auditResult,Byte auditType,Double approvalWageHours) {
+        BpoAttendanceAuditRecord attendanceAuditRecord = new BpoAttendanceAuditRecord();
+        attendanceAuditRecord.setAttendanceInfoId(attendanceInfoId);
+        attendanceAuditRecord.setPersonId(personId);
+        attendanceAuditRecord.setPersonName(personName);
+        attendanceAuditRecord.setRemark(remark);
+        attendanceAuditRecord.setAuditTime(new Date());
+        attendanceAuditRecord.setAuditResult(auditResult);
+        attendanceAuditRecord.setAuditType(auditType);
+        attendanceAuditRecord.setApprovalWageHours(approvalWageHours);
+        attendanceAuditRecordMapper.insertSelective(attendanceAuditRecord);
+    }
+
+    private void generateWorkflow(Integer attendanceInfoId) {
+        Map<String,Object> params = new HashMap<>(4);
+        params.put("id",attendanceInfoId);
+        params.put("type",DictDataConstants.WORKFLOW_ATTENDANCE);
+        params.put("assigneeSuggestion","考勤流程审批");
+        params.put("assigneeResult",DictDataConstants.WORKFLOW_APPROVE_CONFIRM);
+        instanceService.approve(params);
+    }
+
+
+    @Override
+    public List<Map<String, Object>> clockDetail(Integer attendanceInfoId) {
+        BpoAttendanceInfo attendanceInfo = attendanceInfoMapper.selectByPrimaryKey(attendanceInfoId);
+        BpoPerson person = personMapper.selectByPrimaryKey(attendanceInfo.getPersonId());
+        BpoAttendanceInfo nextAttendanceInfo = attendanceInfoMapper.selectNextInfo(attendanceInfo.getPersonId(),attendanceInfo.getEndTime());
+        Date startTime = attendanceInfo.getArrivalTime();
+        Date endTime = new Date();
+        if (nextAttendanceInfo != null) {
+            endTime = nextAttendanceInfo.getArrivalTime();
+        }
+        List<Map<String,Object>> list =  attendanceRecordMapper.clockDetail(person.getIdCard(),startTime,endTime);
+        return list;
+    }
+
+
+    @Override
+    public List<Map<String,Object>> auditDetail(Integer attendanceInfoId) {
+        List<Map<String,Object>> list =  attendanceAuditRecordMapper.auditDetail(attendanceInfoId);
+        return list;
+    }
+}

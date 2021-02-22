@@ -1,0 +1,70 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.BpoBillPersonMonthMapper;
+import com.rz.iot.bpo.mapper.BpoBillTimeMapper;
+import com.rz.iot.bpo.model.param.BillSelectPersonParam;
+import com.rz.iot.bpo.model.show.BpoBillPayablePersonShow;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillPersonDayTotal;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillPersonDayDetail;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillPersonMonthShow;
+import com.rz.iot.bpo.service.BpoBillPayablePersonService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@Service
+public class BpoBillPayablePersonServiceImpl implements BpoBillPayablePersonService {
+
+    @Resource
+    BpoBillTimeMapper bpoBillTimeMapper;
+
+    @Resource
+    BpoBillPersonMonthMapper bpoBillPersonMonthMapper;
+
+    @Override
+    public Result findAllBillPerson(BillSelectPersonParam select) {
+
+        List<BpoBillPayablePersonShow> bpoBillPayablePersonShow = bpoBillTimeMapper.findAllBillPerson(select);
+        return Result.success(bpoBillPayablePersonShow);
+    }
+
+    @Override
+    public Result findBillPersonDetail(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Result findAllBillMonth(BillSelectPersonParam select) {
+
+        List<BpoBillPersonMonthShow> list = bpoBillPersonMonthMapper.findAllBillMonth(select);
+        return Result.success(list);
+    }
+
+    @Override
+    public Result findADayBillDetail(Integer id, String date) {
+
+        List<BpoBillPersonDayDetail> bpoBillPersonDayDetail = bpoBillTimeMapper.billPersonDayDetail(id, date);
+
+        return Result.success(bpoBillPersonDayDetail);
+    }
+
+    @Override
+    public Result getBillPersonTotal(Integer id, String date) {
+
+        //获取日账单汇总
+        BpoBillPersonDayTotal list = bpoBillTimeMapper.getBillPersonTotal(id, date);
+
+        //获取日账单详情
+        List<BpoBillPersonDayDetail> bpoBillPersonDayDetail = bpoBillTimeMapper.billPersonDayDetail(id, date);
+
+        //计算总补助
+        list.setTotalSubsidy(list.getTotalFoodSubsidy()+list.getTotalNightSubsidy()+list.getTotalOtherSubsidy());
+
+        list.setBpoBillPersonDayDetails(bpoBillPersonDayDetail);
+
+        return Result.success(list);
+    }
+
+}

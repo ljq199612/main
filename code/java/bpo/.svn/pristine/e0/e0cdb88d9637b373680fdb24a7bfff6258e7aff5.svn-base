@@ -1,0 +1,79 @@
+import request from '@/utils/request'
+
+// 类型管理
+export function insertDt(query) {
+  return request({
+    url: '/sysDictType/insert',
+    method: 'get',
+    params: query
+  })
+}
+export function findAllDt(query) {
+  return request({
+    url: '/sysDictType/findAll',
+    method: 'get',
+    params: query
+  })
+}
+export function updateDt(query) {
+  return request({
+    url: '/sysDictType/update',
+    method: 'get',
+    params: query
+  })
+}
+
+export function deleteDt(query) {
+  return request({
+    url: '/sysDictType/delete',
+    method: 'get',
+    params: query
+  })
+}
+
+// 数据管理
+export function insertDa(query) {
+  return request({
+    url: '/sysDictData/insert',
+    method: 'get',
+    params: query
+  })
+}
+export function findAllDa(query) {
+  return request({
+    url: '/sysDictData/findAll',
+    method: 'get',
+    params: query
+  })
+}
+
+export function findAllTypes(query) {
+  return request({
+    url: '/sysDictType/findAllNoPage',
+    method: 'get',
+    params: query
+  })
+}
+
+export function updateDa(query) {
+  return request({
+    url: '/sysDictData/update',
+    method: 'get',
+    params: query
+  })
+}
+
+export function deleteDa(query) {
+  return request({
+    url: '/sysDictData/delete',
+    method: 'get',
+    params: query
+  })
+}
+// export function addUser(data) {
+//   return request({
+//     url: '/Users',
+//     method: 'post',
+//     data
+//   })
+// }

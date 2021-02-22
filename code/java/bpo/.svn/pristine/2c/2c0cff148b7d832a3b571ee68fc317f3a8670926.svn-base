@@ -1,0 +1,52 @@
+package com.rz.iot.bpo.mina.service;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.model.MinaClassesFromExternal;
+import com.rz.iot.bpo.mina.model.param.MinaClassesGenerateParam;
+import com.rz.iot.bpo.mina.model.param.MinaClassesParam;
+import com.rz.iot.bpo.mina.model.param.MinaScheduleRuleParam;
+import com.rz.iot.bpo.mina.model.param.MinaUpdateClassesParam;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+import com.rz.iot.bpo.mina.model.show.MinaClassesShow;
+
+import java.util.List;
+
+
+public interface MinaScheduleService {
+
+    Result getClassFromExternal(MinaClassesParam minaClassesParam);
+
+    Result<MinaClassesShow> getClassFromExternalList(MinaClassesParam minaClassesParam);
+
+    Result addClassFromExternal(MinaClassesParam minaClassesParam);
+
+    Result updateClassFromExternal(MinaUpdateClassesParam minaClassesParam);
+
+    Result deleteClassFromExternal(MinaClassesParam minaClassesParam);
+
+    Result getProjectNamesByTransferStationName(MinaClassesParam minaClassesParam);
+
+    Result<MinaClassGenerateShow> getClassGenerate(MinaClassesGenerateParam classesGenerateParam);
+
+    Result addClassGenerate(MinaClassesGenerateParam classesGenerateParam);
+
+    Result addClassGenerateList(MinaClassesParam classesParamList);
+
+    Result updateClassGenerate(MinaClassesGenerateParam bpoClassesGenerateParam);
+
+
+
+//    Result<BpoScheduleRuleShow> getScheduleRule(Integer projectId);
+//
+//    Result<BpoProjectEmployeeShow> getEmployeeData(Integer projectId);
+
+    //    Result updateScheduleRule(MinaScheduleRuleParam scheduleRuleParam);
+//
+    Result addScheduleRule(MinaScheduleRuleParam scheduleRuleParam);
+
+    Result deleteClassGenerate(Integer scheduleId);
+
+    Result deleteScheduleRule(Integer scheduleRuleId);
+
+
+}

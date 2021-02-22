@@ -1,0 +1,65 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.BillSelectPersonParam;
+import com.rz.iot.bpo.service.BpoBillPayablePersonService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+/**
+ * 账单 个人应付
+ */
+@RestController
+@RequestMapping("/bpoBillHandle")
+public class BpoBillPayablePersonController {
+
+    @Resource
+    BpoBillPayablePersonService bpoBillPayablePersonService;
+
+    /**
+     * 查询个人账单列表
+     * @param select
+     * @return
+     */
+    @GetMapping("/findAllBillPerson")
+    public Result findAllBillPerson(BillSelectPersonParam select){
+        return bpoBillPayablePersonService.findAllBillPerson(select);
+    }
+
+    /**
+     * 查询个人账单详情
+     * @param id
+     * @param date
+     * @return
+     */
+    @GetMapping("/billPersonDayDetail")
+    public Result billPersonDayDetail(Integer id , String date){
+        return bpoBillPayablePersonService.findADayBillDetail(id, date);
+    }
+
+    /**
+     * 查询个人日账单汇总数据和详情
+     * @param id
+     * @param date
+     * @return
+     */
+    @GetMapping("getBillPersonTotal")
+    public Result getBillPersonTotal(Integer id, String date){
+        return bpoBillPayablePersonService.getBillPersonTotal(id, date);
+    }
+
+    /**
+     * 查询个人月账单
+     * @param select
+     * @return
+     */
+    @GetMapping("/findAllBillMonth")
+    public Result findAllBillMonth(BillSelectPersonParam select){
+        return bpoBillPayablePersonService.findAllBillMonth(select);
+    }
+
+
+}

@@ -1,0 +1,184 @@
+/** When your routing table is too long, you can split it into small modules**/
+
+import Layout from '@/views/layout/Layout'
+
+const systemManageRouter = {
+  path: '/systemManage',
+  component: Layout,
+  redirect: '/systemManage/roleManage',
+  name: 'systemManage',
+  meta: {
+    title: '系统设置',
+    icon: 'system',
+    childrenFilter: true
+  },
+  children: [
+    {
+      path: 'orgnizationManage',
+      component: () => import('@/views/systemManage/orgnizationManage'),
+      name: 'orgnizationManage',
+      meta: { title: '组织管理' },
+      children: [
+        {
+          path: 'orgList',
+          component: () => import('@/views/systemManage/orgnizationManage/orgList'),
+          name: 'orgList',
+          meta: { title: '组织管理' }
+        },
+        {
+          path: 'orgInfo',
+          component: () => import('@/views/systemManage/orgnizationManage/orgInfo'),
+          name: 'orgInfo',
+          hidden: true,
+          meta: { title: '组织信息' }
+        },
+        {
+          path: 'orgDetail',
+          component: () => import('@/views/systemManage/orgnizationManage/orgDetail'),
+          name: 'orgDetail',
+          hidden: true,
+          meta: { title: '组织详情' }
+        }
+      ]
+    },
+    {
+      path: 'departmentManage',
+      component: () => import('@/views/systemManage/departmentManage/departmentList'),
+      name: 'departmentManage',
+      meta: { title: '部门管理' }
+    },
+    {
+      path: 'roleManage',
+      component: () => import('@/views/systemManage/roleManage'),
+      name: 'roleManage',
+      meta: { title: '角色管理' }
+    },
+    {
+      path: 'userManage',
+      name: 'userManage',
+      component: () => import('@/views/systemManage/userManage'),
+      meta: { title: '用户管理' },
+      children: [
+        {
+          path: 'userList',
+          component: () => import('@/views/systemManage/userManage/userList'),
+          name: 'userList',
+          meta: { title: '用户管理' }
+        },
+        {
+          path: 'userInfo',
+          component: () => import('@/views/systemManage/userManage/userInfo'),
+          name: 'userInfo',
+          hidden: true,
+          meta: { title: '用户信息' }
+        },
+        {
+          path: 'userDetail',
+          component: () => import('@/views/systemManage/userManage/userDetail'),
+          name: 'userDetail',
+          hidden: true,
+          meta: { title: '用户详情' }
+        }
+      ]
+    },
+    {
+      path: 'permissionManage',
+      component: () => import('@/views/systemManage/permissionManage'),
+      name: 'permissionManage',
+      meta: { title: '权限管理' }
+    },
+    {
+      path: 'dataPermissionInfo',
+      component: () => import('@/views/systemManage/dataPermissionInfo'),
+      name: 'dataPermissionInfo',
+      hidden: true,
+      meta: { title: '数据权限' }
+    },
+
+    {
+      path: 'SiteManagePage',
+      component: () => import('@/views/systemManage/siteManage'),
+      name: 'SiteManagePage',
+      meta: { title: '场地管理' },
+      children: [
+        {
+          path: 'siteManage',
+          component: () => import('@/views/systemManage/siteManage/siteManage'),
+          name: 'SiteManage',
+          meta: { title: '场地管理' }
+        },
+        {
+          path: 'newSite',
+          component: () => import('@/views/systemManage/siteManage/newSite'),
+          name: 'NewSite',
+          hidden: true,
+          meta: { title: '新增场地' }
+        },
+        {
+          path: 'siteDetails',
+          component: () => import('@/views/systemManage/siteManage/siteDetails'),
+          name: 'SiteDetails',
+          hidden: true,
+          meta: { title: '场地详情' }
+        }
+      ]
+    },
+    {
+      path: 'dataDictionary',
+      component: () => import('@/views/systemManage/dataDictionary'),
+      name: 'dataDictionary',
+      meta: { title: '数据字典' }
+    },
+    {
+      path: 'dataDictionaryDataMgt',
+      component: () => import('@/views/systemManage/datadictionary/dataDictionaryDataMgt'),
+      name: 'DataDictionaryDataMgt',
+      hidden: true,
+      meta: { title: '数据字典数据管理' }
+    },
+    {
+      path: 'logMgt',
+      component: () => import('@/views/systemManage/logMgt'),
+      name: 'LogMgt',
+      meta: { title: '日志管理' },
+      children: [
+        {
+          path: 'systemLog',
+          component: () => import('@/views/systemManage/logMgt/systemLog'),
+          name: 'SystemLog',
+          hidden: true,
+          meta: { title: '系统日志' }
+        },
+        {
+          path: 'operateLog',
+          component: () => import('@/views/systemManage/logMgt/operateLog'),
+          name: 'OperateLog',
+          hidden: true,
+          meta: { title: '操作日志' }
+        },
+        {
+          path: 'loginLog',
+          component: () => import('@/views/systemManage/logMgt/loginLog'),
+          name: 'LoginLog',
+          hidden: true,
+          meta: { title: '登录日志' }
+        }
+      ]
+    },
+    {
+      path: 'workModule',
+      component: () => import('@/views/systemManage/workModule'),
+      name: 'workModule',
+      meta: { title: '工作模块' },
+      children: [
+        {
+          path: 'workSequenceTeam',
+          component: () => import('@/views/systemManage/workModule/workSequenceTeam'),
+          name: 'WorkSequenceTeam',
+          meta: { title: '工作模块/工序/工作小组' }
+        }
+      ]
+    }
+  ]
+}
+export default systemManageRouter

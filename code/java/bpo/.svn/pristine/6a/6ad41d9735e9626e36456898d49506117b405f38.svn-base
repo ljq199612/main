@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysDictTypeMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysDictType" >
+    <id column="dict_id" property="dictId" jdbcType="BIGINT" />
+    <result column="dict_name" property="dictName" jdbcType="VARCHAR" />
+    <result column="dict_type" property="dictType" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    dict_id, dict_name, dict_type, status, create_time, update_time, remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_dict_type
+    where dict_id = #{dictId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_dict_type
+    where dict_id = #{dictId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysDictType" >
+    insert into sys_dict_type (dict_id, dict_name, dict_type, 
+      status, create_time, update_time, 
+      remark)
+    values (#{dictId,jdbcType=BIGINT}, #{dictName,jdbcType=VARCHAR}, #{dictType,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysDictType" >
+    insert into sys_dict_type
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="dictId != null" >
+        dict_id,
+      </if>
+      <if test="dictName != null" >
+        dict_name,
+      </if>
+      <if test="dictType != null" >
+        dict_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="dictId != null" >
+        #{dictId,jdbcType=BIGINT},
+      </if>
+      <if test="dictName != null" >
+        #{dictName,jdbcType=VARCHAR},
+      </if>
+      <if test="dictType != null" >
+        #{dictType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysDictType" >
+    update sys_dict_type
+    <set >
+      <if test="dictName != null" >
+        dict_name = #{dictName,jdbcType=VARCHAR},
+      </if>
+      <if test="dictType != null" >
+        dict_type = #{dictType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where dict_id = #{dictId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysDictType" >
+    update sys_dict_type
+    set dict_name = #{dictName,jdbcType=VARCHAR},
+      dict_type = #{dictType,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where dict_id = #{dictId,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectBySysDictType" parameterType="com.rz.iot.bpo.model.SysDictType" resultType="com.rz.iot.bpo.model.SysDictType">
+    select dict_id as dictId,dict_name as dictName,dict_type as dictType,status,create_time as createTime,update_time as updateTime,remark from sys_dict_type
+    <if test="sysDictType != null">
+      <where>
+        1 = 1
+        <if test="sysDictType.dictName != null and sysDictType.dictName != ''">
+          and dict_name like concat('%',#{sysDictType.dictName},'%')
+        </if>
+        <if test="sysDictType.dictType != null and sysDictType.dictType != ''">
+          and dict_type like concat('%',#{sysDictType.dictType},'%')
+        </if>
+        <if test="sysDictType.status != null and sysDictType.status != 0">
+          and status = #{sysDictType.status}
+        </if>
+      </where>
+    </if>
+  </select>
+
+  <select id="findAllNoPage" resultType="com.rz.iot.bpo.model.SysDictType">
+    select dict_id as dictId,dict_name as dictName,dict_type as dictType,status,create_time as createTime,update_time as updateTime,remark from sys_dict_type
+    where `status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+  <select id="isExsitType" resultType="com.rz.iot.bpo.model.SysDictType">
+    select dict_id as dictId,dict_name as dictName,dict_type as dictType,status,create_time as createTime,update_time as updateTime,remark from sys_dict_type
+    where dict_type = #{dictType} and `status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <if test="id != null">
+        and dict_id != #{id}
+    </if>
+  </select>
+
+  <!--通过字典类型查询所有数据-->
+  <select id="findDataByType" parameterType="java.lang.String" resultType="com.rz.iot.bpo.model.SysDictData">
+        select d.id as id,d.dict_label as dictLabel,d.dict_value as dictValue,d.dict_id as dictId,d.`status` as `status` from sys_dict_data d
+  left join sys_dict_type t ON d.dict_id = t.dict_id and t.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  where d.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} and t.dict_type = #{value}
+  </select>
+
+  <select id="updateStatus">
+    update sys_dict_type set `status` = #{status}
+    where dict_id = #{dictId}
+  </select>
+</mapper>

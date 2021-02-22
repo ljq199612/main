@@ -1,0 +1,27 @@
+package com.rz.iot.bpo.mina.mapper;
+
+import com.rz.iot.bpo.mina.model.MinaClassesFromExternal;
+import com.rz.iot.bpo.mina.model.show.MinaClassesShow;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface MinaClassesFromExternalMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(MinaClassesFromExternal record);
+
+    int insertSelective(MinaClassesFromExternal record);
+
+    MinaClassesFromExternal selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(MinaClassesFromExternal record);
+
+    int updateByPrimaryKey(MinaClassesFromExternal record);
+
+    MinaClassesShow selectByProjectId(Integer projectId);
+
+//    MinaClassesShow selectByProjectIdAndTransferStationName(
+//            @Param("projectId")Integer projectId, @Param("transferStationName")String transferStationName);
+
+}

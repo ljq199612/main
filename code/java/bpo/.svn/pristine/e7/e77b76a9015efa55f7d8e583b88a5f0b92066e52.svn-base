@@ -1,0 +1,20 @@
+package com.rz.iot.bpo.mina.mapper;
+
+import com.rz.iot.bpo.mina.model.MinaScheduleToEmployee;
+
+public interface MinaScheduleToEmployeeMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(MinaScheduleToEmployee record);
+
+    int insertSelective(MinaScheduleToEmployee record);
+
+    MinaScheduleToEmployee selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(MinaScheduleToEmployee record);
+
+    int updateByPrimaryKey(MinaScheduleToEmployee record);
+
+    int deleteStatusByScheduleId(Integer scheduleId);
+
+}

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoBillReconciliationPersonalMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoBillReconciliationPersonal" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="reconciliation_id" property="reconciliationId" jdbcType="INTEGER" />
+    <result column="hourly_wage" property="hourlyWage" jdbcType="DECIMAL" />
+    <result column="food_subsidy" property="foodSubsidy" jdbcType="DECIMAL" />
+    <result column="night_subsidy" property="nightSubsidy" jdbcType="DECIMAL" />
+    <result column="other_subsidy" property="otherSubsidy" jdbcType="DECIMAL" />
+    <result column="deduction" property="deduction" jdbcType="DECIMAL" />
+    <result column="business_deduction" property="businessDeduction" jdbcType="DECIMAL" />
+    <result column="social_security" property="socialSecurity" jdbcType="DECIMAL" />
+    <result column="accumulation_fund" property="accumulationFund" jdbcType="DECIMAL" />
+    <result column="personal_income_tax" property="personalIncomeTax" jdbcType="DECIMAL" />
+    <result column="other_income" property="otherIncome" jdbcType="DECIMAL" />
+    <result column="other_deduction" property="otherDeduction" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, reconciliation_id, hourly_wage, food_subsidy, night_subsidy, other_subsidy, deduction, 
+    business_deduction, social_security, accumulation_fund, personal_income_tax, other_income, 
+    other_deduction, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_bill_reconciliation_personal
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_bill_reconciliation_personal
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationPersonal" >
+    insert into bpo_bill_reconciliation_personal (id, reconciliation_id, hourly_wage, 
+      food_subsidy, night_subsidy, other_subsidy, 
+      deduction, business_deduction, social_security, 
+      accumulation_fund, personal_income_tax, other_income, 
+      other_deduction, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{reconciliationId,jdbcType=INTEGER}, #{hourlyWage,jdbcType=DECIMAL}, 
+      #{foodSubsidy,jdbcType=DECIMAL}, #{nightSubsidy,jdbcType=DECIMAL}, #{otherSubsidy,jdbcType=DECIMAL}, 
+      #{deduction,jdbcType=DECIMAL}, #{businessDeduction,jdbcType=DECIMAL}, #{socialSecurity,jdbcType=DECIMAL}, 
+      #{accumulationFund,jdbcType=DECIMAL}, #{personalIncomeTax,jdbcType=DECIMAL}, #{otherIncome,jdbcType=DECIMAL}, 
+      #{otherDeduction,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationPersonal" >
+    insert into bpo_bill_reconciliation_personal
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="reconciliationId != null" >
+        reconciliation_id,
+      </if>
+      <if test="hourlyWage != null" >
+        hourly_wage,
+      </if>
+      <if test="foodSubsidy != null" >
+        food_subsidy,
+      </if>
+      <if test="nightSubsidy != null" >
+        night_subsidy,
+      </if>
+      <if test="otherSubsidy != null" >
+        other_subsidy,
+      </if>
+      <if test="deduction != null" >
+        deduction,
+      </if>
+      <if test="businessDeduction != null" >
+        business_deduction,
+      </if>
+      <if test="socialSecurity != null" >
+        social_security,
+      </if>
+      <if test="accumulationFund != null" >
+        accumulation_fund,
+      </if>
+      <if test="personalIncomeTax != null" >
+        personal_income_tax,
+      </if>
+      <if test="otherIncome != null" >
+        other_income,
+      </if>
+      <if test="otherDeduction != null" >
+        other_deduction,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="reconciliationId != null" >
+        #{reconciliationId,jdbcType=INTEGER},
+      </if>
+      <if test="hourlyWage != null" >
+        #{hourlyWage,jdbcType=DECIMAL},
+      </if>
+      <if test="foodSubsidy != null" >
+        #{foodSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="nightSubsidy != null" >
+        #{nightSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="otherSubsidy != null" >
+        #{otherSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="businessDeduction != null" >
+        #{businessDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="socialSecurity != null" >
+        #{socialSecurity,jdbcType=DECIMAL},
+      </if>
+      <if test="accumulationFund != null" >
+        #{accumulationFund,jdbcType=DECIMAL},
+      </if>
+      <if test="personalIncomeTax != null" >
+        #{personalIncomeTax,jdbcType=DECIMAL},
+      </if>
+      <if test="otherIncome != null" >
+        #{otherIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="otherDeduction != null" >
+        #{otherDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationPersonal" >
+    update bpo_bill_reconciliation_personal
+    <set >
+      <if test="reconciliationId != null" >
+        reconciliation_id = #{reconciliationId,jdbcType=INTEGER},
+      </if>
+      <if test="hourlyWage != null" >
+        hourly_wage = #{hourlyWage,jdbcType=DECIMAL},
+      </if>
+      <if test="foodSubsidy != null" >
+        food_subsidy = #{foodSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="nightSubsidy != null" >
+        night_subsidy = #{nightSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="otherSubsidy != null" >
+        other_subsidy = #{otherSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        deduction = #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="businessDeduction != null" >
+        business_deduction = #{businessDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="socialSecurity != null" >
+        social_security = #{socialSecurity,jdbcType=DECIMAL},
+      </if>
+      <if test="accumulationFund != null" >
+        accumulation_fund = #{accumulationFund,jdbcType=DECIMAL},
+      </if>
+      <if test="personalIncomeTax != null" >
+        personal_income_tax = #{personalIncomeTax,jdbcType=DECIMAL},
+      </if>
+      <if test="otherIncome != null" >
+        other_income = #{otherIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="otherDeduction != null" >
+        other_deduction = #{otherDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationPersonal" >
+    update bpo_bill_reconciliation_personal
+    set reconciliation_id = #{reconciliationId,jdbcType=INTEGER},
+      hourly_wage = #{hourlyWage,jdbcType=DECIMAL},
+      food_subsidy = #{foodSubsidy,jdbcType=DECIMAL},
+      night_subsidy = #{nightSubsidy,jdbcType=DECIMAL},
+      other_subsidy = #{otherSubsidy,jdbcType=DECIMAL},
+      deduction = #{deduction,jdbcType=DECIMAL},
+      business_deduction = #{businessDeduction,jdbcType=DECIMAL},
+      social_security = #{socialSecurity,jdbcType=DECIMAL},
+      accumulation_fund = #{accumulationFund,jdbcType=DECIMAL},
+      personal_income_tax = #{personalIncomeTax,jdbcType=DECIMAL},
+      other_income = #{otherIncome,jdbcType=DECIMAL},
+      other_deduction = #{otherDeduction,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

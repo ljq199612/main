@@ -1,0 +1,3 @@
+export const systemManage = {
+  getOrgList: 'sysCompany/findAll'
+}

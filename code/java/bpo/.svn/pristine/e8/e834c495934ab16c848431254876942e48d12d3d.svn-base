@@ -1,0 +1,136 @@
+$bg:rgba(0, 0, 0, 0.1);
+$dark_gray:#889aa4;
+.login{
+  width: 100%;
+  height: 100%;
+  background-image: url('./login_bg.jpg');
+  background-size: cover;
+  background-position: 60%;
+  header {
+    background-color: #fff;
+    height: 60px;
+    line-height: 60px;
+    .logo {
+      height: 60px;
+      margin-left: 10px;
+      float: left;
+      & img {
+        padding: 15px;
+        height: 100%;
+      }
+    }
+    h1{
+      margin: 0;
+      color: #333;
+      font-weight: 700;
+      font-size: 20px;
+    }
+  }
+  .box-card{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-60%);
+    width: 100%;
+    border: 0;
+    background-color: transparent;
+      .login-form{
+          padding: 10px 0 0;
+      }
+  }
+}
+@media (min-width: 768px ) {
+  .login{
+    background-position: 67%;
+    .box-card{
+      right: 60px;
+      width: 36%;
+      border: 1px solid #ebeef5;
+      background-color: #fff;
+    }
+  }
+}
+@media (min-width: 992px) {
+  .login{
+
+    .box-card{
+      right: 100px;
+      width: 35%;
+    }
+  }
+}
+@media (min-width: 1200px) {
+  .login{
+    .box-card{
+      right: 120px;
+      width: 350px;
+    }
+  }
+}
+@media (min-width: 1920px) {
+  .login{
+    background-size: cover;
+    .box-card{
+      right: 160px;
+      width: 420px;
+    }
+  }
+}
+/* reset element-ui css */
+.login {
+  .el-input {
+    display: inline-block;
+    width: 85%;
+    input {
+      background: transparent;
+      border: 0px;
+      -webkit-appearance: none;
+      border-radius: 0px;
+      &:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px $bg inset !important;
+        -webkit-text-fill-color: #fff !important;
+      }
+    }
+  }
+  .el-form-item {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: $bg;
+    border-radius: 5px;
+    color: #454545;
+  }
+  .captcha{
+    .el-input {
+      width: 60%;
+    }
+
+    img {
+      position: absolute;
+      right: 10px;
+      top: 5px;
+      cursor: pointer;
+    }
+  }
+}
+
+.login {
+  .svg-container {
+    padding: 2px 5px 2px 15px;
+    color: $dark_gray;
+    vertical-align: middle;
+    width: 30px;
+    display: inline-block;
+    &_login {
+      font-size: 20px;
+    }
+  }
+
+  .show-pwd {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: pointer;
+    user-select: none;
+  }
+
+}

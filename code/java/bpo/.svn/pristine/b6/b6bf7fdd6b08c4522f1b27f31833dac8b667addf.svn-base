@@ -1,0 +1,50 @@
+import request from '@/utils/request'
+
+// 条件查询（支持模糊查询）
+export function queryList(query) {
+  return request({
+    url: '/jiafang/selectJiaFangByCondition',
+    method: 'get',
+    params: query
+  })
+}
+// 根据甲方信息的id查询单条甲方信息
+export function getJiaFangById(query) {
+  return request({
+    url: '/jiafang/getJiaFangById',
+    method: 'get',
+    params: query
+  })
+}
+// 删除一个甲方
+export function deleteJiaFang(query) {
+  return request({
+    url: '/jiafang/deleteJiaFang',
+    method: 'get',
+    params: query
+  })
+}
+// 修改甲方
+export function updateJiaFang(data) {
+  return request({
+    url: '/jiafang/updateJiaFang',
+    method: 'post',
+    data
+  })
+}
+// 新增甲方
+export function addJiaFang(data) {
+  return request({
+    url: '/jiafang/addJiaFang',
+    method: 'post',
+    data
+  })
+}
+// 根据用户所属组织获取甲方信息
+export function getDetailById(query) {
+  return request({
+    url: '/jiafang/getDetailById',
+    method: 'get',
+    params: query
+  })
+}

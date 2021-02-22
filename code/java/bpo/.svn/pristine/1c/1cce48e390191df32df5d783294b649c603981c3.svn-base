@@ -1,0 +1,392 @@
+<template>
+  <CfPanel title="数据字典数据管理" :back-to="backTo" class="main">
+    <el-form class="searchForm">
+      <el-row>
+        <el-col :span="6">
+          <el-form-item label-width="52px" label="类型：">
+            <el-select v-model="queryForm.dictId" placeholder="请选择数据字典类型" @change="submit">
+              <el-option v-for="(item,index) in typeOptions" :key="index" :label="item.dictName" :value="item.dictId" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label-width="90px" label="类型编码：">
+            <el-input v-model.trim="queryForm.dictValue" placeholder="请输入类型编码" class="half" @keyup.13.native="submit" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label-width="72px" label="名称：">
+            <el-input v-model.trim="queryForm.dictLabel" placeholder="请输入名称" class="half" @keyup.13.native="submit" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="4" style="margin-left: 10px;">
+          <el-form-item>
+            <el-button class="bpoBtn" @click="submit">搜索</el-button>
+            <el-button @click="reset">重置</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+
+    <el-button type="primary" icon="el-icon-plus" @click="addFn">
+      新增
+    </el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="tableList"
+      class="bpoTable"
+      fit
+      @sort-change="sortChange"
+    >
+      <el-table-column align="center" label="编号" type="index" width="80" />
+      <el-table-column align="left" label="类型" min-width="80" prop="dictId">
+        <template slot-scope="scope">{{ scope.row.dictId|filterType(typeOptions) }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="字典编码" min-width="80" prop="dictValue" />
+      <el-table-column show-overflow-tooltip align="left" label="名称" min-width="80" prop="dictLabel" />
+      <el-table-column show-overflow-tooltip align="left" label="备注" min-width="80">
+        <template slot-scope="scope">{{ scope.row.remark }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="创建时间" min-width="80">
+        <template slot-scope="scope">{{ scope.row.createTime }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="状态" width="80">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.statusValue"
+            :active-value="1"
+            :inactive-value="2"
+            @change="changeStatus(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button type="text" style="color:#19D185" @click="updateAddForm(scope.row)">修改</el-button>
+          <el-button v-if="scope.row.status!='deleted'" type="text" style="color:#4794F7" @click="delAddForm(scope.row,'deleted')">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 新增弹框 -->
+    <el-dialog
+      :title="`${currentRow?'修改':'增加'}数据字典项`"
+      class="bpoDialog"
+      :close-on-click-modal="false"
+      :visible.sync="dialogFormVisible"
+      @close="cancelAddForm"
+    >
+      <el-form
+        ref="addForm"
+        :model="addForm"
+        label-width="90px"
+        :rules="addFormRules"
+      >
+        <el-form-item label="类型：" prop="dictId">
+          <el-select v-model="addForm.dictId" disabled placeholder="请选择数据字典类型" @change="submit">
+            <el-option v-for="(item,index) in typeOptions" :key="index" :label="item.dictName" :value="item.dictId" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="类型编码：" prop="dictValue">
+          <el-input v-model="addForm.dictValue" placeholder="请输入类型编码" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="名称：" prop="dictLabel">
+          <el-input v-model="addForm.dictLabel" placeholder="请输入名称" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="备注：">
+          <el-input v-model="addForm.remark" placeholder="请输入备注" type="textarea" :rows="3" autocomplete="off" />
+        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="24" class="bpoButtonGroup pull-right">
+            <el-button type="primary" @click="confirmAddForm">提交</el-button>
+            <el-button @click="cancelAddForm">关闭</el-button>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-dialog>
+    <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="page.pageNum" :limit.sync="page.pageSize" @pagination="getList" />
+  </CfPanel>
+</template>
+<script>
+import { findAllTypes, findAllDa, deleteDa, insertDa, updateDa } from '@/api/dataDictionary'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination'
+
+export default {
+  name: 'DataDictionaryDataMgt',
+  components: {
+    CfPanel,
+    Pagination
+  },
+  filters: {
+    filterType(dictId, typeOptions) {
+      const cur = typeOptions.filter(item => +item.dictId === +dictId)
+      return cur[0] ? cur[0].dictName : ''
+    }
+  },
+  data() {
+    return {
+      listLoading: false,
+      typeOptions: [],
+      page: {
+        pageNum: 1,
+        pageSize: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      total: 0,
+      queryForm: {
+        dictId: null,
+        dictLabel: '',
+        dictValue: ''
+      },
+      tableList: [],
+      dialogFormVisible: false,
+      addFormDictName: '',
+      addForm: {
+        dictId: null,
+        dictLabel: '',
+        dictValue: '',
+        remark: '',
+        id: '',
+        status: ''
+      },
+      addFormRules: {
+        dictId: { required: true, message: '请选择数据字典类型', trigger: 'blur' },
+        dictLabel: { required: true, message: '请输入名称', trigger: 'blur' },
+        dictValue: { required: true, message: '请输类型编码', trigger: 'blur' }
+      },
+      currentRow: null // 修改表格当前行数据
+    }
+  },
+  created() {
+    // 默认设置类型
+    const { dictId } = this.$route.query
+    this.queryForm.dictId = +dictId
+    this.addForm.dictId = +dictId
+    this.getTypeOptions()
+    this.getList()
+  },
+  methods: {
+    backTo() {
+      this.$router.go(-1)
+    },
+    getTypeOptions() {
+      findAllTypes().then((res) => {
+        this.typeOptions = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    addFn() {
+      // 绑定搜索栏类型值
+      this.addForm.dictId = this.queryForm.dictId
+      this.dialogFormVisible = true
+    },
+    cancelAddForm() {
+      this.clearAddForm()
+    },
+    confirmAddForm() {
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          // 修改数据
+          if (this.currentRow) {
+            this.updateDa()
+          // 新增数据
+          } else {
+            this.insertDa()
+          }
+        }
+      })
+    },
+    // 重置新增表单
+    clearAddForm() {
+      this.dialogFormVisible = false
+      this.addForm.dictLabel = ''
+      this.addForm.dictId = ''
+      this.addForm.dictValue = ''
+      this.addForm.remark = ''
+      this.addForm.id = ''
+      this.addForm.status = ''
+      this.$refs.addForm.resetFields()
+    },
+    insertDa() {
+      // 测试代码
+      this.tableList.push({
+        dictId: Date.now(),
+        ...this.addForm
+      })
+      const { dictId, dictLabel, dictValue, remark } = this.addForm
+      insertDa({
+        dictId,
+        dictLabel,
+        dictValue,
+        remark
+      }).then((res) => {
+        if (res.code === 40030) {
+          this.$message({
+            type: 'warning',
+            message: res.message || '该类型编码已存在'
+          })
+        } else {
+          // 刷新列表
+          this.reset()
+          this.$message({
+            type: 'success',
+            message: res.data.message || '字典类型新增成功'
+          })
+          // 重置表单
+          this.clearAddForm()
+        }
+      }).catch((err) => {
+        // 重置表单
+        this.clearAddForm()
+        this.$message({
+          type: 'error',
+          message: err.message || '新增错误'
+        })
+      })
+    },
+    updateDa() {
+      updateDa({
+        id: this.currentRow.id,
+        dictId: this.currentRow.dictId,
+        ...this.addForm
+      }).then((res) => {
+        if (res.code === 40030) {
+          this.$message({
+            type: 'warning',
+            message: res.message || '该类型编码已存在'
+          })
+        } else {
+          // 刷新列表
+          this.getList()
+          this.currentRow = null
+          this.$message({
+            type: 'success',
+            message: res.message || '字典类型更新成功'
+          })
+          // 重置表单
+          this.clearAddForm()
+        }
+      }).catch((err) => {
+        // 重置表单
+        this.clearAddForm()
+        this.currentRow = null
+        this.$message({
+          type: 'error',
+          message: err.message || '更新错误'
+        })
+      })
+    },
+    reset() {
+      this.page.pageNum = 1
+      this.queryForm.dictId = ''
+      this.queryForm.dictLabel = ''
+      this.queryForm.dictValue = ''
+      this.getList()
+    },
+    submit() {
+      this.page.pageNum = 1
+      this.getList()
+    },
+    getList() {
+      this.listLoading = true
+      findAllDa({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...this.queryForm
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.tableList = (data.list || []).map((item) => {
+          if (/1/.test(item.status)) {
+            item.statusValue = true
+          } else {
+            item.statusValue = false
+          }
+          return item
+        })
+        this.total = data.total
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    sortChange() {},
+    updateAddForm(row) {
+      this.dialogFormVisible = true
+      this.currentRow = row
+      const { dictId, dictLabel, dictValue, remark, status, id } = row
+      // 赋值新增表格
+      this.addForm.dictId = +dictId
+      this.addForm.dictLabel = dictLabel
+      this.addForm.dictValue = dictValue
+      this.addForm.remark = remark
+      this.addForm.id = id
+      this.addForm.status = status
+    },
+    delAddForm(row) {
+      this.$confirm('此操作将永久删除该类型数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteDa(row.id)
+      }).catch(() => {})
+    },
+    deleteDa(id) {
+      deleteDa({
+        id
+      }).then((res) => {
+        this.$message({
+          type: 'success',
+          message: res.data.message || '删除成功'
+        })
+        this.submit()
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '删除失败'
+        })
+      })
+    },
+    // 改变状态
+    changeStatus(row) {
+      console.log(row, 'row')
+      updateDa({
+        id: row.id,
+        dictId: row.dictId,
+        dictLabel: row.dictLabel,
+        dictValue: row.dictValue,
+        remark: row.remark,
+        status: row.statusValue ? 1 : 2
+      }).then((res) => {
+        // 刷新列表
+        setTimeout(() => {
+          this.getList()
+        }, 500)
+        this.$message({
+          type: 'success',
+          message: res.message || '状态更新成功'
+        })
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '更新错误'
+        })
+      })
+    }
+  }
+}
+</script>

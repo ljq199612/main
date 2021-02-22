@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysUserMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysUser" >
+    <id column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="real_name" property="realName" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="INTEGER" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="login_ip" property="loginIp" jdbcType="VARCHAR" />
+    <result column="login_date" property="loginDate" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, username, password, nick_name, real_name, user_type, email, phone, sex, 
+    avatar, status, login_ip, login_date, create_time, update_time, remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from sys_user
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_user
+    where user_id = #{userId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysUser" >
+    insert into sys_user (user_id, username, password, 
+      nick_name, real_name, user_type, 
+      email, phone,backups_phone, sex,
+      avatar, status, login_ip, 
+      login_date, create_time, update_time, 
+      remark)
+    values (#{userId,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{nickName,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER}, 
+      #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},#{backupsPhone,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER},
+      #{avatar,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{loginIp,jdbcType=VARCHAR}, 
+      #{loginDate,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysUser" useGeneratedKeys="true" keyColumn="userId" keyProperty="userId">
+    insert into sys_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="nickName != null" >
+        nick_name,
+      </if>
+      <if test="realName != null" >
+        real_name,
+      </if>
+      <if test="userType != null" >
+        user_type,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="backupsPhone != null" >
+        backups_phone,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="avatar != null" >
+        avatar,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="loginIp != null" >
+        login_ip,
+      </if>
+      <if test="loginDate != null" >
+        login_date,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null" >
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null" >
+        #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="backupsPhone != null" >
+        #{backupsPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="avatar != null" >
+        #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="loginIp != null" >
+        #{loginIp,jdbcType=VARCHAR},
+      </if>
+      <if test="loginDate != null" >
+        #{loginDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysUser" >
+    update sys_user
+    <set >
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null" >
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null" >
+        real_name = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        user_type = #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="avatar != null" >
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="loginIp != null" >
+        login_ip = #{loginIp,jdbcType=VARCHAR},
+      </if>
+      <if test="loginDate != null" >
+        login_date = #{loginDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysUser" >
+    update sys_user
+    set username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      real_name = #{realName,jdbcType=VARCHAR},
+      user_type = #{userType,jdbcType=INTEGER},
+      email = #{email,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=INTEGER},
+      avatar = #{avatar,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      login_ip = #{loginIp,jdbcType=VARCHAR},
+      login_date = #{loginDate,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+
+  <resultMap id="FindUserResultMap" type="com.rz.iot.bpo.model.SysUser" extends="BaseResultMap">
+    <association property="sysOrg" javaType="com.rz.iot.bpo.model.SysOrg">
+      <id column="org_id" property="id" jdbcType="INTEGER" />
+      <result column="org_name" property="orgName" jdbcType="VARCHAR" />
+      <result column="org_key" property="orgKey" jdbcType="VARCHAR" />
+      <result column="org_sort" property="orgSort" jdbcType="INTEGER" />
+      <result column="org_remark" property="remark" jdbcType="VARCHAR" />
+    </association>
+    <association property="sysRole" javaType="com.rz.iot.bpo.model.SysRole">
+      <id column="role_id" property="id" jdbcType="INTEGER" />
+      <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+      <result column="role_key" property="roleKey" jdbcType="VARCHAR" />
+      <result column="role_sort" property="roleSort" jdbcType="INTEGER" />
+      <result column="role_remark" property="remark" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+
+  <sql id="findUserVO">
+    SELECT
+    sys_user.user_id, sys_user.username, sys_user.password, sys_user.nick_name, sys_user.real_name, sys_user.user_type, sys_user.email, sys_user.phone, sys_user.sex,
+    sys_user.avatar, sys_user.status, sys_user.login_ip, sys_user.login_date, sys_user.create_time, sys_user.update_time, sys_user.remark,
+    sys_org.id AS org_id, sys_org.org_name, sys_org.org_key, sys_org.org_sort, sys_org.remark AS org_remark,
+    sys_role.id AS role_id, sys_role.role_name, sys_role.role_key, sys_role.role_sort, sys_role.remark AS role_remark
+    FROM
+      sys_user
+      LEFT JOIN sys_company_role_user company_role_user ON company_role_user.user_id = sys_user.user_id AND company_role_user.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      LEFT JOIN sys_company company ON company.id = company_role_user.company_id AND company.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      LEFT JOIN sys_org ON sys_org.id = company.org_type AND sys_org.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      LEFT JOIN sys_role ON sys_role.id = company_role_user.role_id AND sys_role.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    WHERE
+      sys_user.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </sql>
+
+  <select id="findByUsername" resultMap="FindUserResultMap">
+    <include refid="findUserVO"/>
+    AND sys_user.username = #{username}
+  </select>
+
+  <select id="findByUserId" resultMap="FindUserResultMap">
+    <include refid="findUserVO"/>
+    AND sys_user.user_id = #{userId}
+  </select>
+
+  <select id="isExistUserUpdate" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from
+    sys_user
+    where
+    status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    <if test="username != null and username != ''">
+        and username = #{username}
+    </if>
+    <if test="userId != null and userId != 0">
+      and user_id != #{userId}
+    </if>
+  </select>
+
+  <resultMap id="findAllMap" type="com.rz.iot.bpo.model.show.SysUserShow">
+    <result property="id" column="id"/>
+    <result property="username" column="username"/>
+    <result property="orgName" column="orgName"/>
+    <result property="companyName" column="companyName"/>
+    <result property="roleName" column="roleName"/>
+    <result property="phone" column="phone"/>
+    <result property="status" column="status"/>
+    <collection property="deptShows" column="deptId" select="deptSelect"/>
+  </resultMap>
+
+  <select id="findAll" resultType="com.rz.iot.bpo.model.show.SysUserShow" parameterType="com.rz.iot.bpo.model.param.SysUserParam">
+        select usr.user_id as id,usr.username as username,org.org_name as orgName,com.company_name as companyName,com.id as companyId,role.role_name as roleName,role.id as roleId,
+        usr.phone as phone,usr.status as status,dept.dept_id as deptId
+        from sys_user usr
+    left join sys_company_role_user rel ON rel.user_id = usr.user_id AND rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_company com ON rel.company_id = com.id AND com.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_org org ON com.org_type = org.id AND org.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_role role ON role.id = rel.role_id AND role.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_dept_user_rel dept_rel ON dept_rel.user_id = usr.user_id AND dept_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_dept dept ON dept.dept_id = dept_rel.dept_id AND dept.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    where
+    true
+    <if test="username != null and username != ''">
+        and usr.username like concat('%',#{username},'%')
+    </if>
+    <if test="deptId != null">
+      and dept.dept_id = #{deptId}
+    </if>
+    <if test="orgType != null">
+        and org.id = #{orgType}
+    </if>
+    <if test="roleId != null and roleId != 0">
+        and role.id = #{roleId}
+    </if>
+    <if test="phone != null and phone != ''">
+        and usr.phone like concat('%',#{phone},'%')
+    </if>
+    <if test="status != null and status != ''">
+      and usr.status like concat('%',#{status},'%')
+    </if>
+    <if test="status == null or status == ''">
+      and usr.status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </if>
+    <!--数据过滤-->
+    <if test="dataScope != null">
+      AND ${dataScope}
+    </if>
+  </select>
+
+  <select id="detail" parameterType="java.lang.Integer" resultType="com.rz.iot.bpo.model.show.SysUserDetail">
+    SELECT
+      usr.user_id AS userId,
+      usr.avatar AS avatar,
+      usr.phone AS phone,
+      usr.backups_phone AS backupsPhone,
+      usr.username AS username,
+      org.org_name AS orgName,
+      com.company_name AS companyName,
+      role.role_name AS roleName,
+      usr.real_name AS realName,
+      usr.create_time AS createTime,
+      usr. STATUS AS STATUS,
+      com.id AS companyId,
+      org.id AS orgType,
+      role.id AS roleId,
+      usr.remark AS remark,
+      usr.email as email,
+      dept.dept_id as deptId
+    FROM
+        sys_user usr
+    LEFT JOIN sys_company_role_user rel ON rel.user_id = usr.user_id
+    AND rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    LEFT JOIN sys_company com ON rel.company_id = com.id
+    AND com.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    LEFT JOIN sys_org org ON com.org_type = org.id
+    AND org.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    LEFT JOIN sys_role role ON role.id = rel.role_id
+    AND role.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    LEFT JOIN sys_dept_user_rel user_rel ON user_rel.user_id = usr.user_id AND user_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    LEFT JOIN sys_dept dept ON user_rel.dept_id = dept.dept_id AND dept.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    WHERE
+        usr.user_id = #{value}
+    AND usr.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+  </select>
+
+  <!--通过用户id查询其组织类型,组织,角色,用户-->
+  <select id="findOrgComRoleByUserId" parameterType="java.lang.Integer" resultType="com.rz.iot.bpo.model.OrgComRoleUser">
+      select usr.user_id as userId,usr.username as username,org.org_key as orgKey,org.org_name as orgName,com.id as companyId,role.id as roleId,role.role_name as roleName from sys_user usr
+    left join sys_company_role_user rel ON usr.user_id = rel.user_id and rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_company com ON com.id = rel.company_id and com.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_role role ON role.id = rel.role_id and role.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_org org ON com.org_type = org.id and org.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    where usr.user_id = #{value} and usr.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <update id="updateUserStatus">
+    update sys_user set `status` = #{status} where user_id = #{userId}
+  </update>
+
+  <select id="selectAuditorByProject" resultType="java.util.Map">
+    SELECT
+        USER.user_id as userId,
+        USER.real_name as realName
+    FROM
+        sys_user
+        USER LEFT JOIN sys_company_role_user company_role_user ON USER.user_id = company_role_user.user_id
+        LEFT JOIN sys_company company ON company.id = company_role_user.company_id
+        LEFT JOIN sys_role role ON company_role_user.role_id = role.id
+        LEFT JOIN bpo_supplier_info supplier_info ON company.id = supplier_info.org_id
+    WHERE
+        supplier_info.project_id = #{projectId,jdbcType=INTEGER}
+        AND role.role_key != 'admin'
+        AND role.role_key != 'person'
+  </select>
+</mapper>

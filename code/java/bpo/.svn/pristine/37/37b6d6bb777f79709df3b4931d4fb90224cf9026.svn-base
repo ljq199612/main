@@ -1,0 +1,59 @@
+import request from '@/utils/request'
+import qs from 'qs'
+
+export function addDept(data) {
+  return request({
+    url: '/sysDept/addDept',
+    method: 'post',
+    data: qs.stringify(data)
+  })
+}
+
+export function updateDept(data) {
+  return request({
+    url: '/sysDept/updateDept',
+    method: 'post',
+    params: qs.stringify(data)
+  })
+}
+
+export function getAllDept(params) {
+  return request({
+    url: '/sysDept/getAllDept',
+    method: 'get',
+    params: params
+  })
+}
+
+export function deleteDept(params) {
+  return request({
+    url: '/sysDept/deleteDept',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getDeptByDeptId(params) {
+  return request({
+    url: '/sysDept/getDeptByDeptId',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getCondition(params) {
+  return request({
+    url: '/sysDept/getCondition',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getAllByDUserId(params) {
+  return request({
+    url: '/sysDept/getAllByDUserId',
+    method: 'get',
+    params: params
+  })
+}
+

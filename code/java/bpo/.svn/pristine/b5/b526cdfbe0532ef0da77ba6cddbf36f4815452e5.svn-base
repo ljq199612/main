@@ -1,0 +1,172 @@
+package com.rz.iot.bpo.framework.task;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.utils.DateUtils;
+import com.rz.iot.bpo.mapper.BpoAttendanceInfoMapper;
+import com.rz.iot.bpo.mapper.BpoAttendanceRecordMapper;
+import com.rz.iot.bpo.mapper.BpoPersonMapper;
+import com.rz.iot.bpo.model.BpoAttendanceInfo;
+import com.rz.iot.bpo.model.BpoAttendanceRecord;
+import com.rz.iot.bpo.model.BpoPerson;
+import com.rz.iot.bpo.service.WorkflowConfigService;
+import com.rz.iot.bpo.service.WorkflowInstanceService;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+
+@Configuration
+@EnableScheduling
+public class ScheduleTask {
+
+    @Resource
+    private WorkflowInstanceService instanceService;
+
+    @Resource
+    private BpoAttendanceInfoMapper attendanceInfoMapper;
+
+    @Resource
+    private BpoAttendanceRecordMapper attendanceRecordMapper;
+
+    @Resource
+    private BpoPersonMapper personMapper;
+
+    @Scheduled(cron = "0 51 15 * * ? ")
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void createAttendanceInfoTask() {
+//        String yesterday = DateUtils.getYesterdayDate();
+        String yesterday = "2020-07-06";
+        List<BpoAttendanceInfo> attendanceInfos = attendanceInfoMapper.selectByDate(yesterday);
+        for (BpoAttendanceInfo attendanceInfo:attendanceInfos) {
+            //该条考勤信息已进行过判定
+            if (attendanceInfo.getRecordStatus() != null) {
+                continue;
+            }
+            Date arrivalTime = attendanceInfo.getArrivalTime();
+            Date startTime = attendanceInfo.getStartTime();
+            Date endTime = attendanceInfo.getEndTime();
+            //获取人员信息
+            BpoPerson person = personMapper.selectByPrimaryKey(attendanceInfo.getPersonId());
+            if (person == null) {
+                continue;
+            }
+
+            Date clockInTime = null;
+            Date clockOutTime = null;
+            Byte recordStatus = DictDataConstants.ATTENDANCE_NORMAL;
+            //上班打卡记录
+            BpoAttendanceRecord clockInRecord = attendanceRecordMapper.selectBetweenInfo(person.getIdCard(),arrivalTime,startTime,true);
+            if (clockInRecord != null) {
+                clockInTime = clockInRecord.getAttendanceTime();
+                //存在上班打卡记录，查询是否有早退记录
+                BpoAttendanceRecord leaveEarlyRecord = attendanceRecordMapper.selectBetweenInfo(person.getIdCard(),startTime,endTime,false);
+                if (leaveEarlyRecord != null) {
+                    //存在早退记录
+                    recordStatus = DictDataConstants.ATTENDANCE_LEAVE_EARLY;
+                    clockOutTime = leaveEarlyRecord.getAttendanceTime();
+                }
+            } else {
+                //不存在上班打卡记录，查询是否有迟到记录
+                BpoAttendanceRecord lateRecord = attendanceRecordMapper.selectBetweenInfo(person.getIdCard(),startTime,endTime,true);
+                if (lateRecord != null) {
+                    clockInTime = lateRecord.getAttendanceTime();
+                    recordStatus = DictDataConstants.ATTENDANCE_LATE;
+                    //存在迟到记录，查询是否有早退记录
+                    BpoAttendanceRecord lateLeaveEarlyRecord = attendanceRecordMapper.selectBetweenInfo(person.getIdCard(),startTime,endTime,false);
+                    if (!lateLeaveEarlyRecord.getAttendanceTime().equals(lateRecord.getAttendanceTime())) {
+                        //存在早退
+                        recordStatus = DictDataConstants.ATTENDANCE_LEAVE_EARLY;
+                        clockOutTime = lateLeaveEarlyRecord.getAttendanceTime();
+                    }
+                }
+            }
+
+            //下班打卡记录
+            //如果已经早退，就不再处理下班逻辑
+            if (!recordStatus.equals(DictDataConstants.ATTENDANCE_LEAVE_EARLY)) {
+                //获取下一场排班信息
+                Date nextArrivalTime = null;
+                BpoAttendanceInfo nextAttendanceInfo = attendanceInfoMapper.selectNextInfo(person.getId(),endTime);
+                if (nextAttendanceInfo != null) {
+                    nextArrivalTime = nextAttendanceInfo.getArrivalTime();
+                } else {
+                    nextArrivalTime = new Date();
+                }
+                BpoAttendanceRecord clockOutRecord = attendanceRecordMapper.selectBetweenInfo(person.getIdCard(),endTime,nextArrivalTime,true);
+                if (clockOutRecord != null) {
+                    clockOutTime = clockOutRecord.getAttendanceTime();
+                }
+            }
+
+            double workingHours = DateUtils.getDateDifferHours(startTime,endTime);
+            double attendanceHours = 0;
+            double wageHours = 0;
+            double overtimeHours = 0;
+
+            //计算考勤时长
+            Date useStartTime = startTime;
+            Date useEndTime = endTime;
+            if (clockInTime != null && clockInTime.after(startTime)) {
+                useStartTime = clockInTime;
+            }
+            if (clockOutTime != null && clockOutTime.before(endTime)) {
+                useEndTime = clockOutTime;
+            }
+            if ((clockInTime == null && clockOutTime != null) || (clockInTime != null && clockOutTime != null)) {
+                wageHours = DateUtils.getDateDifferHours(useStartTime,useEndTime);
+                if (clockOutTime.after(endTime)) {
+                    overtimeHours = DateUtils.getDateDifferHours(endTime,clockOutTime);
+                }
+            }
+            if (clockInTime != null && clockOutTime == null) {
+                wageHours = DateUtils.getDateDifferHours(useStartTime,useEndTime);
+            }
+
+            //判断考勤状态
+            if (clockInTime == null) {
+                recordStatus = DictDataConstants.ATTENDANCE_LACK_CLOCK_IN;
+            }
+            if (clockOutTime == null) {
+                recordStatus = DictDataConstants.ATTENDANCE_LACK_CLOCK_OUT;
+            }
+            if (overtimeHours > 1) {
+                recordStatus = DictDataConstants.ATTENDANCE_OVERTIME_TOO_LONG;
+            }
+            if (clockInTime == null && clockOutTime == null) {
+                recordStatus = DictDataConstants.ATTENDANCE_NEGLECT_WORK;
+            }
+
+            //计算考勤时长 旷工没有考勤时长
+            Date useClockInTime = startTime;
+            Date useClockOutTime = endTime;
+            if (clockInTime != null) {
+                useClockInTime = clockInTime;
+            }
+            if (clockOutTime != null) {
+                useClockOutTime = clockOutTime;
+            }
+            if (! recordStatus.equals(DictDataConstants.ATTENDANCE_NEGLECT_WORK)) {
+                attendanceHours = DateUtils.getDateDifferHours(useClockInTime,useClockOutTime);
+                attendanceHours -= attendanceInfo.getExcludeHour();
+            }
+
+            //更新考勤信息
+            attendanceInfo.setClockInTime(clockInTime);
+            attendanceInfo.setClockOutTime(clockOutTime);
+            attendanceInfo.setWorkingHours(workingHours);
+            attendanceInfo.setAttendanceHours(attendanceHours);
+            attendanceInfo.setWageHours(wageHours);
+            attendanceInfo.setOvertimeHours(overtimeHours);
+            attendanceInfo.setRecordApprovalStatus(DictDataConstants.PENDING_REVIEW);
+            attendanceInfo.setRecordStatus(recordStatus);
+            attendanceInfo.setApprovalStatus(recordStatus);
+            attendanceInfoMapper.updateByPrimaryKeySelective(attendanceInfo);
+            //生成审核流程
+            instanceService.generateInstance(DictDataConstants.WORKFLOW_ATTENDANCE,null,attendanceInfo.getId());
+        }
+    }
+}

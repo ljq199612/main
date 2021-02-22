@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rz.iot.bpo.mapper.SysOrgMapper">
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysOrg">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    <result column="org_key" jdbcType="VARCHAR" property="orgKey" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="org_sort" jdbcType="INTEGER" property="orgSort" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, org_name, org_key, code, org_sort, status, remark, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_org
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sys_org
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysOrg">
+    insert into sys_org (id, org_name, org_key, 
+      code, org_sort, status, 
+      remark, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{orgName,jdbcType=VARCHAR}, #{orgKey,jdbcType=VARCHAR}, 
+      #{code,jdbcType=VARCHAR}, #{orgSort,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysOrg">
+    insert into sys_org
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orgName != null">
+        org_name,
+      </if>
+      <if test="orgKey != null">
+        org_key,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="orgSort != null">
+        org_sort,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orgName != null">
+        #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="orgKey != null">
+        #{orgKey,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSort != null">
+        #{orgSort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysOrg">
+    update sys_org
+    <set>
+      <if test="orgName != null">
+        org_name = #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="orgKey != null">
+        org_key = #{orgKey,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSort != null">
+        org_sort = #{orgSort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysOrg">
+    update sys_org
+    set org_name = #{orgName,jdbcType=VARCHAR},
+      org_key = #{orgKey,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      org_sort = #{orgSort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="findAllType" resultType="com.rz.iot.bpo.model.SysOrg">
+    select
+    id,org_key as orgKey,code,org_name as orgName
+    from sys_org
+    where status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="getOrgPerms" resultType="string" parameterType="int">
+    SELECT
+      sys_org.org_key
+    FROM
+      sys_org,
+      sys_company_role_user,
+      sys_company
+    WHERE
+      sys_org.org_key = sys_company.org_type
+      AND sys_company_role_user.company_id = sys_company.id
+      AND sys_org.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND sys_company_role_user.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND sys_company_role_user.user_id = #{userId}
+  </select>
+</mapper>

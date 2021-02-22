@@ -1,0 +1,81 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.web.controller.BaseController;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.SysDictData;
+import com.rz.iot.bpo.service.SysDictDataService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * 描述 : 系统字典数据controller
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/17 14:32
+ *
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@RestController
+@RequestMapping("/sysDictData")
+public class SysDictDataController extends BaseController {
+    @Resource
+    private SysDictDataService sysDictDataService;
+
+    /**
+     * 新增字典数据
+     * @param sysDictData 字典数据
+     * @return 结果集
+     */
+    @RequestMapping("/insert")
+    @Log(title = "系统新增字典数据",businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('sysDictData:insert')")
+    public Result insert(SysDictData sysDictData){
+        return sysDictDataService.insert(sysDictData);
+    }
+
+    /**
+     * 分页查询字典数据
+     * @param sysDictData 字典数据
+     * @return 结果集
+     */
+    @RequestMapping("/findAll")
+    @PreAuthorize("@ss.hasPermi('sysDictData:findAll')")
+    public Result findAll(SysDictData sysDictData){
+        startPage();
+        List<SysDictData> sysDictDataPage = sysDictDataService.findAll(sysDictData);
+        return getDataTable(sysDictDataPage);
+    }
+
+    @RequestMapping("/update")
+    @Log(title = "系统修改字典数据",businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('sysDictData:update')")
+    public Result update(SysDictData sysDictData){
+        return sysDictDataService.update(sysDictData);
+    }
+
+    @RequestMapping("/delete")
+    @Log(title = "系统删除字典数据",businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermi('sysDictData:delete')")
+    public Result delete(SysDictData sysDictData){
+        return sysDictDataService.delete(sysDictData);
+    }
+
+    /**
+     * 通过字典Key获取Value
+     * @param key
+     * @return
+     */
+    @RequestMapping("/getValueByKey")
+    @PreAuthorize("@ss.hasPermi('sysDictType:getValueByKey')")
+    public Result getValueByKey(String key){
+        return sysDictDataService.getValueByKey(key);
+    }
+}

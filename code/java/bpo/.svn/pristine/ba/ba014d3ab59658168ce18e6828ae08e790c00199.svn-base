@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoPersonCheckMapper" >
+  <select id="findAll" parameterType="com.rz.iot.bpo.model.param.bpoPerson.BpoPersonCheckParam" resultType="com.rz.iot.bpo.model.show.bpoPerson.BpoPersonCheckShow">
+    select person.id as personId,person.person_name as personName,person.id_card as idCard,person.sex,nation.nation as nation,person.age,person.birth,person.id_card_address as idCardAddress from bpo_person person
+    left join sys_nation nation ON nation.id = person.nation
+    where
+    `status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NOT_VERIFY_STATUS}
+    <if test="personName != null and personName != ''">
+      AND person.person_name like concat('%',#{personName},'%')
+    </if>
+    <if test="idCardAddress != null and idCardAddress != ''">
+      AND person.id_card_address like concat('%',#{idCardAddress},'%')
+    </if>
+    <if test="sex != null">
+      AND person.sex = #{sex}
+    </if>
+    <if test="nation != null and nation != ''">
+      AND person.nation = #{nation}
+    </if>
+  </select>
+
+  <select id="getBaseInfo" parameterType="java.lang.Integer" resultType="com.rz.iot.bpo.model.show.bpoPerson.BpoBasePerson">
+    select person.id as personId,person.person_name as personName,person.id_card as idCard,person.sex,nation.nation,person.birth,person.id_card_address as idCardAddress
+    from bpo_person person
+    left join sys_nation nation ON nation.id = person.nation
+    where person.id = #{personId}
+  </select>
+
+  <update id="updateBaseProp">
+    update bpo_person
+    <set>
+      <if test="base.personName != null and base.personName != ''">
+        person_name = #{base.personName},
+      </if>
+      <if test="base.sex != null">
+        sex = #{base.sex},
+      </if>
+      <if test="base.age != null">
+        age = #{base.age},
+      </if>
+      <if test="base.nation != null and base.nation != ''">
+        nation = #{base.nation},
+      </if>
+      <if test="base.birth != null and base.birth != ''">
+        birth = #{base.birth},
+      </if>
+      <if test="base.idCardAddress != null and base.idCardAddress != ''">
+        id_card_address = #{base.idCardAddress},
+      </if>
+      <if test="base.age != null and base.age != ''">
+        age = #{base.age},
+      </if>
+      <if test="base.workNo != null and base.workNo != ''">
+        work_no = #{base.workNo},
+      </if>
+      <if test="base.sfWorkNo != null and base.sfWorkNo != ''">
+        sf_work_no = #{base.sfWorkNo},
+      </if>
+      <if test="base.phone != null and base.phone != ''">
+        phone = #{base.phone},
+      </if>
+      <if test="base.address != null and base.address != ''">
+        address = #{base.address},
+      </if>
+      <if test="base.remark != null and base.remark != ''">
+        remark = #{base.remark},
+      </if>
+      <if test="prop.companyId != null">
+        company_id = #{prop.companyId},
+      </if>
+      <if test="prop.deptId != null">
+        dept_id = #{prop.deptId},
+      </if>
+      <if test="prop.personType != null and prop.personType != ''">
+        person_type = #{prop.personType},
+      </if>
+      <if test="prop.station != null and prop.station != ''">
+        station = #{prop.station},
+      </if>
+      <if test="prop.projectId != null and prop.projectId != ''">
+        project_id = #{prop.projectId},
+      </if>
+      <if test="prop.status != null and prop.status != ''">
+        status = #{prop.status},
+      </if>
+      <if test="prop.createTime != null and prop.createTime != ''">
+        create_time = #{prop.createTime},
+      </if>
+      <if test="prop.dimissionTime != null and prop.dimissionTime != ''">
+        dimission_time = #{prop.dimissionTime},
+      </if>
+      <if test="prop.dimissionType != null">
+        dimission_type = #{prop.dimissionType},
+      </if>
+      <if test="prop.dimissionReason != null and prop.dimissionReason != ''">
+        dimission_reason = #{prop.dimissionReason},
+      </if>
+    </set>
+    where
+    id = #{base.personId}
+  </update>
+
+  <!--修改人员账户信息-->
+  <update id="updatePersonAccount">
+    update bpo_person
+    set account_id = #{accountId},wage_id = #{wageId},contract_id = #{contractId}
+    where id = #{personId}
+  </update>
+
+  <select id="selectContractUrl" parameterType="java.lang.Integer" resultType="java.util.Map">
+    select info.id as contractId,info.file_path as filePath from bpo_person_contract_info info
+    left join bpo_person per ON info.id = per.contractId AND per.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    where
+    info.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} AND per.id = #{value}
+  </select>
+
+  <select id="findAllNation" resultType="java.util.Map">
+    SELECT id,nation FROM sys_nation
+  </select>
+</mapper>

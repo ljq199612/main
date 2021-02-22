@@ -1,0 +1,153 @@
+<template>
+  <CfPanel
+    title="设备管理"
+    class="main equipmentManageDetails"
+    :back-to="onBackTo"
+  >
+    <div class="infoWrapper">
+      <p class="infoTitle">基本信息</p>
+      <div class="infoContent">
+        <el-form ref="form" :model="form" label-width="180px" class="bpoForm">
+          <el-row :gutter="20" />
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="设备名称：">
+                <span>{{ form.deviceName }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="设备序列号：">
+                <span>{{ form.deviceSn }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12"><el-form-item label="设备所属场地：">
+              <span>{{
+                form.bpoTransferStation && form.bpoTransferStation.name
+              }}</span>
+            </el-form-item>
+            </el-col>
+            <el-col :span="12"><el-form-item label="归属场地：">
+              <span>{{ form.transBelong }}</span>
+            </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12"><el-form-item label="设备编号：">
+              <span>{{ form.deviceNo }}</span>
+            </el-form-item>
+            </el-col>
+            <el-col :span="12"><el-form-item label="设备归属：">
+              <span>{{ form.attendenceBelong }}</span>
+            </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="20">
+            <el-col :span="12"><el-form-item label="IP：">
+              <span>{{ form.ip }}</span>
+            </el-form-item>
+            </el-col>
+            <el-col :span="12"><el-form-item label=" 版本：">
+              <span>{{ form.version }}</span>
+            </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12"><el-form-item label="设备厂商：">
+              <span>{{ form.manufactor }}</span>
+            </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系人：">
+                <span>{{ form.linkMan }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12"><el-form-item label="备注：">
+              <span>{{ form.remark }}</span>
+            </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系方式：">
+                <span>{{ form.phone }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+    </div>
+  </CfPanel>
+</template>
+
+<script>
+import CfPanel from '@/components/Panel'
+import { getEquipmentDetail } from '@/api/equipmentManage/equipmentManage'
+export default {
+  components: {
+    CfPanel
+  },
+  data() {
+    return {
+      form: {
+        deviceName: '', // 设备名
+        deviceSn: '', // 序列号
+        bpoTransferStation: {}, // 中转场
+        transBelong: '', // 归属场地
+        deviceNo: '', // 设备编号
+        attendenceBelong: '', // 设备归属
+        ip: '', // IP
+        version: '', // 版本
+        manufactor: '', // 设备厂商
+        linkMan: '', // 联系人
+        remark: '', // 备注
+        phone: '' // 联系方式
+      }
+    }
+  },
+  created() {
+    this.getEquipmentDetail()
+  },
+  methods: {
+    getEquipmentDetail() {
+      getEquipmentDetail({
+        id: this.$route.query.id
+      })
+        .then((res) => {
+          const result = res['data']['data']
+          Object.assign(this.form, result)
+          console.log(this.form)
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取设备详情失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    onBackTo() {
+      this.$router.push({
+        path: '/equipment/list'
+      })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.equipmentManageDetails {
+  font-family: Microsoft YaHei;
+  .infoTitle {
+    margin: 10px 0 22px 0;
+    font-size: 14px;
+    color: #000000;
+    font-weight: bold;
+    height: 16px;
+    line-height: 16px;
+    border-left: 3px solid #ff6b00;
+    padding-left: 6px;
+  }
+}
+</style>

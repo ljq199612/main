@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoProcessMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoProcess" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sys_work_module_rel_id" property="sysWorkModuleRelId" jdbcType="INTEGER" />
+    <result column="work_group_id" property="workGroupId" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="is_product" property="isProduct" jdbcType="TINYINT" />
+    <result column="process_name" property="processName" jdbcType="VARCHAR" />
+    <result column="process_code" property="processCode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, sys_work_module_rel_id, work_group_id, sort, is_product, process_name, process_code,
+    status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_process
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="findByGroupId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select
+      <include refid="Base_Column_List" />
+      from bpo_process
+      where work_group_id = #{groupId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_process
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoProcess" >
+    insert into bpo_process (id, sys_work_module_rel_id, work_group_id,
+      sort, is_product, process_name,
+      process_code, status, create_time,
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{sysWorkModuleRelId,jdbcType=INTEGER}, #{workGroupId,jdbcType=INTEGER},
+      #{sort,jdbcType=INTEGER}, #{isProduct,jdbcType=TINYINT}, #{processName,jdbcType=VARCHAR},
+      #{processCode,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoProcess" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    insert into bpo_process
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sysWorkModuleRelId != null" >
+        sys_work_module_rel_id,
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="isProduct != null" >
+        is_product,
+      </if>
+      <if test="processName != null" >
+        process_name,
+      </if>
+      <if test="processCode != null" >
+        process_code,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sysWorkModuleRelId != null" >
+        #{sysWorkModuleRelId,jdbcType=INTEGER},
+      </if>
+      <if test="workGroupId != null" >
+        #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="isProduct != null" >
+        #{isProduct,jdbcType=TINYINT},
+      </if>
+      <if test="processName != null" >
+        #{processName,jdbcType=VARCHAR},
+      </if>
+      <if test="processCode != null" >
+        #{processCode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoProcess" >
+    update bpo_process
+    <set >
+      <if test="sysWorkModuleRelId != null" >
+        sys_work_module_rel_id = #{sysWorkModuleRelId,jdbcType=INTEGER},
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id = #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="isProduct != null" >
+        is_product = #{isProduct,jdbcType=TINYINT},
+      </if>
+      <if test="processName != null" >
+        process_name = #{processName,jdbcType=VARCHAR},
+      </if>
+      <if test="processCode != null" >
+        process_code = #{processCode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoProcess" >
+    update bpo_process
+    set sys_work_module_rel_id = #{sysWorkModuleRelId,jdbcType=INTEGER},
+      work_group_id = #{workGroupId,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      is_product = #{isProduct,jdbcType=TINYINT},
+      process_name = #{processName,jdbcType=VARCHAR},
+      process_code = #{processCode,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

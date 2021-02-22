@@ -1,0 +1,26 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.WorkflowNode;
+import com.rz.iot.bpo.model.show.workflow.WorkflowNodeShow;
+
+import java.util.List;
+
+public interface WorkflowNodeMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(WorkflowNode record);
+
+    int insertSelective(WorkflowNode record);
+
+    WorkflowNode selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(WorkflowNode record);
+
+    int updateByPrimaryKey(WorkflowNode record);
+
+    WorkflowNode selectFirstNode(Integer configId);
+
+    List<WorkflowNode> selectByConfigId(Integer id);
+
+    List<WorkflowNodeShow> selectShowByConfigId(Integer id);
+}

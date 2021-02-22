@@ -1,0 +1,492 @@
+<template>
+  <div>
+    <CfPanel :title="pageTitle" :back-to="backTo">
+      <el-form ref="contractForm" :model="entity" class="bpoForm" label-width="180px" :rules="rules">
+        <fieldset>
+          <legend class="bpo-legend">基本信息</legend>
+          <el-col :span="12">
+            <el-form-item label="合同类型：">
+              <el-select v-model="entity.type" :disabled="disabled" placeholder="请选择状态" class="half" @change="optionsChange">
+                <el-option
+                  v-for="(item,index) in typeOption"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同名称：" prop="name">
+              <el-input v-model="entity.name" placeholder="请输入合同名称" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同编号：">
+              <el-input v-model="entity.contractCode" placeholder="请输入合同编号" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="客户合同编号：">
+              <el-input v-model="entity.customerCode" class="half" placeholder="请输入客户合同编号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="kehuTitle+'：'">
+              <!-- <el-input v-model="entity.xx" class="half" :placeholder="'请输入'+kehuTitle" />-->
+              <el-select v-model="entity.jiaOrgId" class="half" :placeholder="'请输入'+kehuTitle" @change="customerSupplierChange">
+                <el-option
+                  v-for="(item,index) in jiaOrgIdoptions"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="kehuTitle+'归属：'">
+              <SelectTree
+                v-model="entity.jiaDeptId"
+                :props="props"
+                :options="options"
+                :value="valueId"
+                :clearable="isClearable"
+                :accordion="isAccordion"
+                class="half"
+                @getValue="getValue($event)"
+              />
+              <!--<el-input v-model="entity.jiaDeptId" class="half" :placeholder="'请输入'+kehuTitle+'归属'" />-->
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="甲方：">
+              <el-input v-model="entity.jiaName" placeholder="请输入甲方" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="甲方统一社会信用代码：">
+              <el-input v-model="entity.jiaUscc" placeholder="请输入甲方统一社会信用代码" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="乙方：">
+              <el-input v-model="entity.yiName" class="half" :disabled="disabled" placeholder="请输入乙方" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="乙方统一社会信用代码：">
+              <el-input v-model="entity.yiUscc" class="half" placeholder="请输入乙方统一社会信用代码" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="保证金：">
+              <el-input v-model="entity.cashDeposit" type="number" class="half" placeholder="请输入乙方统一社会信用代码" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label="合同签订日期：">
+              <el-date-picker
+                v-model="entity.signTime"
+                type="date"
+                placeholder="请输入合同签订日期"
+                class="half"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同结束时间：">
+              <el-date-picker
+                v-model="entity.endTime"
+                type="date"
+                placeholder="请选择日期"
+                class="half"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同结束时间：">
+              <el-date-picker
+                v-model="entity.endTime"
+                type="date"
+                placeholder="请选择日期"
+                class="half"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              <el-input v-model="entity.remark" placeholder="请输入备注" type="textarea" style="height: 100px;" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="上传附件：">
+              <el-upload
+                class="contract-upload"
+                :action="uploadContractURL"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :before-remove="beforeRemove"
+                multiple
+                :on-success="handleSuccess"
+                :on-exceed="handleExceed"
+                :file-list="fileList"
+              >
+                <el-button icon="el-icon-paperclip" type="text" style="color:#333333;">添加附件</el-button>
+                <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+                <!--<div slot="file" slot-scope="{file}" class="half" style="white-space: nowrap;">
+                  <span @click="handleDownload(file)">{{ file.name }}</span>
+                  <span class="el-upload-list__item-actions">
+                    <el-button type="text" style="color: #F52222;" @click="handleDownload(file)">删除</el-button>
+                  </span>
+                </div>-->
+              </el-upload>
+            </el-form-item>
+          </el-col>
+        </fieldset>
+        <fieldset>
+          <legend class="bpo-legend">财务结算信息</legend>
+
+          <el-col :span="12">
+            <el-form-item label="结算类型：">
+              <el-select v-model="entity.bpoContractSettlementInfo.type" placeholder="请选择状态" class="half">
+                <el-option
+                  v-for="(item,index) in setypeOption"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="结算日期：">
+              <el-input v-model="entity.bpoContractSettlementInfo.settlementDate" class="half" placeholder="请输入结算日期" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              <el-input v-model="entity.bpoContractSettlementInfo.remark" placeholder="请输入备注" type="textarea" style="height: 100px;" class="half" />
+            </el-form-item>
+          </el-col>
+        </fieldset>
+        <fieldset style="margin-bottom:20px;">
+          <legend class="bpo-legend">财务付款信息</legend>
+          <el-row style="margin-left:20px;">
+            <el-button class="bpoBtn" icon="el-icon-plus" @click="addbpoContractPaymentInfo">添加一条记录</el-button>
+          </el-row>
+          <div v-for="(item,index) in entity.bpoContractPaymentInfoList" :key="index">
+            <el-row v-if="item.status != 9" class="payment-row" style="margin: 10px 0px 10px 20px;">
+              <el-col :span="7">
+                <el-form-item label="乙方开户行：">
+                  <el-input v-model="item.yiOpeningBank" placeholder="请输入乙方开户行" class="half" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="7">
+                <el-form-item label="乙方开户账号：">
+                  <el-input v-model="item.yiOpeningBankAccount" class="half" placeholder="请输入乙方开户账号" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="7">
+                <el-form-item label="乙方名称：">
+                  <el-input v-model="item.yiName" placeholder="请输入乙方名称" class="half" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="3">
+                <el-form-item class="tableData-operation">
+                  <!--<el-button icon="el-icon-close" icon-class="close" circle @click="handleHide(index)" />-->
+                  <el-button type="text" circle @click="handleHide(index)">
+                    <svg-icon icon-class="close" style="width: 24px;height: 24px;" />
+                  </el-button>
+
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend class="bpo-legend">开票信息</legend>
+          <el-col :span="12">
+            <el-form-item label="公司名称：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.companyName" :disabled="disabled" placeholder="请输入公司名称" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="法人：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.artificialPerson" class="half" placeholder="请输入法人" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="纳税人识别号：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.taxId" placeholder="请输入纳税人识别号" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="开户行：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.openingBank" class="half" placeholder="请输入开户行" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="账户：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.openingBankAccount" placeholder="请输入账号" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="税率：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.taxRate" class="half" placeholder="请输入税率(单位%)" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系电话：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.phone" placeholder="请输入联系电话" :disabled="disabled" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="地址：">
+              <el-input v-model="entity.bpoContractInvoiceInfo.address" class="half" :disabled="disabled" placeholder="请输入地址" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item class="bpoButtonGroup" label="">
+              <el-button type="primary" size="medium" @click="submit('form')">提交</el-button>
+              <el-button size="medium" @click="backTo">关闭</el-button>
+            </el-form-item>
+          </el-col>
+        </fieldset>
+      </el-form>
+    </CfPanel>
+  </div>
+</template>
+
+<script>
+import Vue from 'vue'
+import CfPanel from '@/components/Panel'
+import { findCanControl, detailContract, updateContract, insertContract, getInfoByType, findAllCustomerByLoginUserId, findAllSupplierByLoginUserId } from '@/api/contract'
+import SelectTree from '@/components/treeSelect'
+export default {
+  name: '',
+  components: { CfPanel, SelectTree },
+  data() {
+    return {
+      pageTitle: '新增合同',
+      id: this.$route.query.id,
+      entity: {
+        type: 1,
+        jiaName: '',
+        yiName: '',
+        bpoContractSettlementInfo: {},
+        bpoContractPaymentInfoList: [{}],
+        bpoContractInvoiceInfo: {}
+      },
+      uploadContractURL: process.env.BASE_API + '/contractInfo/upload',
+      tableData: [{}],
+      disabled: false,
+      fileList: [],
+      typeOption: [{ value: 1, label: '客户' }, { value: 2, label: '供应商' }],
+      setypeOption: [{ value: 1, label: '按工序计费' }, { value: 2, label: '按小时计费' }],
+      rules: { name: [{ required: true, message: '请填写合同名称', trigger: 'blur' }] },
+      jiaOrgIdoptions: [],
+
+      isClearable: true, // 可清空（可选）
+      isAccordion: false, // 可收起（可选）
+      valueId: '0', // 初始ID（可选）
+      props: { // 配置项（必选）
+        value: 'deptId',
+        label: 'deptName',
+        children: 'depts'
+      },
+      options: []
+    }
+  },
+  computed: {
+    kehuTitle() {
+      if (this.entity.type === 2) {
+        return '供应商'
+      } else {
+        return '客户'
+      }
+    }
+  },
+  watch: { },
+  created() {
+    this.init()
+    this.getCustomerList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+    if (this.id) {
+      this.disabled = true
+    }
+  },
+  methods: {
+    getRemoteOptions() {
+      findCanControl().then(res => {
+        this.options = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    customerSupplierChange(val) {
+      // id	type为1，id为空；type为2，id为客户id；type为3，id为供应商orgId
+      // type	1当前用户，2客户，3供应商
+      // 甲方信息
+      let orgId = ''
+      for (var i in this.jiaOrgIdoptions) {
+        if (this.jiaOrgIdoptions[i].id === val) {
+          orgId = this.jiaOrgIdoptions[i].orgId
+          break
+        }
+      }
+      if (val) { // this.entity.jiaOrgId
+        getInfoByType({ id: orgId, type: this.entity.type }).then(res => {
+          this.entity.jiaDeptId = res.data.data.deptId
+          this.entity.jiaName = res.data.data.companyName
+          this.entity.jiaUscc = res.data.data.creditCode
+        })
+      }
+    },
+    optionsChange(val) {
+      this.entity.jiaOrgId = ''
+      this.entity.jiaOrgName = ''
+      this.entity.jiaDeptId = ''
+      this.entity.jiaName = ''
+      this.entity.jiaUscc = ''
+      if (val === 1) {
+        this.getCustomerList()
+      } else {
+        this.getSupplierList()
+      }
+    },
+    getSupplierList() {
+      // 获取供应商列表
+      findAllSupplierByLoginUserId().then(res => {
+        res.data.data.forEach(item => {
+          item.name = item.companyName
+        })
+
+        this.jiaOrgIdoptions = res.data.data
+      })
+    },
+    getCustomerList() {
+      // 获取客户列表
+      findAllCustomerByLoginUserId().then(res => {
+        this.jiaOrgIdoptions = res.data.data
+      })
+    },
+    addbpoContractPaymentInfo() {
+      this.entity.bpoContractPaymentInfoList.push({})
+    },
+    handleHide(index) {
+      if (this.entity.bpoContractPaymentInfoList[index].id) {
+        this.entity.bpoContractPaymentInfoList[index].status = 9
+        Vue.set(this.entity.bpoContractPaymentInfoList, index, this.entity.bpoContractPaymentInfoList[index])
+      } else {
+        this.entity.bpoContractPaymentInfoList.splice(index, 1)
+      }
+    },
+    init() {
+      // 获取初始化数据
+      if (this.id) {
+        this.pageTitle = '修改合同'
+        detailContract({ id: 'id' }).then(res => {
+          this.entity = res.data.data
+          this.tableData = this.entity.bpoContractPaymentInfoList
+          this.fileList = this.entity.fileList
+          this.fileList.forEach(item => {
+            item.name = item.fileName
+          })
+        })
+      } else {
+        // 不管哪一种都需要调用【获取当前用户或客户供应商的组织信息】（type为1，id为空） 查询乙方信息（乙方名称、乙方统一社会信用代码）
+        // 乙方信息
+        getInfoByType({ id: '', type: 1 }).then(res => {
+          this.entity.yiName = res.data.data.companyName
+          this.entity.yiUscc = res.data.data.creditCode
+        })
+      }
+    },
+    submit() {
+      this.$refs['contractForm'].validate((valid) => {
+        if (valid) {
+          // 对文件处理
+          const fileList = []
+          this.fileList.forEach(item => {
+            fileList.push(item.response.data)
+          })
+          this.entity.fileList = fileList
+          let option = insertContract
+          if (this.id) {
+            option = updateContract
+          }
+          option(this.entity).then(res => {
+            this.$notify({
+              title: '成功',
+              duration: '2000',
+              message: '操作成功！',
+              type: 'success'
+            })
+            this.backTo()
+          })
+        }
+      })
+    },
+    backTo() {
+      this.$router.push({
+        name: 'contractManage'
+      })
+    },
+    handleSuccess(response, file, fileList) {
+      this.fileList = fileList
+    },
+    handleExceed() {},
+    handlePreview() {},
+    handleRemove() {},
+    beforeRemove() {}
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .payment-row{
+    background: #F1F2F6;
+    padding-top: 10px;
+  }
+  .tableData-operation{
+   /deep/ .el-form-item__content{
+      margin-left: 0px !important;
+      float:right;
+      padding-right: 40px;
+
+     .el-button{
+       padding-top: 0px;
+     }
+    }
+  }
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+  }
+  fieldset:first-child{
+    legend{
+      border-top: none;
+      padding-top: 0px;
+    }
+  }
+  .contract-upload{
+    width: 400px;
+  }
+  /deep/.el-textarea textarea{
+    height: 100%;
+  }
+  .el-upload-list__item-actions{
+    margin-left: 20px;
+  }
+  /deep/.el-upload-list{
+    width: 50%;
+  }
+</style>

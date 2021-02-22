@@ -1,0 +1,143 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.aspectj.DataScopeAspect;
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.DataScope;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+import com.rz.iot.bpo.model.BpoProject;
+import com.rz.iot.bpo.model.BpoTransferStation;
+import com.rz.iot.bpo.model.show.personClass.*;
+import com.rz.iot.bpo.service.BpoClassesGenerateService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 描述 : 人员安排业务实现
+ * 作者 : Rycony
+ * 创建时间 : 2020/7/29 11:52
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+public class BpoClassesGenerateServiceImpl implements BpoClassesGenerateService {
+    @Resource
+    private BpoClassesGenerateMapper mapper;
+    @Resource
+    private BpoTransferStationMapper stationMapper;
+    @Resource
+    private BpoProjectMapper projectMapper;
+
+    @Override
+    @DataScope(level = DataScopeAspect.DATA_SCOPE_DEPT)
+    public List<BpoPersonArrangeShow> findAll(Integer stationId,Integer projectId) {
+        // 获取当前用户
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+
+        List<BpoPersonArrangeShow> list =  mapper.findAll(new BaseEntity(),stationId,projectId,userId);
+        return list;
+    }
+
+    /**
+     * 查询所有场地信息
+     * @return
+     */
+    @Override
+    @DataScope(level = DataScopeAspect.DATA_SCOPE_DEPT)
+    public Result findStations() {
+        List<BpoTransferStation> list = stationMapper.findAllByLoginUserId(new BaseEntity());
+        return Result.success(list);
+    }
+
+    /**
+     * 根据场地对应项目信息
+     * @param stationId 场地id
+     * @return
+     */
+    @Override
+    public Result findProjects(Integer stationId) {
+        // 获取当前用户
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+
+        // 获取项目信息
+        List<Map<String,Object>> list = projectMapper.findProjectByStationId(userId,stationId);
+        return Result.success(list);
+    }
+
+    /**
+     * 人员安排详情
+     * @param classId
+     * @return
+     */
+    @Override
+    public Result findArrangeDetail(Integer classId) {
+        // todo 未做数据权限问题
+
+        if(classId == null){
+            return Result.error(ResultConstants.REQUEST_SUCCESS);
+        }
+
+        // 定义结果集
+        BpoPersonArrageDetail bpoClassDetail = new BpoPersonArrageDetail();
+
+        // 获取班次详情
+        BpoClassesGenerate bpoClassesGenerate = mapper.selectByPrimaryKey(classId);
+        bpoClassDetail.setClassId(bpoClassesGenerate.getId());
+        bpoClassDetail.setClassSn(bpoClassesGenerate.getClassSn());
+        bpoClassDetail.setClassType(bpoClassesGenerate.getClassType());
+        // 日期格式
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        // 时间格式
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:ss:mm");
+
+        bpoClassDetail.setStartTime(timeFormat.format(bpoClassesGenerate.getStartTime()));
+        bpoClassDetail.setEndTime(timeFormat.format(bpoClassesGenerate.getEndTime()));
+        bpoClassDetail.setStartDate(dateFormat.format(bpoClassesGenerate.getStartDate()));
+        bpoClassDetail.setEndDate(dateFormat.format(bpoClassesGenerate.getEndDate()));
+
+        // 扣除时薪
+        long arriveTime = bpoClassesGenerate.getArriveTime().getTime();
+        long startTime = bpoClassesGenerate.getStartTime().getTime();
+        long endTime = bpoClassesGenerate.getEndTime().getTime();
+
+        // 毫秒值转化为小时
+        int nt = 1000*60*60;
+        int time = (int) (startTime - arriveTime);
+        int absTime = Math.abs(time);
+        int excludeHour = absTime%nt == 0?absTime/nt:absTime/nt + 1;
+
+        bpoClassDetail.setExcludeHour(excludeHour);
+
+        int tempTime = (int) (endTime - arriveTime);
+        int absTempTime = Math.abs(tempTime);
+        int feeHour = absTempTime/nt;
+
+        // 计薪
+        bpoClassDetail.setFeeHour(feeHour);
+
+
+        // 通过班次获取工作小组
+        List<BpoGroupShow> groups = mapper.getGroupsByClassId(classId);
+        bpoClassDetail.setWorkGroupShowList(groups);
+
+        // 通过班次获取无工作小组人员
+        List<BpoPersonShow> personShows = mapper.getPersonNoGroup(classId);
+        bpoClassDetail.setBpoPersonShow(personShows);
+
+        // 获取所有未添加人员
+        List<BpoPersonShow> unPersonShows = mapper.getPersonNoClass();
+        bpoClassDetail.setUnBpoPersonShow(unPersonShows);
+
+        return Result.success(bpoClassDetail);
+    }
+}

@@ -1,0 +1,237 @@
+<template>
+  <CfPanel title="人员审核" class="form main">
+    <el-form ref="search_from" :inline="true" :model="search_from" class="searchForm-inline" label-position="left" label-width="80px">
+      <el-row>
+        <el-form-item label="姓名：" prop="personName" label-width="40px">
+          <el-input v-model="search_content.personName" placeholder="请输入姓名" />
+        </el-form-item>
+        <el-form-item label="户籍地址：" prop="idCardAddress" label-width="60px">
+          <el-input v-model="search_content.idCardAddress" placeholder="请输入户籍" />
+        </el-form-item>
+        <el-form-item label="性别：" prop="sex" label-width="40px">
+          <el-select v-model="search_content.sex" placeholder="请选择性别" style="width:100%">
+            <el-option
+              v-for="(item,index) in search_from.state_data"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="民族：" prop="nation" label-width="40px">
+          <el-select v-model="search_content.nation" filterable placeholder="请选择民族（可搜索）" style="width:100%">
+            <el-option
+              v-for="(item,index) in search_from.nationList"
+              :key="index"
+              :label="item.nation"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button style="border: 1px solid #FF6B00;color:#FF6B00;" @click="search_button">搜索</el-button>
+          <el-button @click="reset_button">重置</el-button>
+        </el-form-item>
+      </el-row>
+    </el-form>
+    <el-table
+      v-loading="listLoading"
+      :data="fieldList"
+      class="bpoTable"
+      fit
+    >
+      <el-table-column align="center" label="序号" width="80">
+        <template slot-scope="scope">{{ scope.row.num }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="姓名" min-width="80">
+        <template slot-scope="scope">{{ scope.row.personName }}</template>
+      </el-table-column>
+      <el-table-column align="center" class="idCard" label="身份证号码" min-width="80">
+        <template slot-scope="scope">
+          <el-button type="text" style="color:#4794F7" size="mini" @click="idCard_button(scope.row)">{{ scope.row.idCard }}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="性别" min-width="80">
+        <template slot-scope="scope">{{ search_from.state_data[scope.row.sex].label }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="民族" min-width="80">
+        <template slot-scope="scope">{{ scope.row.nation }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="年龄" min-width="80">
+        <template slot-scope="scope">{{ scope.row.age }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="出生日期" min-width="80">
+        <template slot-scope="scope">{{ scope.row.birth }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="户籍地址" min-width="80">
+        <template slot-scope="scope">{{ scope.row.idCardAddress }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="250">
+        <template slot-scope="scope">
+          <el-button type="text" style="color:#19D185" size="mini" @click="details_button(scope.row)">审核</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 新增弹框 -->
+    <el-dialog
+      title="查看身份证号码"
+      custom-class="dialog-small"
+      :close-on-click-modal="false"
+      :visible.sync="dialogFormVisible"
+      @close="cancelAddForm"
+    >
+      <div>{{ idCard }}</div>
+      <div class="dialog-footer">
+        <el-button type="primary" @click="cancelAddForm">确定</el-button>
+      </div>
+    </el-dialog>
+    <pagination
+      v-show="total>0"
+      :total="total"
+      lang-type="zh"
+      :page.sync="page.pageNum"
+      :limit.sync="page.pageSize"
+      @pagination="findAll"
+    />
+  </CfPanel>
+</template>
+
+<script type="text/javascript">
+// 请求方法加载
+import { findAll, findAllNation, lookIdCard } from '@/api/personnelManagement/personnelManagement'
+// 整体页面加载
+import CfPanel from '@/components/Panel'
+// 分页加载
+import Pagination from '@/components/Pagination'
+
+export default {
+  name: 'SiteManage',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      listLoading: true,
+      // 分页初始数据
+      page: {
+        pageNum: 1,
+        pageSize: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      // 初始化页数
+      total: 0,
+      // 搜索的value值
+      search_from: {
+        // 当前场地是否启用
+        state_data: [{ value: '0', label: '其他' }, { value: '1', label: '男' }, { value: '2', label: '女' }]
+      },
+      // 搜索的内容
+      search_content: {
+        sex: '1'
+      },
+      idCard: '', // 初始化完整身份证号
+      dialogFormVisible: false,
+      fieldList: []
+    }
+  },
+  created() {
+    // 人员审核-查询所有未审核人员
+    this.findAll()
+    // 查询所有民族
+    this.findAllNation()
+  },
+  methods: {
+    // 人员审核-查询所有未审核人员
+    findAll(search_content, type) {
+      findAll({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...search_content
+      }).then((res) => {
+        console.log(res)
+        if (type === true) {
+          if (res.data.code === 20000) {
+            this.$notify({
+              title: '成功',
+              duration: '2000',
+              message: '搜索成功！',
+              type: 'success'
+            })
+          } else {
+            this.$notify({
+              title: '失败',
+              duration: '2000',
+              message: res.data.message,
+              type: 'error'
+            })
+          }
+        }
+        const findAll_list = res.data.data.list
+        findAll_list.map((item, i) => {
+          if (item.status === 1) {
+            this.$set(item, 'status', true)
+          } else if (item.status === 2) {
+            this.$set(item, 'status', false)
+          }
+          this.$set(item, 'num', i + 1)
+        })
+        this.fieldList = findAll_list
+        this.total = 1
+        this.listLoading = false
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 查询所有民族
+    findAllNation() {
+      findAllNation({}).then((res) => {
+        this.$set(this.search_from, 'nationList', res.data.data)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 搜索按钮
+    search_button(e) {
+      this.findAll(this.search_content, true)
+    },
+    // 重置按钮
+    reset_button() {
+      // 重置搜索数据
+      this.search_content = {}
+    },
+    // 查询完整身份证号
+    idCard_button(e) {
+      lookIdCard({ personId: e.personId }).then((res) => {
+        this.$alert(res.data.data.idCard, '查看身份证号码', {
+          confirmButtonText: '确定',
+          callback: action => {
+          }
+        })
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 隐藏弹窗
+    cancelAddForm() {
+      this.dialogFormVisible = false
+    },
+    // 跳转审核详情界面
+    details_button(row) {
+      this.$router.push({ name: 'PersonnelAuditDetails', query: { id: row.personId }})
+    }
+  }
+}
+</script>
+<style lang="scss">
+</style>

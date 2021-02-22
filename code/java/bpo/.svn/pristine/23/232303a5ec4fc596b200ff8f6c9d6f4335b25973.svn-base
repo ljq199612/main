@@ -1,0 +1,147 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+/* 其他页面 */
+/* Layout */
+import Layout from '@/views/layout/Layout'
+/* 项目管理 */
+import projectManage from './modules/projectManage'
+/* 商户管理 */
+import merchantManage from './modules/supplierManage'
+/* 人员管理 */
+import staffManage from './modules/staffManage'
+/* 考勤管理 */
+import attendanceManage from './modules/attendanceManage'
+/* 财务管理 */
+import financialManage from './modules/financialManage'
+/* 设备管理 */
+import equipmentManage from './modules/equipmentManage'
+/* 系统设置 */
+import systemManage from './modules/systemManage'
+/** note: sub-menu only appear when children.length>=1
+ *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
+ **/
+
+/**
+ * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
+ * alwaysShow: true               if set true, will always show the root menu, whatever its child routes length
+ *                                if not set alwaysShow, only more than one route under the children
+ *                                it will becomes nested mode, otherwise not show the root menu
+ * redirect: noredirect           if `redirect:noredirect` will no redirect in the breadcrumb
+ * name:'router-name'             the name is used by <keep-alive> (must set!!!)
+ * meta : {
+    roles: ['admin','editor']    will control the page roles (you can set multiple roles)
+    title: 'title'               the name show in sub-menu and breadcrumb (recommend set)
+    icon: 'svg-name'             the icon show in the sidebar
+    noCache: true                if true, the page will no be cached(default is false)
+    breadcrumb: false            if false, the item will hidden in breadcrumb(default is true)
+    affix: true                  if true, the tag will affix in the tags-view
+  }
+ **/
+export const constantRoutes = [
+  {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path*',
+        component: () => import('@/views/redirect/index')
+      }
+    ]
+  },
+  {
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true
+  },
+  {
+    path: '/register',
+    component: () => import('@/views/register/index'),
+    name: 'Register',
+    hidden: true
+  },
+  {
+    path: '/auth-redirect',
+    component: () => import('@/views/login/authredirect'),
+    hidden: true
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/errorPage/404'),
+    hidden: true
+  },
+  {
+    path: '/401',
+    component: () => import('@/views/errorPage/401'),
+    hidden: true
+  },
+  {
+    path: '',
+    component: Layout,
+    redirect: 'dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: '工作主界面', icon: 'dashboard', noCache: true, affix: true }
+      }
+    ]
+  },
+  {
+    path: '/example',
+    component: Layout,
+    redirect: '/example/list',
+    name: 'example',
+    meta: {
+      title: '范例',
+      icon: 'dashboard'
+    },
+    children: [
+      {
+        path: 'layout',
+        component: () => import('@/views/example/layout'),
+        name: 'layout',
+        meta: { title: '布局范例' }
+      },
+      {
+        path: 'button',
+        component: () => import('@/views/example/button'),
+        name: 'button',
+        meta: { title: '按钮范例' }
+      },
+      {
+        path: 'form',
+        component: () => import('@/views/example/form'),
+        name: 'form',
+        meta: { title: '表单范例' }
+      },
+      {
+        path: 'table',
+        component: () => import('@/views/example/table'),
+        name: 'talbe',
+        meta: { title: '表格规范' }
+      }
+    ]
+  }
+]
+
+export const asyncRoutes = [
+  projectManage,
+  merchantManage,
+  staffManage,
+  attendanceManage,
+  financialManage,
+  equipmentManage,
+  systemManage
+]
+
+export default new Router({
+  // mode: 'history', // require service support
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRoutes.concat(asyncRoutes)
+})
+

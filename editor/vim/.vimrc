@@ -14,7 +14,7 @@
     "           ~/public/gitRepo/00/editor/vim/font/Droid Sans Mono Nerd Font Complete.otf
     "       方式二：注释掉该插件
     " >> ###############################################################################################
-    
+
     " >> ###############################################################################################
     "                       -------------------- 快捷键 --------------------
 
@@ -22,24 +22,16 @@
 
     " >>
         " 1 <C-g> 显示文件绝对路径
-        
 
     " >>
         nmap  <Leader>fed  :e ~/.vimrc<CR>
         nmap  <Leader>fer  :e ~/public/
-        nmap  <Leader>ab   :abclear<CR>
-        nmap  <Leader>fo : call OpenbyDolphin()<CR>
-        func! OpenbyDolphin()
-           call system("dolphin" . matchstr(expand('%:p'),'.*/')
-        endfunc
-
+        nmap  <Leader>ab   :abclear<CR>                           " 清除所有缩写
         nmap  <Leader>ds   :1,$s///gc
-
-        nmap <leader>s :w!<cr>
-        nmap <leader><C-s> :w !sudo tee > /dev/null % <cr>            " 保存超级用户文件
-         
+        nmap  <leader>s :w!<cr>
+        nmap  <leader><C-s> :w !sudo tee > /dev/null % <cr>         " 保存超级用户文件
         set pastetoggle=<F11>                                      " 切换到粘贴模式
-        nmap <silent> <Leader>ed :%s/\s\+$//g<CR>gg                 " 删除行未<Space><Tab>
+        nmap  <silent> <Leader>ed :%s/\s\+$//g<CR>                " 删除行未<Space><Tab>
 
     " >> emacs 基础操作
         imap  <C-b>         <Esc>ha
@@ -90,9 +82,9 @@
         nmap <Leader>wl  <C-W><C-L>                         " 切换到右屏幕
 
     " [m]>>  markdown
-        " 替换 #### 为 h4 
+        " 替换 #### 为 h4
         nmap <Leader>ch  :%s/^#### \(.*\)/<h4 class = 'auto-sort-sub1'>\1<\/h4>\r/gc
-        
+
         map <Leader>ms : call AddSection()<CR>
         func! AddSection()
             call append(line("."), "<div class = 'data-section default-folding'>")  "光标当前位置添加一行
@@ -135,12 +127,26 @@
             call append(line("."), '<div class="myImage">')
             call append(line(".")+1, "")
             call append(line(".")+2, "![-image-]()")
-            call append(line(".")+3, "")
-            call append(line(".")+4, '<label class="imageTitle">图示 </label>')
-            call append(line(".")+5, '</div>')
+            call append(line(".")+3, '<label class="imageTitle">图示 </label>')
+            call append(line(".")+4, '</div>')
 
             let pos = getpos(".")      "鼠标位置
             call setpos(".", [0, pos[1]+3, 12, 0])
+        endfunc
+
+        map <Leader>mg : call AddGrid()<CR>
+        func! AddGrid()
+            call append(line("."), '<div class="myGrid">')  "光标当前位置添加一行
+            call append(line(".")+1, '<div style="margin-top:2rem;">')
+            call append(line(".")+2, "")
+            call append(line(".")+3, '</div>')
+            call append(line(".")+4, '<div>')
+            call append(line(".")+5, '')
+            call append(line(".")+6, '</div>')
+            call append(line(".")+7, '</div>')
+
+            let pos = getpos(".")      "鼠标位置
+            call setpos(".", [0, pos[1]+3, 3, 0])
         endfunc
 
         map <Leader>mf : call AddFormula()<CR>
@@ -156,12 +162,12 @@
 
         map <Leader>mp : call AddProblem()<CR>
         func! AddProblem()
-            call append(line("."), '<div class="myProblem">')  "光标当前位置添加一行
+            call append(line("."), '<div class="myProblem no-shadow">')  "光标当前位置添加一行
             call append(line(".")+1, '<div class="myQuestion">')
             call append(line(".")+2, '')
             call append(line(".")+3, '</div>')
-            call append(line(".")+4, '<button class="toggleAnswer">证明:</button>')
-            call append(line(".")+5, '<div class="myAnswer">')
+            call append(line(".")+4, '<button class="toggleAnswer answer-button">证明:</button>')
+            call append(line(".")+5, '<div class="myAnswer hidden">')
             call append(line(".")+6, "")
             call append(line(".")+7, "//TODO")
             call append(line(".")+8, '</div>')
@@ -169,6 +175,19 @@
 
             let pos = getpos(".")      "鼠标位置
             call setpos(".", [0, pos[1]+3, 3, 0])
+        endfunc
+
+        map <Leader>ma : call AddAnnotate()<CR>
+        func! AddAnnotate()
+            call append(line("."), '<span class="myAnnotate">')  "光标当前位置添加一行
+            call append(line(".")+1, '')
+            call append(line(".")+2, '</span>')
+            call append(line(".")+3, '<div class="js-annotate annotate hidden">')
+            call append(line(".")+4, '')
+            call append(line(".")+5, '</div>')
+
+            let pos = getpos(".")      "鼠标位置
+            call setpos(".", [0, pos[1]+2, 3, 0])
         endfunc
 
         map <Leader>me : call AddExample()<CR>
@@ -314,43 +333,35 @@
     " }
 
 
-    " 开发编程{
-        " 文件自动加入头部信息{
-            "新建.c,.h,.sh,.java文件，自动插入文件头
-            autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()"
-            func SetTitle()
-                "如果文件类型为.sh文件
-                if &filetype == 'sh'
-                    call setline(1,          "\#########################################################################")
-                    call append(line("."),   "\# File Name: ".expand("%"))
-                    call append(line(".")+1, "\# Author: ma6174")
-                    call append(line(".")+2, "\# mail: ma6174@163.com")
-                    call append(line(".")+3, "\# Created Time: ".strftime("%c"))
-                    call append(line(".")+4, "\#########################################################################")
-                    call append(line(".")+5, "\#!/bin/bash")
-                    call append(line(".")+6, "")
-                else
-                    call setline(1,          "/*************************************************************************")
-                    call append(line("."),   "    > File Name: ".expand("%"))
-                    call append(line(".")+1, "    > Author: ma6174")
-                    call append(line(".")+2, "    > Mail: ma6174@163.com ")
-                    call append(line(".")+3, "    > Created Time: ".strftime("%c"))
-                    call append(line(".")+4, " ************************************************************************/")
-                    call append(line(".")+5, "")
-                endif
-                if &filetype == 'cpp'
-                    call append(line(".")+6, "#include<iostream>")
-                    call append(line(".")+7, "using namespace std;")
-                    call append(line(".")+8, "")
-                endif
-                if &filetype == 'c'
-                    call append(line(".")+6, "#include<stdio.h>")
-                    call append(line(".")+7, "")
-                endif
-                "新建文件后，自动定位到文件末尾
-                autocmd BufNewFile * normal G
-            endfunc
-        " }
+"   " 开发编程{
+"       " 文件自动加入头部信息{
+"           "新建.c,.h,.sh,.java文件，自动插入文件头
+"           autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()"
+
+"           func SetTitle()
+"               call setline(1,          "\#########################################################################")
+"               call append(line("."),   "\# File Name    : ".expand("%"))
+"               call append(line(".")+1, "\# Author       : ljq")
+"               call append(line(".")+2, "\# mail         : ljq1483858517@163.com")
+"               call append(line(".")+3, "\# Created Time : ".strftime("%c"))
+"               call append(line(".")+4, "\#########################################################################")
+"               call append(line(".")+5, "")
+"               if &filetype == 'sh'
+"                   call append(line(".")+6, "\#!/bin/bash")
+"               endif
+"               if &filetype == 'cpp'
+"                   call append(line(".")+6, "#include<iostream>")
+"                   call append(line(".")+7, "using namespace std;")
+"                   call append(line(".")+8, "")
+"               endif
+"               if &filetype == 'c'
+"                   call append(line(".")+6, "#include<stdio.h>")
+"                   call append(line(".")+7, "")
+"               endif
+"               "新建文件后，自动定位到文件末尾
+"               autocmd BufNewFile * normal G
+"           endfunc
+"       " }
 
 
     " vim-plug插件管理器{

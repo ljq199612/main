@@ -1,0 +1,228 @@
+<template>
+  <div :class="className" :style="{height:height,width:width}" />
+</template>
+
+<script>
+import echarts from 'echarts'
+require('echarts/theme/macarons') // echarts theme
+import { debounce } from '@/utils'
+
+export default {
+  props: {
+    className: {
+      type: String,
+      default: 'chart'
+    },
+    width: {
+      type: String,
+      default: '100%'
+    },
+    height: {
+      type: String,
+      default: '570px'
+    },
+    autoResize: {
+      type: Boolean,
+      default: true
+    },
+    chartData: {
+      type: Object,
+      required: true
+    },
+    xAxisData: {
+      type: Array,
+      required: true
+    },
+    type: {
+      type: Number,
+      default: null
+    }
+  },
+  data() {
+    return {
+      chart: null,
+      sidebarElm: null
+    }
+  },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
+    },
+    type(val) {
+      const $el = this.$el
+      // 清空节点再次生成图表
+      if ($el) {
+        $el.innerHTML = ''
+        $el.removeAttribute('_echarts_instance_')
+      }
+      setTimeout(() => {
+        this.initChart()
+      }, 100)
+    }
+  },
+  mounted() {
+    this.initChart()
+    if (this.autoResize) {
+      this.__resizeHandler = debounce(() => {
+        if (this.chart) {
+          this.chart.resize()
+        }
+      }, 100)
+      window.addEventListener('resize', this.__resizeHandler)
+    }
+
+    // 监听侧边栏的变化
+    this.sidebarElm = document.getElementsByClassName('sidebar-container')[0]
+    this.sidebarElm && this.sidebarElm.addEventListener('transitionend', this.sidebarResizeHandler)
+  },
+  beforeDestroy() {
+    if (!this.chart) {
+      return
+    }
+    if (this.autoResize) {
+      window.removeEventListener('resize', this.__resizeHandler)
+    }
+
+    this.sidebarElm && this.sidebarElm.removeEventListener('transitionend', this.sidebarResizeHandler)
+
+    this.chart.dispose()
+    this.chart = null
+  },
+  methods: {
+    sidebarResizeHandler(e) {
+      if (e.propertyName === 'width') {
+        this.__resizeHandler()
+      }
+    },
+    setOptions({ cpuData, romData, hardDiskData } = {}) {
+      // const xAxisData = []
+      // const str = '00:00'
+      // for (let i = 1, len = 13; i < len; i += 1) {
+      //   xAxisData.push(`${i}:${str}`)
+      // }
+      const cpuChart = {
+        name: 'CPU', itemStyle: {
+          normal: {
+            color: '#FF6B00',
+            lineStyle: {
+              color: '#ffa666',
+              width: 2
+            },
+            areaStyle: {
+              color: '#fff0e5'
+            }
+          }
+        },
+        smooth: true,
+        type: 'line',
+        data: cpuData,
+        animationDuration: 2800,
+        animationEasing: 'cubicInOut'
+      }
+      const romChart = {
+        name: '内存',
+        smooth: true,
+        type: 'line',
+        itemStyle: {
+          normal: {
+            color: '#3C9CE6',
+            lineStyle: {
+              color: '#7dbdee',
+              width: 2
+            },
+            areaStyle: {
+              color: '#d8ebfa'
+            }
+          }
+        },
+        data: romData,
+        animationDuration: 2800,
+        animationEasing: 'quadraticOut'
+      }
+      const ramChart = {
+        name: '硬盘',
+        smooth: true,
+        type: 'line',
+        itemStyle: {
+          normal: {
+            color: '#64D641',
+            lineStyle: {
+              color: '#8ce171',
+              width: 2
+            },
+            areaStyle: {
+              color: '#effbec'
+            }
+          }
+        },
+        data: hardDiskData,
+        animationDuration: 2800,
+        animationEasing: 'quadraticOut'
+      }
+      let series = []
+      let legendData = []
+      // 全部显示
+      if (!this.type) {
+        series = [cpuChart, romChart, ramChart]
+        legendData = ['CPU', '内存', '硬盘']
+      }
+      if (this.type === 1) {
+        series = [cpuChart]
+        legendData = ['CPU']
+      }
+      if (this.type === 2) {
+        legendData = ['内存']
+        series = [romChart]
+      }
+      if (this.type === 3) {
+        series = [ramChart]
+        legendData = ['硬盘']
+      }
+      this.chart.setOption({
+        xAxis: {
+          data: this.xAxisData,
+          boundaryGap: false,
+          axisTick: {
+            show: false
+          }
+        },
+        grid: {
+          left: 10,
+          right: 25,
+          bottom: 60,
+          top: 30,
+          containLabel: true
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          padding: [5, 10]
+        },
+        yAxis: {
+          axisTick: {
+            show: false
+          }
+        },
+        legend: {
+          data: legendData,
+          icon: 'circle',
+          itemWidth: 10,
+          itemHeight: 10,
+          itemGap: 45,
+          top: 550
+        },
+        series
+      })
+    },
+    initChart() {
+      this.chart = echarts.init(this.$el, 'macarons')
+      this.setOptions(this.chartData)
+    }
+  }
+}
+</script>

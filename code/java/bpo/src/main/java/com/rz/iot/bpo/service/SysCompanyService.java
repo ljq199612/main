@@ -1,0 +1,42 @@
+package com.rz.iot.bpo.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.SysCompany;
+import com.rz.iot.bpo.model.param.SysCompanyParam;
+import com.rz.iot.bpo.model.show.SysCompanyShow;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+
+public interface SysCompanyService {
+    List<SysCompanyShow> findAll(SysCompanyShow sysCompanyShow);
+
+    Result insert(SysCompanyParam param);
+
+    Result update(SysCompanyParam param);
+
+    Result delete(SysCompany sysCompany);
+
+    Result findAllComByKey(Integer orgType, BaseEntity baseEntity);
+
+    Result<List<SysCompany>> findAll();
+
+    Result getInfoByType(Integer id,Integer type);
+
+    Result uploadFileUrl(MultipartFile[] files);
+
+    Result detail(Integer companyId);
+
+    Result deleteFileUrl(String fileUrl);
+
+    Result downloadFileUrl(String fileName,String url,HttpServletResponse response);
+
+    Result findBelongBusiness();
+
+    Result updateStatus(SysCompanyParam sysCompanyParam);
+
+    List<Map<String,Object>> selectByProject(Integer projectId);
+}

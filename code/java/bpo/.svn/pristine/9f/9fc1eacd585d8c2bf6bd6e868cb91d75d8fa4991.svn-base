@@ -1,0 +1,9 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailedLog;
+
+public interface BpoBillReconciliationTimeDetailedLogMapper {
+    int insert(BpoBillReconciliationTimeDetailedLog record);
+
+    int insertSelective(BpoBillReconciliationTimeDetailedLog record);
+}

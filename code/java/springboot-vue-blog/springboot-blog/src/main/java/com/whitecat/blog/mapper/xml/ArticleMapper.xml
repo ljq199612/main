@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whitecat.blog.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.whitecat.blog.entity.Article">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="description" property="description" />
+        <result column="created_user_id" property="createdUserId" />
+        <result column="type_id" property="typeId" />
+        <result column="tag_id" property="tagId" />
+        <result column="markerdown_message" property="markerdownMessage" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="is_release" property="isRelease" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, description, created_user_id, type_id, tag_id, html_message, markerdown_message, gmt_create, gmt_modified, is_release, deleted
+    </sql>
+
+</mapper>

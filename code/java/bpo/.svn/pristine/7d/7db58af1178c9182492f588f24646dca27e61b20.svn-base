@@ -1,0 +1,312 @@
+<template>
+  <div>
+    <div>
+      <CfPanel title="用户管理" class="userManage">
+        <el-form
+          class="bpoFormInline"
+          :inline="true"
+        >
+          <el-form-item label="用户名：">
+            <el-input v-model="searchParam.username" placeholder="请输入用户名" />
+          </el-form-item>
+          <el-form-item label="组织类型：">
+            <el-select v-model="searchParam.orgKey" :remote-method="getRemoteOptions" filterable placeholder="请选择组织类型">
+              <el-option v-for="(item,index) in orgOptions" :key="index" :label="item.orgName" :value="item.id" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="角色类型：">
+            <el-select v-model="searchParam.roleId" filterable placeholder="请选择角色类型">
+              <el-option v-for="(item,index) in roleOptions" :key="index" :label="item.roleName" :value="item.id" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="联系电话：">
+            <el-input v-model="searchParam.phone" placeholder="请输入联系电话" />
+          </el-form-item>
+
+          <el-form-item label="状态：">
+            <el-select v-model="searchParam.status" filterable placeholder="请选择状态">
+              <el-option v-for="(item,index) in stateOptions" :key="index" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button class="bpoBtn" @click="getList">搜索</el-button>
+            <el-button @click="reset">重置</el-button>
+          </el-form-item>
+
+        </el-form>
+
+        <el-button type="primary" icon="el-icon-plus" @click="addUser">
+          新增
+        </el-button>
+        <el-table
+          v-loading="listLoading"
+          :data="userList"
+          class="bpo-table"
+          fit
+          @sort-change="sortChange"
+          @cell-mouse-enter="currentRowChange"
+        >
+          <el-table-column align="center" label="编号" type="index" width="80" />
+          <el-table-column header-align="" align="left" label="用户名" min-width="80">
+            <template slot-scope="scope">{{ scope.row.username }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="组织类型" min-width="80">
+            <template slot-scope="scope">
+              {{ scope.row.orgName }}
+            </template>
+          </el-table-column>
+          <el-table-column align="left" label="组织名称" min-width="80">
+            <template slot-scope="scope">{{ scope.row.companyName }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="角色类型" min-width="80">
+            <template slot-scope="scope">{{ scope.row.roleName }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="联系电话" min-width="100">
+            <template slot-scope="scope">{{ scope.row.phone }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="状态" width="80">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.status"
+                active-value="1"
+                inactive-value="2"
+                :disabled="specialPermission(scope.row.username)"
+                @change="statusChange"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="操作" width="200">
+            <template slot-scope="scope">
+              <el-button type="text" size="mini" @click="restPassword(scope.row)">重置密码</el-button>
+              <el-button type="text" style="color:#4794F7" size="mini" @click="handleView(scope.row)">详情</el-button>
+              <el-button type="text" style="color:#19D185" size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+              <el-button v-if="scope.row.status!='deleted'" :disabled="scope.row.username !== '超级管理员' && scope.row.username !== '主体管理员'" size="mini" type="text" style="color:#F52222" @click="handleDelete(scope.row,'deleted')">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+      </CfPanel>
+      <el-dialog
+        title="重置密码"
+        class="bpoDialog"
+        :visible.sync="restPasswordDialog"
+      >
+        <el-form
+          ref="restPasswordForm"
+          :model="restPasswordForm"
+          label-width="90px"
+          :rules="restPasswordRules"
+        >
+          <el-row>
+            <el-form-item label="新密码：" prop="password">
+              <el-input v-model="restPasswordForm.password" placeholder="请输入新密码" autocomplete="off" />
+            </el-form-item>
+
+          </el-row>
+          <el-row>
+            <el-form-item label="确认密码：" prop="confirmPassword">
+              <el-input v-model="restPasswordForm.confirmPassword" placeholder="请输入确认密码" autocomplete="off" />
+            </el-form-item>
+          </el-row>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="restPasswordDialog=false">取消</el-button>
+          <el-button type="primary" @click="confirmRestPassword">确定</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+// import path from 'path'
+// import { deepClone } from '@/utils'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import { getUserList, deleteUser, resetPassword, UpdateUser } from '@/api/user'
+import { getRolesNoPage } from '../../../api/role'
+import { findOrgType } from '../../../api/orgnization'
+import { validatePassword } from '@/utils/validate'
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'UserManage',
+  components: { CfPanel, Pagination },
+  data() {
+    // 重复密码验证
+    const pwdAgainCheck = async(rule, value, callback) => {
+      if (this.restPasswordForm.password !== this.restPasswordForm.confirmPassword) {
+        return callback(new Error('两次输入密码不一致！'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      total: 0,
+      searchParam: {},
+      userList: [],
+      orgOptions: [],
+      roleOptions: [],
+      stateOptions: [{ value: '0', label: '启用' }, { value: '1', label: '停用' }],
+
+      restPasswordForm: {},
+
+      restPasswordRules: {
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        confirmPassword: [{ required: true, trigger: 'blur', validator: validatePassword },
+          { required: true, trigger: 'blur', validator: pwdAgainCheck }]
+      },
+      restPasswordDialog: false
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'roles',
+      'name'
+    ])
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+
+  },
+  methods: {
+    specialPermission(roleName) {
+      if (roleName !== '超级管理员' && name !== '主体管理员') {
+        return false
+      } else if (roleName === '超级管理员') {
+        return true
+      } else if (roleName === '主体管理员' && name === '超级管理员') {
+        return false
+      }
+      return true
+    },
+    confirmRestPassword() {
+      this.$refs['restPasswordForm'].validate((valid) => {
+        if (valid) {
+          resetPassword(this.restPasswordForm).then((res) => {
+            this.restPasswordDialog = false
+            this.$notify({
+              title: '成功',
+              duration: '2000',
+              message: '重置密码成功！',
+              type: 'success'
+            })
+          })
+        }
+      })
+    },
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    statusChange(status) {
+      this.currentRow.status = status
+      UpdateUser(this.currentRow).then(res => {
+        this.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '修改成功！',
+          type: 'success'
+        })
+      })
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getUserList(this.searchParam).then((res) => {
+        this.userList = res.data.data.list
+        this.total = res.data.data.total
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch((err) => {
+        this.listLoading = false
+      })
+    },
+    addUser() {
+      this.$router.push({ name: 'userInfo' })
+    },
+    getRemoteOptions() {
+      getRolesNoPage().then(res => {
+        this.roleOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    restPassword(row) {
+      this.restPasswordForm = { userId: row.id }
+      this.restPasswordDialog = true
+    },
+    handleUpdate(row) {
+      this.$router.push({ name: 'userInfo', query: {
+        userId: 1
+      }})
+    },
+    handleView() {
+      this.$router.push({ name: 'userDetail', query: {
+        userId: 1,
+        readonly: true
+      }})
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该用户？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        deleteUser({ userId: row.id }).then(() => {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '删除用户成功！',
+            type: 'success'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+      })
+    }
+  }
+}
+</script>
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .userManage {
+  }
+
+</style>

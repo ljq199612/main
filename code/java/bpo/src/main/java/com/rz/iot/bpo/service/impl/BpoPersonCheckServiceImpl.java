@@ -1,0 +1,416 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.Constants;
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.PicUtils;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.security.LoginUser;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.bpoPerson.BpoPersonCheckParam;
+import com.rz.iot.bpo.model.show.bpoPerson.*;
+import com.rz.iot.bpo.service.BpoPersonCheckService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 描述 : 人员审核业务实现
+ * 作者 : Rycony
+ * 创建时间 : 2020/7/1 9:47
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+public class BpoPersonCheckServiceImpl implements BpoPersonCheckService {
+    @Resource
+    private BpoPersonCheckMapper bpoPersonCheckMapper;
+    @Resource
+    private SysCompanyMapper sysCompanyMapper;
+    @Resource
+    private BpoPersonContractInfoMapper personContractInfoMapper;
+    @Resource
+    private BpoAccountInfoMapper bpoAccountInfoMapper;
+    @Resource
+    private BpoPersonWageMapper bpoPersonWageMapper;
+    @Resource
+    private PicUtils picUtils;
+    @Resource
+    private BpoFileUploadMapper fileUploadMapper;
+    @Resource
+    private BpoPersonIdFileMapper bpoPersonIdFileMapper;
+    @Resource
+    private SysDeptMapper sysDeptMapper;
+    @Resource
+    private SysDictTypeMapper sysDictTypeMapper;
+    @Resource
+    private SysUserMapper sysUserMapper;
+    @Resource
+    private SysCompanyRoleUserMapper sysCompanyRoleUserMapper;
+
+    /**
+     * 查询所有未审核人员
+     * @param checkParam 查询参数
+     * @return
+     */
+    @Override
+    public List<BpoPersonCheckShow> findAll(BpoPersonCheckParam checkParam) {
+        List<BpoPersonCheckShow> list = bpoPersonCheckMapper.findAll(checkParam);
+        for(BpoPersonCheckShow bpoPersonShow : list){
+            String idCard = bpoPersonShow.getIdCard();
+            int idCardLength  = idCard.length();
+            String showIdCard = idCard.substring(0,3) + "***********" + idCard.substring(idCardLength - 4,idCardLength);
+            bpoPersonShow.setIdCard(showIdCard);
+        }
+        return list;
+    }
+
+    /**
+     * 获取未审核人员信息
+     * @param personId
+     * @return
+     */
+    @Override
+    public Result personCheckDetail(Integer personId) {
+        if(personId == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+        BpoPersonDetailShow bpoPersonDetailShow = new BpoPersonDetailShow();
+
+        // 获取未审核的基本信息
+        BpoBasePerson bpoBasePerson = bpoPersonCheckMapper.getBaseInfo(personId);
+        bpoPersonDetailShow.setBpoBasePerson(bpoBasePerson);
+
+        // 员工属性
+        BpoWorkPerson bpoWorkPerson = new BpoWorkPerson();
+        /**
+         * 获取当前用户,根据用户查询用户所属公司
+         */
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        SysUser sysUser = loginUser.getUser();
+        // 当前用户所在公司
+        SysCompany sysCompany = sysCompanyMapper.findCompanyByUserId(sysUser.getUserId());
+
+        bpoWorkPerson.setCompanyId(sysCompany.getId());
+        bpoWorkPerson.setCompanyName(sysCompany.getCompanyName());
+
+        // 获取公司所有部门
+        //SysDept sysDept =sysDeptMapper.selectByCompanyId(sysCompany.getId());
+
+        List<SysDeptShow> list = sysDeptMapper.findAllSysDeptByUserId(sysUser.getUserId());
+
+        // 设置公司所有部门层级
+        bpoWorkPerson.setDeptShows(list);
+        bpoPersonDetailShow.setBpoWorkPerson(bpoWorkPerson);
+        return Result.success(bpoPersonDetailShow);
+    }
+
+    /**
+     * 审核人员
+     * @param personDetailShow
+     * @return
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result checkPerson(BpoPersonDetailShow personDetailShow) {
+        if(personDetailShow.getBpoBasePerson() == null || personDetailShow.getBpoBasePerson().getPersonId() == null)
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+
+        // 获取基本信息 员工属性
+        BpoBasePerson bpoBasePerson = personDetailShow.getBpoBasePerson();
+        BpoWorkPerson bpoWorkPerson = personDetailShow.getBpoWorkPerson();
+        /**
+         * 修改基本信息以及员工属性
+         *
+         * 基本信息只能修改:
+         *  工号,甲方工号,联系方式,住址,备注
+         */
+        bpoPersonCheckMapper.updateBaseProp(bpoBasePerson,bpoWorkPerson);
+
+        // 修改人员附件
+        List<BpoPersonIdFile> list = new ArrayList<>();
+        List<Map<String,String>> maps = bpoBasePerson.getFile();
+        for(Map<String,String> map : maps){
+            BpoPersonIdFile personIdFile = new BpoPersonIdFile();
+            personIdFile.setUrl(map.get("url"));
+            personIdFile.setFileName(map.get("fileName"));
+            personIdFile.setPersonId(bpoBasePerson.getPersonId());
+            list.add(personIdFile);
+        }
+        // 批量修改人员文件
+        bpoPersonIdFileMapper.updatePerFiles(list);
+
+
+        // 合同信息
+        BpoContractPerson bpoContractPerson = personDetailShow.getBpoContractPerson();
+        // 新增人员合同信息
+        BpoPersonContractInfo personContractInfo = new BpoPersonContractInfo();
+        // 设置相应参数
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+
+        personContractInfo.setJiaId(bpoWorkPerson.getCompanyId());
+        personContractInfo.setYiId(bpoBasePerson.getPersonId());
+        personContractInfo.setName(bpoContractPerson.getContractName());
+        personContractInfo.setContractCode(bpoContractPerson.getContractCode());
+        personContractInfo.setType(bpoContractPerson.getContractType());
+        personContractInfo.setIsSocialSecurity(bpoContractPerson.getIsSocialSecurity());
+        personContractInfo.setIsFixedDueTime(bpoContractPerson.getIsSocialSecurity());
+        try {
+            personContractInfo.setStartTime(dateFormat.parse(bpoContractPerson.getStartTime()));
+            personContractInfo.setEndTime(dateFormat.parse(bpoContractPerson.getEndTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        personContractInfo.setRemark(bpoContractPerson.getRemark());
+
+        // 获取合同文件
+        List<Map<String,String>> maps1 = bpoContractPerson.getContractFile();
+
+
+        // 根据数据库合同url在人员表中存储是拼接,则创建一个暂存buffer
+        StringBuffer contractUrlBuffer = new StringBuffer();
+        if(maps1 != null && maps1.size() > 0){
+            for(int i = 0;i < maps1.size();i++){
+                contractUrlBuffer.append(maps1.get(i).get("contractUrl"));
+                if(i != (maps1.size()-1)){
+                    contractUrlBuffer.append(',');
+                }
+            }
+        }
+
+
+        personContractInfo.setFilePath(contractUrlBuffer.toString());
+
+        personContractInfoMapper.insertSelective(personContractInfo);
+
+        // 薪资信息
+        BpoWagePerson bpoWagePerson = personDetailShow.getBpoWagePerson();
+
+        BpoAccountInfo bpoAccountInfo = new BpoAccountInfo();
+        bpoAccountInfo.setName(bpoBasePerson.getPersonName());
+        bpoAccountInfo.setBankNumber(bpoWagePerson.getAccountNumber());
+        bpoAccountInfo.setBank(bpoWagePerson.getBank());
+        // 新增银行卡信息
+        bpoAccountInfoMapper.insertSelective(bpoAccountInfo);
+
+        // 新增薪酬信息
+        BpoPersonWage bpoPersonWage = new BpoPersonWage();
+        bpoPersonWage.setMealAllowance(bpoWagePerson.getMealAllowance());
+        bpoPersonWage.setNightAllowance(bpoWagePerson.getNightAllowance());
+        bpoPersonWage.setOtherAllowance(bpoWagePerson.getOtherAllowance());
+        bpoPersonWage.setPayType(bpoWagePerson.getPayType());
+        bpoPersonWage.setPayChannels(bpoWagePerson.getPayChannels());
+        bpoPersonWage.setWage(bpoWagePerson.getWage());
+        bpoPersonWage.setWageType(bpoWagePerson.getWageType());
+
+        bpoPersonWageMapper.insertSelective(bpoPersonWage);
+
+
+        // 修改人员账户,合同,薪酬信息
+        bpoPersonCheckMapper.updatePersonAccount(bpoBasePerson.getPersonId(),personContractInfo.getId(),bpoAccountInfo.getId(),bpoPersonWage.getId());
+
+
+
+        // 审核完人员之后,给人员创建一个微信公众号账户,用户类型为2: 1.web用户 2.微信用户
+        Integer userType = DictDataConstants.SYS_WECHAT_USER;
+
+        // 该人员创建一个账户,当前暂定手机号码为用户名,密码是身份证后六位
+        SysUser sysUser = new SysUser();
+        sysUser.setUsername(bpoBasePerson.getPhone());
+        sysUser.setPassword(SecurityUtils.encryptPassword(bpoBasePerson.getIdCard().substring(bpoBasePerson.getIdCard().length() - 6)));
+        sysUser.setSex(bpoBasePerson.getSex());
+        sysUser.setRealName(bpoBasePerson.getPersonName());
+        sysUser.setUserType(userType);
+        sysUserMapper.insertSelective(sysUser);
+
+        // 建立人员关联用户关联关系
+        bpoPersonCheckMapper.personBindUser(bpoBasePerson.getPersonId(),sysUser.getUserId());
+
+
+        // 建立用户,角色,组织关联关系
+        Integer rolePersonal = DictDataConstants.SYS_ROLE_PERSONAL;
+        SysCompanyRoleUser sysCompanyRoleUser = new SysCompanyRoleUser();
+        sysCompanyRoleUser.setUserId(sysUser.getUserId());
+        sysCompanyRoleUser.setCompanyId(bpoWorkPerson.getCompanyId());
+        sysCompanyRoleUser.setRoleId(rolePersonal);
+        sysCompanyRoleUserMapper.insertSelective(sysCompanyRoleUser);
+
+        return Result.success();
+    }
+
+    /**
+     * 上传合同附件
+     * @param files
+     * @return
+     */
+    @Override
+    public Result uploadContractFiles(MultipartFile[] files) {
+        // 定义一个文件集合
+        List<BpoFileUpload> list = new ArrayList<>();
+
+        // 上传至文件服务器
+        Map<String,String> map = picUtils.upload(files);
+
+        List<Map<String,String>> urlContractNames = new ArrayList<>();
+        // 获取文件名称
+        for(int i = 0;i < files.length;i++){
+            BpoFileUpload bpoFileUpload = new BpoFileUpload();
+            bpoFileUpload.setFileName(files[i].getOriginalFilename());
+            bpoFileUpload.setUrl(map.get("url" + i));
+            bpoFileUpload.setUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+            list.add(bpoFileUpload);
+
+            Map<String,String> tempMap = new HashMap<>();
+            tempMap.put("contractUrl",map.get("url" + i));
+            tempMap.put("fileName",files[i].getOriginalFilename());
+            urlContractNames.add(tempMap);
+        }
+
+        // 上传文件集合
+        fileUploadMapper.insertFileUploads(list);
+
+        return Result.success(urlContractNames);
+    }
+
+    /**
+     * 上传身份证附件
+     * @param files
+     * @return
+     */
+    @Override
+    public Result uploadPersonFiles(MultipartFile[] files) {
+        // 定义一个文件集合
+        List<BpoPersonIdFile> list = new ArrayList<>();
+
+        // 上传至文件服务器
+        Map<String,String> map = picUtils.upload(files);
+
+        // 获取url以及文件名称
+        List<Map<String,String>> urlFileNames = new ArrayList<>();
+        for(int i = 0;i < files.length;i++){
+            BpoPersonIdFile personIdFile = new BpoPersonIdFile();
+            personIdFile.setUrl(map.get("url" + i));
+            personIdFile.setUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+            personIdFile.setFileName(files[i].getOriginalFilename());
+            list.add(personIdFile);
+
+            Map<String,String> tempMap = new HashMap<>();
+            tempMap.put("url",map.get("url" + i));
+            tempMap.put("fileName",files[i].getOriginalFilename());
+            urlFileNames.add(tempMap);
+        }
+
+        // 上传文件集合
+        bpoPersonIdFileMapper.insertList(list);
+
+        return Result.success(urlFileNames);
+    }
+
+    /**
+     * 删除人员附件
+     * @param url
+     * @return
+     */
+    @Override
+    public Result deletePersonFile(String url) {
+        // 删除人员身份附件
+        picUtils.delete(url);
+
+        // 更新数据库人员附件信息
+        bpoPersonIdFileMapper.updateByUrl(url);
+        return Result.success();
+    }
+
+    /**
+     * 删除合同文件
+     * @param url 合同url 根据','分割拼接后的字符串
+     * @return
+     */
+    @Override
+    public Result deleteContractFile(String url) {
+        picUtils.delete(url);
+
+        // 更改文件url
+        fileUploadMapper.deleteStatusByUrl(url);
+
+        return Result.success();
+    }
+
+    /**
+     * 同步客户工号
+     * TODO 模拟客户工号
+     * @return
+     */
+    @Override
+    public Result synClientNo() {
+        String clientNo = "xxx-9528";
+        return Result.success(clientNo);
+    }
+
+    /**
+     * 查询所有民族
+     * @return
+     */
+    @Override
+    public Result findAllNation() {
+        List<Map<String,Object>> map = bpoPersonCheckMapper.findAllNation();
+        return Result.success(map);
+    }
+
+    /**
+     * 查询所有岗位信息
+     *
+     * @return
+     */
+    @Override
+    public Result findAllStation() {
+        // 岗位类型
+        String personStation = Constants.SYS_PERSON_STATION;
+        List<SysDictData> list = sysDictTypeMapper.findDataByType(personStation);
+        return Result.success(list);
+    }
+
+    /**
+     * 查询当前用户所有项目
+     * todo 当前没有数据库没有用户对应的项目关联关系表,使用假数据,
+     * @return
+     */
+    @Override
+    public Result findCurrentUserProject() {
+        // 定义结果集
+        List<Map<String,Object>> list = new ArrayList<>();
+
+        // 项目数据
+        Map<String,Object> map1 = new HashMap<>();
+        map1.put("projectId",1);
+        map1.put("projectName","小型项目");
+
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("projectId",2);
+        map2.put("projectName","中小型项目");
+
+        Map<String,Object> map3 = new HashMap<>();
+        map3.put("projectId",3);
+        map3.put("projectName","中型项目");
+
+        list.add(map1);
+        list.add(map2);
+        list.add(map3);
+
+        return Result.success(list);
+    }
+}

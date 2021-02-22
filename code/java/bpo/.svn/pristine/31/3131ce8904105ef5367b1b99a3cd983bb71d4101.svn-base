@@ -1,0 +1,440 @@
+<template>
+  <CfPanel title="计费规则" class="main">
+    <el-form class="searchForm">
+      <el-row>
+        <el-col :span="6">
+          <el-form-item label-width="90px" label="计费规则：">
+            <el-select v-model="queryForm.dictId" placeholder="请选择计费方式" @change="submit">
+              <el-option v-for="(item,index) in typeOptions" :key="index" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label-width="90px" label="规则名称：">
+            <el-input v-model.trim="queryForm.belogGroupName" placeholder="请输入规则名称" class="half" @keyup.13.native="submit" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label-width="90px" label="项目名称：">
+            <el-input v-model.trim="queryForm.name" placeholder="请输入项目名称" class="half" @keyup.13.native="submit" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="4" style="margin-left: 10px;">
+          <el-form-item>
+            <el-button class="bpoBtn" @click="submit">搜索</el-button>
+            <el-button @click="reset">重置</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <el-button type="primary" icon="el-icon-plus" @click="addFn">
+      新增规则
+    </el-button>
+    <div class="rule-wrap">
+      <div v-for="(item, index) in list" :key="index" class="rule-li">
+        <i class="el-icon-caret-bottom" />
+        <div class="rule-li-body">
+          <ul class="rule-list">
+            <li>
+              <span class="rule-label">规则名称:</span>
+              <span class="rule-value">{{ item.supplierName }}</span>
+            </li>
+            <li>
+              <span class="rule-label">开始时间:</span>
+              <span class="rule-value">{{ item.effectiveTime|formateTime }}</span>
+            </li>
+            <li>
+              <span class="rule-label">结束时间:</span>
+              <span class="rule-value">{{ item.finishTime|formateTime }}</span>
+            </li>
+            <li>
+              <span class="rule-label">项目名称:</span>
+              <span class="rule-value">{{ item.projectName }}</span>
+            </li>
+            <li>
+              <span class="rule-label">计费方式:</span>
+              <span class="rule-value">{{ item.feeRuleType|formateType(typeOptions) }}</span>
+            </li>
+            <li>
+              <span class="rule-label">供应商单价:</span>
+              <span class="rule-value">{{ item.unitPrice }}(元/小时)</span>
+            </li>
+          </ul>
+          <!-- 计件方式 -->
+          <template v-if="item.feeRuleType !== 1">
+            <a href="javascript:void(0)" @click="toggleDetail(item)">点击查看详情<i :class="[item.isShow ? 'el-icon-arrow-up': 'el-icon-arrow-down']" /></a>
+            <!-- 详情表格 -->
+            <el-table
+              v-show="item.isShow"
+              v-loading="detailTableLoading"
+              style="margin-top: 19px;"
+              :data="detailTable"
+              class="bpoTable"
+              border
+              fit
+              :span-method="arraySpanMethod"
+            >
+              <el-table-column align="center" label="序号" width="80">
+                <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+              </el-table-column>
+              <el-table-column align="left" label="工作模块" min-width="80" prop="modelName" />
+              <el-table-column align="left" label="工序" min-width="80" prop="processName" />
+              <el-table-column align="left" label="产品名称" min-width="80" prop="productName">
+                <template slot-scope="scope">
+                  <span contenteditable>{{ scope.productName }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="left" label="计价模式(件/票)" min-width="80" prop="priceMode" />
+              <el-table-column align="left" label="价格(元/包裹)" min-width="80" prop="price" />
+              <el-table-column align="left" label="计价模式操作" width="120">
+                <template slot-scope="scope">
+                  <el-button v-if="scope.row.status!='deleted'" type="text" style="color:#F52222" @click="delAddForm(scope.row,'deleted')">
+                    删除
+                  </el-button>
+                </template>
+              </el-table-column>
+              <el-table-column align="left" label="产品操作" width="240">
+                <template slot-scope="scope">
+                  <el-button type="text" style="color:#4794F7" @click="updateAddForm(scope.row)">添加计价模式</el-button>
+                  <el-button v-if="scope.row.status!='deleted'" type="text" style="color:#F52222" @click="delAddForm(scope.row,'deleted')">
+                    删除
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </template>
+        </div>
+      </div>
+      <div class="rule-li rule-li-last">
+        <i class="el-icon-caret-top" />
+      </div>
+    </div>
+  </CfPanel>
+</template>
+<script>
+import { ruleList, ruleDetail } from '@/api/supplierManage'
+import CfPanel from '@/components/Panel'
+
+export default {
+  name: 'SalaryRules',
+  components: {
+    CfPanel
+  },
+  filters: {
+    formateTime(time) {
+      if (time) {
+        return time.substring(0, 10)
+      }
+      return ''
+    },
+    formateType(type, typeOptions) {
+      const find = typeOptions.find((item) => item.value === type)
+      if (find) {
+        return find.label
+      }
+      return ''
+    }
+  },
+  data() {
+    return {
+      listLoading: false,
+      typeOptions: [
+        {
+          label: '计件',
+          value: 1
+        },
+        {
+          label: '计时',
+          value: 2
+        }
+      ],
+      queryForm: {
+        supplierId: this.$route.query.id || 1, // 上一级传入
+        projectName: '',
+        freeRuleName: '',
+        feeRuleType: null
+      },
+      list: [],
+      detailTableLoading: false,
+      rowSpanV1: [], // 一级合并数据
+      rowSpanV2: [], // 二级合并数据
+      rowSpanV3: [], // 三级合并数据
+      rowSpanV4: [], // 四级合并数据
+      detailTable: []
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList() {
+      this.listLoading = true
+      ruleList({
+        ...this.queryForm
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.list = data || []
+        this.total = data.total || 0
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    reset() {
+      this.queryForm.customerName = ''
+      this.queryForm.name = ''
+      this.queryForm.belogGroupName = ''
+      this.getList()
+    },
+    submit() {
+      this.getList()
+    },
+    addFn() {
+      this.$router.push({
+        name: 'AddRules'
+      })
+    },
+    toggleDetail(data) {
+      this.$set(data, 'isShow', !data.isShow)
+      this.getDetailTable(data)
+    },
+    getDetailTable({ supplierId, projectId }) {
+      this.detailTableLoading = true
+      ruleDetail({
+        supplierId,
+        projectId
+      }).then((res) => {
+        this.detailTableLoading = false
+        const data = res.data.data
+        this.detailTable = this.iterateArr(data.feeRuleShowList || [])
+        this.rowSpanV1 = this.calcRowSpan(this.detailTable, 'modelId')
+        this.rowSpanV2 = this.calcRowSpan(this.detailTable, 'groupId')
+        this.rowSpanV3 = this.calcRowSpan(this.detailTable, 'processId')
+        this.rowSpanV4 = this.calcRowSpan(this.detailTable, 'priceId')
+        // console.table(this.detailTable)
+        // console.log(this.rowSpanV1, this.rowSpanV2, this.rowSpanV3, this.rowSpanV4)
+      }).catch((err) => {
+        this.detailTableLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex < 2) {
+        const _row = this.rowSpanV1[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      } else if (/2|8/.test(columnIndex)) {
+        const _row = this.rowSpanV2[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      } else if (/3|7/.test(columnIndex)) {
+        const _row = this.rowSpanV3[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      }
+    },
+    // 计算表格合并数据
+    calcRowSpan(list, key) {
+      let pos = 0
+      const rowSpan = []
+      list.forEach((item, index) => {
+        if (index === 0) {
+          rowSpan.push(1)
+          pos = 0
+        } else {
+          if (list[index][key] === list[index - 1][key]) {
+            rowSpan[pos] += 1
+            rowSpan.push(0)
+          } else {
+            rowSpan.push(1)
+            pos = index
+          }
+        }
+      })
+      return rowSpan
+    },
+    iterateArr(list) {
+      const arr = []
+      list.forEach((item) => {
+        const obj = {} // 每一级的数据容器
+        Object.keys(item).forEach((key) => {
+          if (Array.isArray(item[key])) {
+            if (item[key].length === 0 || !item[key]) {
+              const cacheObj = Object.assign({}, obj)
+              arr.push(cacheObj)
+            } else {
+              const childArr = this.iterateArr(item[key])
+              childArr.forEach((itm) => {
+                Object.keys(itm).forEach((key1) => {
+                  obj[key1] = itm[key1]
+                })
+                arr.push({
+                  ...obj
+                })
+              })
+            }
+          } else {
+            obj[key] = item[key]
+          }
+        })
+        // 如果对象属性都没有数组说明到达最后一级，保存到数组
+        const isLast = Object.values(item).every((v) => !Array.isArray(v))
+        if (isLast) {
+          const { lowerLimit = 0, upperLimit = 0 } = obj
+          // 新增价格模式属性
+          if (Reflect.has(obj, 'lowerLimit')) {
+            if (upperLimit > 50) {
+              obj.priceMode = '50以上'
+            } else {
+              obj.priceMode = `${lowerLimit}~${upperLimit}`
+            }
+          }
+          arr.push({
+            ...obj
+          })
+        }
+      })
+      return arr
+    }
+    // 迭代数组汇总各级属性
+    /* terateList(list) {
+      const arr = []
+      // feeRuleShowList
+      list.forEach((item) => {
+        const obj = {} // 保存一级属性
+        Object.keys(item).forEach((key) => {
+          // sysProcessVos数组
+          if (Array.isArray(item[key])) {
+            if (item[key].length === 0 || !item[key]) {
+              const cacheObj = Object.assign({}, obj)
+              arr.push(cacheObj)
+            } else {
+              // 1、feeRuleModelShowList
+              item[key].forEach((item1) => {
+                // 保存二级属性
+                const obj1 = {}
+                Object.keys(item1).forEach((key1) => {
+                  // 2、bpoWorkGroupList数组
+                  if (Array.isArray(item1[key1])) {
+                    if (item1[key1].length === 0 || !item1[key1]) {
+                      const cacheObj = Object.assign({}, obj1, obj)
+                      arr.push(cacheObj)
+                    } else {
+                      // 3、feeRuleGroupShows
+                      item1[key1].forEach((item2) => {
+                        // 保存三级属性
+                        const obj2 = {}
+                        Object.keys(item2).forEach((key2) => {
+                          if (Array.isArray(item2[key2])) {
+                            if (item2[key2].length === 0 || !item2[key2]) {
+                              const cacheObj = Object.assign({}, obj1, obj)
+                              arr.push(cacheObj)
+                            } else {
+                              // 4、feeRuleProcessShowList
+                              item2[key2].forEach((item3) => {
+                              // 保存四级属性
+                                const { lowerLimit = 0, upperLimit = 0 } = item3
+                                if (upperLimit > 50) {
+                                  obj2.priceMode = '50以上'
+                                } else {
+                                  obj2.priceMode = `${lowerLimit}~${upperLimit}`
+                                }
+                                Object.assign(obj2, item3)
+                              })
+                            }
+                          } else {
+                            obj2[key2] = item2[key2]
+                          }
+                        })
+                        const cacheObj = Object.assign({}, obj2, obj1, obj)
+                        arr.push(cacheObj)
+                      })
+                    }
+                  } else {
+                    obj1[key1] = item1[key1]
+                  }
+                })
+              })
+            }
+          } else {
+            obj[key] = item[key]
+          }
+        })
+      })
+      return arr
+    } */
+  }
+}
+</script>
+<style lang="scss">
+.rule-wrap{
+  margin-top: 35px;
+  padding-bottom: 16px;
+  .rule-li{
+    &:before{
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 7px;
+      width: 1px;
+      height: 100%;
+      background: #AAAAAA;
+    }
+    position: relative;
+    .el-icon-caret-top,
+    .el-icon-caret-bottom{
+      position: absolute;
+      font-size: 14px;
+      left: 0;
+      top: 0;
+      border: 1px solid #AAAAAA;
+      color: #AAAAAA;
+      background: #fff;
+    }
+  }
+  .rule-li-body{
+    padding-left: 62px;
+    a{
+      margin-top: 8px;
+      font-size: 13px;
+      color: #FF6B00;
+      i{
+        margin-left: 5px;
+        border: 1px solid #FF6B00;
+        border-radius: 50%;
+        font-weight: bold;
+      }
+    }
+  }
+  .rule-list{
+    padding: 0;
+    font-size: 0;
+    li{
+      font-size: 14px;
+      display: inline-block;
+      width: 33.333333%;
+      line-height: 20px;
+      margin-bottom: 12px;
+    }
+    .rule-label,
+    .rule-value{
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .rule-label{
+      width: 85px;
+      color: #656565;
+    }
+    .rule-value{
+      color: #000;
+    }
+  }
+}
+</style>

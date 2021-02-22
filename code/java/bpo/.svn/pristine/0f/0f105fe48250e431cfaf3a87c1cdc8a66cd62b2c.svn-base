@@ -1,0 +1,144 @@
+<template>
+  <div class="form main">
+    <CfPanel title="场地详情" :back-to="cancel">
+      <el-form ref="addModify_from" label-width="120px" :model="addModify_from" :label-position="label_position">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="归属地：" prop="region">
+              {{ addModify_from.provinceName }}
+              {{ addModify_from.cityName }}
+              {{ addModify_from.districtName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="场地类型：" prop="type">
+              {{ addModify_from.type }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属大区：" prop="regionName">
+              {{ addModify_from.regionName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属业务区：" prop="businessName">
+              {{ addModify_from.businessName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="场地名称：" prop="transferName">
+              {{ addModify_from.name }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="场地编号：" prop="transferCode">
+              {{ addModify_from.code }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="负责人：" prop="linkMan">
+              {{ addModify_from.linkMan }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系方式：" prop="phone">
+              {{ addModify_from.linkMan }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否启用：" prop="status">
+              {{ addModify_from.status }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="备注：" prop="remark">
+              {{ addModify_from.remark }}
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </CfPanel>
+  </div>
+</template>
+
+<script type="text/javascript">
+// 请求方法加载
+import { findStationType, findDetail } from '@/api/systemManage/siteManage/siteManage'
+// 整体页面加载
+import CfPanel from '@/components/Panel'
+// 验证规则
+import siteVerification from './siteVerification'
+export default {
+  name: 'NewSite',
+  components: { CfPanel },
+  data() {
+    return {
+      title: this.$route.query.id ? '修改场地' : '增加场地',
+      label_position: 'right', // label以左边排列right
+      addModify_from: { status: 1 }, // 初始化增加场地下拉框数据
+      rules: siteVerification, // 设置验证规则
+      disabled: this.$route.query.disabled // 设置
+    }
+  },
+  created() {
+    // 获取场地详情  当this.$route.query.id为true时
+    this.findDetail(this.Add_modify)
+  },
+  mounted() {
+
+  },
+  methods: {
+    // 场地详情
+    findDetail(id) {
+      findDetail({ id }).then((res) => {
+        console.log(res)
+        const list = res.data.data
+        list.status = list.status === 1 ? '启用' : '禁用'
+        this.addModify_from = list
+        // 获取场地类型列表
+        this.findStationType()
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 获取场地类型列表
+    findStationType() {
+      findStationType({}).then((res) => {
+        console.log(this.addModify_from)
+        res.data.data.map((item, i) => {
+          if (this.addModify_from.type === item.dictValue) {
+            this.addModify_from.type = item.dictLabel
+          }
+        })
+        console.log(this.addModify_from)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 取消
+    cancel() {
+      this.$router.go(-1)
+    }
+  }
+}
+</script>
+<style lang="scss">
+.app-container-cc {
+  .el-table th {
+    background-color: #eee;
+  }
+  .searchForm {
+    .el-form-item__label {
+      padding: 0px;
+      font-size: 12px;
+      color: #000;
+    }
+  }
+}
+</style>

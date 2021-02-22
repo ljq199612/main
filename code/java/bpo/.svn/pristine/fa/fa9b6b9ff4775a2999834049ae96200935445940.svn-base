@@ -1,0 +1,105 @@
+import request from '@/utils/request'
+import qs from 'qs'
+
+// 查询所有合同-分页
+export function findAllContract(params) {
+  return request({
+    url: '/contractInfo/findAll',
+    method: 'get',
+    params: params
+  })
+}
+// 新增合同
+export function insertContract(data) {
+  return request({
+    url: '/contractInfo/insert',
+    method: 'post',
+    data: data
+  })
+}
+// 下载合同附件
+export function downloadFile(params) {
+  return request({
+    url: '/contractInfo/downloadFile',
+    method: 'get',
+    params
+  })
+}
+// 获取合同详情
+export function detailContract(params) {
+  return request({
+    url: '/contractInfo/detail',
+    method: 'get',
+    params
+  })
+}
+// 修改合同
+export function updateContract(data) {
+  return request({
+    url: '/contractInfo/update',
+    method: 'post',
+    data
+  })
+}
+// 删除合同
+export function deleteContract(data) {
+  return request({
+    url: '/contractInfo/delete',
+    method: 'post',
+    data: qs.stringify(data)
+  })
+}
+
+// 查询供应商下合同
+export function getBySupplierOrgId(params) {
+  return request({
+    url: '/contractInfo/getBySupplierOrgId',
+    method: 'get',
+    params: params
+  })
+}
+
+// 上传合同附件
+export function uploadContractFiles(data) {
+  return request({
+    url: '/personCheck/uploadContractFiles',
+    method: 'post',
+    data: data
+  })
+}
+
+// 合同归属  提供获取当前所属的组织架构以及下级
+export function findCanControl(params) {
+  return request({
+    url: '/customer/findCanControl',
+    method: 'get',
+    params: params
+  })
+}
+
+// 获取当前用户或客户供应商的组织信息
+export function getInfoByType(params) {
+  return request({
+    url: '/sysCompany/getInfoByType',
+    method: 'get',
+    params: params
+  })
+}
+
+// 查询用户部门对应的所有客户以及部门下属所有客户
+export function findAllCustomerByLoginUserId(params) {
+  return request({
+    url: '/customer/findAllByLoginUserId',
+    method: 'get',
+    params: params
+  })
+}
+
+// 供应商信息列表（当前部门及以下）
+export function findAllSupplierByLoginUserId(params) {
+  return request({
+    url: '/supplier/findAllByLoginUserId',
+    method: 'get',
+    params: params
+  })
+}

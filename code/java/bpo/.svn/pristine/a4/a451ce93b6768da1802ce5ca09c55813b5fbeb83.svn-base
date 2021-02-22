@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoPersonMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoPerson" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="id_card" property="idCard" jdbcType="VARCHAR" />
+    <result column="nation" property="nation" jdbcType="VARCHAR" />
+    <result column="birth" property="birth" jdbcType="VARCHAR" />
+    <result column="id_card_address" property="idCardAddress" jdbcType="VARCHAR" />
+    <result column="work_no" property="workNo" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="sync_sf" property="syncSf" jdbcType="TINYINT" />
+    <result column="sf_work_no" property="sfWorkNo" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="account_id" property="accountId" jdbcType="INTEGER" />
+    <result column="person_type" property="personType" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="station" property="station" jdbcType="VARCHAR" />
+    <result column="station_level" property="stationLevel" jdbcType="INTEGER" />
+    <result column="wage_id" property="wageId" jdbcType="INTEGER" />
+    <result column="dimission_time" property="dimissionTime" jdbcType="TIMESTAMP" />
+    <result column="dimission_type" property="dimissionType" jdbcType="INTEGER" />
+    <result column="dimission_reason" property="dimissionReason" jdbcType="VARCHAR" />
+    <result column="contract_id" property="contractId" jdbcType="INTEGER" />
+    <result column="dept_id" property="deptId" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, person_name, sex, age, id_card, nation, birth, id_card_address, work_no, user_id, 
+    sync_sf, sf_work_no, phone, address, remark, project_id, account_id, person_type, 
+    status, station,station_level, wage_id, dimission_time,dimission_type,dimission_reason, contract_id, company_id, dept_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_person
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_person
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoPerson" >
+    insert into bpo_person (id, person_name, sex, 
+      age, id_card, nation, 
+      birth, id_card_address, work_no, 
+      user_id, sync_sf, sf_work_no, 
+      phone, address, remark, 
+      project_id, account_id, person_type, 
+      status, station,station_level, wage_id,
+      dimission_time,dimission_type,dimission_reason, contract_id, company_id, dept_id,
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{personName,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
+      #{age,jdbcType=INTEGER}, #{idCard,jdbcType=VARCHAR}, #{nation,jdbcType=VARCHAR}, 
+      #{birth,jdbcType=VARCHAR}, #{idCardAddress,jdbcType=VARCHAR}, #{workNo,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=INTEGER}, #{syncSf,jdbcType=TINYINT}, #{sfWorkNo,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{projectId,jdbcType=INTEGER}, #{accountId,jdbcType=INTEGER}, #{personType,jdbcType=TINYINT}, 
+      #{status,jdbcType=INTEGER}, #{station,jdbcType=VARCHAR},#{stationLevel,jdbcType=INTEGER},  #{wageId,jdbcType=INTEGER},
+      #{dimissionTime,jdbcType=TIMESTAMP},#{dimissioType,jdbcType=INTEGER},#{dimissioReason,jdbcType=VARCHAR}, #{contractId,jdbcType=INTEGER}, #{companyId,jdbcType=INTEGER}, #{deptId,jdbcType=INTEGER},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoPerson" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into bpo_person
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="personName != null" >
+        person_name,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="idCard != null" >
+        id_card,
+      </if>
+      <if test="nation != null" >
+        nation,
+      </if>
+      <if test="birth != null" >
+        birth,
+      </if>
+      <if test="idCardAddress != null" >
+        id_card_address,
+      </if>
+      <if test="workNo != null" >
+        work_no,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="syncSf != null" >
+        sync_sf,
+      </if>
+      <if test="sfWorkNo != null" >
+        sf_work_no,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="accountId != null" >
+        account_id,
+      </if>
+      <if test="personType != null" >
+        person_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="station != null" >
+        station,
+      </if>
+      <if test="stationLevel != null" >
+        station_level,
+      </if>
+      <if test="wageId != null" >
+        wage_id,
+      </if>
+      <if test="dimissionTime != null" >
+        dimission_time,
+      </if>
+      <if test="dimissionType != null" >
+        dimission_type,
+      </if>
+      <if test="dimissionReason != null" >
+        dimission_reason,
+      </if>
+      <if test="contractId != null" >
+        contract_id,
+      </if>
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="deptId != null" >
+        dept_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="personName != null" >
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null" >
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="nation != null" >
+        #{nation,jdbcType=VARCHAR},
+      </if>
+      <if test="birth != null" >
+        #{birth,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardAddress != null" >
+        #{idCardAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="workNo != null" >
+        #{workNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="syncSf != null" >
+        #{syncSf,jdbcType=TINYINT},
+      </if>
+      <if test="sfWorkNo != null" >
+        #{sfWorkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="accountId != null" >
+        #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="personType != null" >
+        #{personType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="station != null" >
+        #{station,jdbcType=VARCHAR},
+      </if>
+      <if test="stationLevel != null" >
+        #{stationLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="wageId != null" >
+        #{wageId,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionTime != null" >
+        #{dimissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dimissionType != null" >
+        #{dimissionType,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionReason != null" >
+        #{dimissionReason,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="deptId != null" >
+        #{deptId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoPerson" >
+    update bpo_person
+    <set >
+      <if test="personName != null" >
+        person_name = #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null" >
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="nation != null" >
+        nation = #{nation,jdbcType=VARCHAR},
+      </if>
+      <if test="birth != null" >
+        birth = #{birth,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardAddress != null" >
+        id_card_address = #{idCardAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="workNo != null" >
+        work_no = #{workNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="syncSf != null" >
+        sync_sf = #{syncSf,jdbcType=TINYINT},
+      </if>
+      <if test="sfWorkNo != null" >
+        sf_work_no = #{sfWorkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="accountId != null" >
+        account_id = #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="personType != null" >
+        person_type = #{personType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="station != null" >
+        station = #{station,jdbcType=VARCHAR},
+      </if>
+      <if test="stationLevel != null" >
+        station_level = #{stationLevel,jdbcType=INTEGER},
+      </if>
+      <if test="wageId != null" >
+        wage_id = #{wageId,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionTime != null" >
+        dimission_time = #{dimissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dimissionType != null" >
+        dimission_type = #{dimissionType,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionReason != null" >
+        dimission_reason = #{dimissionReason,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        contract_id = #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="deptId != null" >
+        dept_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoPerson" >
+    update bpo_person
+    set person_name = #{personName,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      nation = #{nation,jdbcType=VARCHAR},
+      birth = #{birth,jdbcType=VARCHAR},
+      id_card_address = #{idCardAddress,jdbcType=VARCHAR},
+      work_no = #{workNo,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      sync_sf = #{syncSf,jdbcType=TINYINT},
+      sf_work_no = #{sfWorkNo,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=INTEGER},
+      account_id = #{accountId,jdbcType=INTEGER},
+      person_type = #{personType,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
+      station = #{station,jdbcType=VARCHAR},
+      station_level = #{stationLevel,jdbcType=INTEGER},
+      wage_id = #{wageId,jdbcType=INTEGER},
+      dimission_time = #{dimissionTime,jdbcType=TIMESTAMP},
+      dimission_type = #{dimissionType,jdbcType=INTEGER},
+      dimission_reason = #{dimissionReason,jdbcType=VARCHAR},
+      contract_id = #{contractId,jdbcType=INTEGER},
+      company_id = #{companyId,jdbcType=INTEGER},
+      dept_id = #{deptId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByIdCard" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_person
+    where id_card = #{idCard,jdbcType=VARCHAR}
+  </select>
+
+  <select id="findAllPerson" resultType="com.rz.iot.bpo.model.show.bpoPerson.BpoPersonShow" parameterType="com.rz.iot.bpo.model.param.bpoPerson.BpoPersonParam">
+    SELECT person.id,person.person_name AS personName,person.station,person.id_card AS idCard,person.work_no as workNo,
+    nation.nation,person.id_card_address AS idCardAddress,company.company_name AS companyName,person.project_id as projectId,
+    person.person_type AS personType,person.`status`,
+    person.create_time AS createTime,project.project_name AS projectName,wage.wage_type AS wageType,
+    person.phone,person.sf_work_no AS sfWorkNo,person.dimission_time AS dimissionTime,t_station.name as transactStationName
+    FROM bpo_person person
+    LEFT JOIN sys_company company ON person.company_id = company.id AND company.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_project project ON person.project_id = project.id AND project.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_person_wage wage ON wage.id = person.wage_id AND wage.status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_transfer_station t_station ON t_station.id = project.transfer_station_id AND t_station.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN sys_nation nation ON nation.id = person.nation
+    where
+    person.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@NOT_VERIFY_STATUS}
+    <if test="personName != null and personName != ''">
+      AND person.person_name like concat('%',#{personName},'%')
+    </if>
+    <if test="workNo != null and workNo != ''">
+      AND person.work_no like concat('%',#{workNo},'%')
+    </if>
+    <if test="station != null and station != ''">
+      AND person.station like concat('%',#{station},'%')
+    </if>
+    <if test="companyId != null">
+      AND company.id = #{companyId}
+    </if>
+    <if test="status != null">
+      AND person.status = #{status}
+    </if>
+    <if test="nation != null">
+      AND person.nation = #{nation}
+    </if>
+    <if test="personType != null">
+      AND person.person_type = #{personType}
+    </if>
+    <if test="idCardAddress != null and idCardAddress != ''">
+      AND person.id_card_address = #{idCardAddress}
+    </if>
+    <if test="startTime != null and startTime != ''">
+      AND DATE_FORMAT(person.create_time,'%Y-%m-%d') &gt;= #{startTime}
+    </if>
+    <if test="endTime != null and endTime != ''">
+      AND DATE_FORMAT(person.create_time,'%Y-%m-%d') &lt;= #{endTime}
+    </if>
+  </select>
+
+  <resultMap id="DetailPersonShow" type="com.rz.iot.bpo.model.show.bpoPerson.BpoPersonDetailShow">
+    <association property="bpoBasePerson" javaType="com.rz.iot.bpo.model.show.bpoPerson.BpoBasePerson">
+      <id column="personId" property="personId"/>
+      <result column="personName" property="personName"/>
+      <result column="sex" property="sex"/>
+      <result column="nation" property="nation"/>
+      <result column="idCard" property="idCard"/>
+      <result column="age" property="age"/>
+      <result column="birth" property="birth"/>
+      <result column="idCardAddress" property="idCardAddress"/>
+      <result column="workNo" property="workNo"/>
+      <result column="sfWorkNo" property="sfWorkNo"/>
+      <result column="phone" property="phone"/>
+      <result column="address" property="address"/>
+      <result column="remark" property="remark"/>
+      <collection property="file" column="personId" select="findPersonUrl"/>
+    </association>
+    <association property="bpoWorkPerson" javaType="com.rz.iot.bpo.model.show.bpoPerson.BpoWorkPerson">
+      <id column="companyId" property="companyId"/>
+      <result property="companyName" column="companyName"/>
+      <result property="personType" column="personType"/>
+      <result property="station" column="station"/>
+      <result property="stationLevel" column="stationLevel"/>
+      <result property="projectId" column="projectId"/>
+      <result property="projectName" column="projectName"/>
+      <result property="deptId" column="dept_id"/>
+      <result property="status" column="status"/>
+      <result property="createTime" column="createTime"/>
+      <result property="dimissionTime" column="dimissionTime"/>
+      <result property="dimissionType" column="dimission_type"/>
+      <result property="dimissionReason" column="dimission_reason"/>
+    </association>
+    <association property="bpoContractPerson" javaType="com.rz.iot.bpo.model.show.bpoPerson.BpoContractPerson">
+      <result property="contractType" column="contractType"/>
+      <result property="contractName" column="contractName"/>
+      <result property="contractCode" column="contractCode"/>
+      <result property="jiaCompanyName" column="jiaName"/>
+      <result property="isSocialSecurity" column="isSocialSecurity"/>
+      <result property="contractLimit" column="isFixedDueTime"/>
+      <result property="startTime" column="c_startTime"/>
+      <result property="endTime" column="c_endTime"/>
+      <result property="remark" column="remark"/>
+      <result property="contractId" column="contractId"/>
+      <collection property="contractFile" column="personId" select="findContractUrl"/>
+    </association>
+    <association property="bpoWagePerson" javaType="com.rz.iot.bpo.model.show.bpoPerson.BpoWagePerson">
+      <result property="bank" column="accountBank"/>
+      <result property="accountNumber" column="bankNumber"/>
+      <result property="wageType" column="wageType"/>
+      <result property="payType" column="payType"/>
+      <result property="wage" column="wage"/>
+      <result property="payChannels" column="payChannels"/>
+      <result property="mealAllowance" column="mealAllowance"/>
+      <result property="nightAllowance" column="nightAllowance"/>
+      <result property="otherAllowance" column="otherAllowance"/>
+    </association>
+  </resultMap>
+  <select id="findPersonUrl" resultType="java.util.Map">
+    select url,file_name as fileName from bpo_person_id_file
+    where person_id = #{value}
+  </select>
+  <select id="findContractUrl" resultType="java.util.Map">
+    select info.file_path as filePath from bpo_person person
+    left join bpo_person_contract_info info ON person.contract_id = info.id AND info.`status` != 9
+    where person.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS} AND person.id = #{value}
+  </select>
+  <select id="findBasePerson" parameterType="java.lang.Integer" resultMap="DetailPersonShow">
+    SELECT person.id AS personId,person.person_name AS personName,person.sex as sex,nation.nation,person.id_card as idCard,person.age,
+    person.birth,person.id_card_address as idCardAddress,person.work_no as workNo,person.sf_work_no as sfWorkNo,person.phone,person.address,person.remark,file.url as fileUrl,person.dept_id,
+    company.id as companyId,company.company_name as companyName,person.person_type as personType,person.station,person.project_id as projectId,project.project_name as projectName,person.station_level as stationLevel,
+    person.`status`,date_format(person.create_time,'%Y-%m-%d') as createTime,date_format(person.dimission_time,'%Y-%m-%d') as dimissionTime,person.dimission_type,person.dimission_reason,
+    contract.id as contractId,contract.`type` as contractType,contract.name as contractName,contract.contract_code as contractCode,company.company_name as jiaName,contract.is_social_security as isSocialSecurity,
+    contract.is_fixed_due_time as isFixedDueTime,contract.start_time as c_startTime,contract.end_time as c_endTime,contract.remark as remark,contract.file_path as filePath,
+    account.bank as accountBank,account.bank_number as bankNumber,wage.wage_type as wageType,wage.pay_type as payType,wage.wage as wage,wage.pay_channels as payChannels,
+    wage.meal_allowance as mealAllowance,wage.night_allowance as nightAllowance,wage.other_allowance as otherAllowance
+    FROM bpo_person person
+    LEFT JOIN sys_company company ON company.id = person.company_id AND company.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_project project ON project.id = person.project_id AND project.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_person_contract_info contract ON contract.id = person.contract_id AND contract.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_account_info account ON account.id = person.account_id AND account.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_person_wage wage ON wage.id = person.wage_id AND wage.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN bpo_person_id_file file ON file.person_id = person.id AND file.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN sys_dept dept ON dept.dept_id = person.dept_id AND dept.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    LEFT JOIN sys_nation nation ON nation.id = person.nation
+    where person.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    and person.id = #{value}
+    group by person.id
+  </select>
+
+  <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from
+    bpo_person
+    where
+    user_id = #{value}
+  </select>
+  <select id="getNations" resultType="com.rz.iot.bpo.model.param.SysNation">
+    select id,nation from sys_nation
+  </select>
+
+  <insert id="addPersonsBaseInfo" parameterType="com.rz.iot.bpo.model.show.bpoPerson.BpoBasePerson">
+    INSERT INTO bpo_person(
+        person_name,
+        sex,
+        age,
+        id_card,
+        nation,
+        birth,
+        id_card_address,
+        work_no,
+        sf_work_no,
+        phone,
+        address)
+    values
+    <foreach collection="list" item="item" separator=",">
+    (
+        #{item.personName,jdbcType=VARCHAR},
+        #{item.sex,jdbcType=INTEGER},
+        #{item.age,jdbcType=INTEGER},
+        #{item.idCard,jdbcType=VARCHAR},
+        #{item.nation,jdbcType=VARCHAR},
+        #{item.birth,jdbcType=VARCHAR},
+        #{item.idCardAddress,jdbcType=VARCHAR},
+        #{item.workNo,jdbcType=VARCHAR},
+        #{item.sfWorkNo,jdbcType=VARCHAR},
+        #{item.phone,jdbcType=VARCHAR},
+        #{item.address,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+</mapper>

@@ -1,0 +1,10 @@
+import request from '@/utils/request'
+
+export function router(token) {
+  return request({
+    url: '/user/permission',
+    method: 'get',
+    params: { token }
+  })
+}
+

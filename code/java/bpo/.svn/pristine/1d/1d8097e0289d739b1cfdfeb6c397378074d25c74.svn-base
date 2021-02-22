@@ -1,0 +1,22 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @program: bpo-preview
+ * @description: 账单应收
+ * @author: YangShun
+ * @create: 2020-07-28 17:09
+ **/
+@RestController
+@RequestMapping("BpoBillReceivable")
+public class BpoBillReceivable {
+
+    @GetMapping("findAll")
+    public Result findAll(){
+        return null;
+    }
+}

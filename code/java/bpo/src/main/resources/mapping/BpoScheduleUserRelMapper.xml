@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoScheduleUserRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoScheduleUserRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="pro_id" property="proId" jdbcType="INTEGER" />
+    <result column="schedule_id" property="scheduleId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="创建时间" property="创建时间" jdbcType="TIMESTAMP" />
+    <result column="修改时间" property="修改时间" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, pro_id, schedule_id, status, 创建时间, 修改时间
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_schedule_user_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_schedule_user_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoScheduleUserRel" >
+    insert into bpo_schedule_user_rel (id, pro_id, schedule_id, 
+      status, 创建时间, 修改时间
+      )
+    values (#{id,jdbcType=INTEGER}, #{proId,jdbcType=INTEGER}, #{scheduleId,jdbcType=INTEGER}, 
+      #{status,jdbcType=TINYINT}, #{创建时间,jdbcType=TIMESTAMP}, #{修改时间,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoScheduleUserRel" >
+    insert into bpo_schedule_user_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="proId != null" >
+        pro_id,
+      </if>
+      <if test="scheduleId != null" >
+        schedule_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="创建时间 != null" >
+        创建时间,
+      </if>
+      <if test="修改时间 != null" >
+        修改时间,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="proId != null" >
+        #{proId,jdbcType=INTEGER},
+      </if>
+      <if test="scheduleId != null" >
+        #{scheduleId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="创建时间 != null" >
+        #{创建时间,jdbcType=TIMESTAMP},
+      </if>
+      <if test="修改时间 != null" >
+        #{修改时间,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoScheduleUserRel" >
+    update bpo_schedule_user_rel
+    <set >
+      <if test="proId != null" >
+        pro_id = #{proId,jdbcType=INTEGER},
+      </if>
+      <if test="scheduleId != null" >
+        schedule_id = #{scheduleId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="创建时间 != null" >
+        创建时间 = #{创建时间,jdbcType=TIMESTAMP},
+      </if>
+      <if test="修改时间 != null" >
+        修改时间 = #{修改时间,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoScheduleUserRel" >
+    update bpo_schedule_user_rel
+    set pro_id = #{proId,jdbcType=INTEGER},
+      schedule_id = #{scheduleId,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      创建时间 = #{创建时间,jdbcType=TIMESTAMP},
+      修改时间 = #{修改时间,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

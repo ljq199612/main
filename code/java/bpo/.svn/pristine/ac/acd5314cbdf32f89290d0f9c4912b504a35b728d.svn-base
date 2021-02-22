@@ -1,0 +1,34 @@
+package com.rz.iot.bpo.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.BpoTransferStation;
+import com.rz.iot.bpo.model.param.BpoTransferStationParam;
+import com.rz.iot.bpo.model.show.BpoTransferStationShow;
+
+import java.util.List;
+
+public interface BpoTransferStationService {
+    Result insert(BpoTransferStationParam bpoTransferStationParam);
+
+    Result update(BpoTransferStationParam param);
+
+    Result findStationType();
+
+    List<BpoTransferStationShow> findAll(BpoTransferStationParam bpoTransferStationParam);
+
+    Result delete(BpoTransferStation bpoTransferStation);
+
+    Result findDetail(BpoTransferStation bpoTransferStation);
+
+    /**
+     * 获取所有中转场信息
+     * @return
+     */
+    Result<List<BpoTransferStation>> findAll();
+
+    Result<List<BpoTransferStation>> findAllByLoginUserId(BaseEntity param);
+
+    Result<List<BpoTransferStation>> findAllInDepByLoginUserId(BaseEntity param);
+}

@@ -1,0 +1,9 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillReconciliationPieceDetailed;
+
+public interface BpoBillReconciliationPieceDetailedMapper {
+    int insert(BpoBillReconciliationPieceDetailed record);
+
+    int insertSelective(BpoBillReconciliationPieceDetailed record);
+}

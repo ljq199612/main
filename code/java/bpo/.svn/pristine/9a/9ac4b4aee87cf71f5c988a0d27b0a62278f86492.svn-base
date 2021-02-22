@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysRoleMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysRole" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+    <result column="role_key" property="roleKey" jdbcType="VARCHAR" />
+    <result column="role_sort" property="roleSort" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, role_name, role_key, role_sort, status, remark, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_role
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysRole" >
+    insert into sys_role (id, role_name, role_key, 
+      role_sort, status, remark, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{roleName,jdbcType=VARCHAR}, #{roleKey,jdbcType=VARCHAR}, 
+      #{roleSort,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysRole" >
+    insert into sys_role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="roleName != null" >
+        role_name,
+      </if>
+      <if test="roleKey != null" >
+        role_key,
+      </if>
+      <if test="roleSort != null" >
+        role_sort,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="roleName != null" >
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleKey != null" >
+        #{roleKey,jdbcType=VARCHAR},
+      </if>
+      <if test="roleSort != null" >
+        #{roleSort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysRole" >
+    update sys_role
+    <set >
+      <if test="roleName != null" >
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleKey != null" >
+        role_key = #{roleKey,jdbcType=VARCHAR},
+      </if>
+      <if test="roleSort != null" >
+        role_sort = #{roleSort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysRole" >
+    update sys_role
+    set role_name = #{roleName,jdbcType=VARCHAR},
+      role_key = #{roleKey,jdbcType=VARCHAR},
+      role_sort = #{roleSort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getRolePerms" resultType="string">
+    SELECT
+      sys_role.role_key
+    FROM
+      sys_role,
+      sys_company_role_user
+    WHERE
+      sys_role.id = sys_company_role_user.role_id
+      AND sys_role.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND sys_company_role_user.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+      AND sys_company_role_user.user_id = #{userId}
+  </select>
+
+  <!--查询系统所有角色-->
+  <select id="findAllRole" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from sys_role
+    where status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="findAll" resultMap="BaseResultMap" parameterType="com.rz.iot.bpo.model.SysRole">
+    select
+    <include refid="Base_Column_List"></include>
+    from sys_role
+    where
+    true
+    <if test="roleName != null and roleName != ''">
+      and role_name like concat('%',#{roleName},'%')
+    </if>
+    <if test="status != null and status != 0">
+      and status = #{status}
+    </if>
+    <if test="status == null or status == 0">
+      and status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </if>
+  </select>
+
+  <select id="isExistCode" resultMap="BaseResultMap" parameterType="com.rz.iot.bpo.model.SysRole">
+    select
+    <include refid="Base_Column_List"/>
+    from
+    sys_role
+    where
+    status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <if test="id != null and id != 0">
+      and id != #{id}
+    </if>
+    and
+    role_key = #{roleKey}
+  </select>
+
+  <select id="findAllNoPage" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from
+    sys_role
+    where status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="detail" parameterType="java.lang.Integer" resultType="com.rz.iot.bpo.model.SysRole">
+    select
+    id,role_name as roleName,role_key as roleKey,status,remark
+    from sys_role
+    where id = #{value}
+  </select>
+
+  <!--通过用户查询对应角色-->
+  <select id="findRoleByUserId" parameterType="java.lang.Integer" resultType="com.rz.iot.bpo.model.SysRole">
+    select
+    s_role.id as roleId,s_role.role_name as roleName
+    from sys_company_role_user rel
+    LEFT JOIN sys_role s_role ON rel.role_id = s_role.id AND s_role.`status` =  ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    WHERE
+    rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} AND rel.user_id = #{value}
+  </select>
+</mapper>

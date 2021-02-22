@@ -1,0 +1,63 @@
+package com.rz.iot.bpo.mina.model.param;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rz.iot.bpo.mina.model.MinaClassesGenerate;
+import com.rz.iot.bpo.mina.model.MinaScheduleToEmployee;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Description: 排班到个人 参数
+ * @Author: Liu Jiaqi
+ * @Create: 2020-07-29
+ */
+
+@Data
+public class MinaScheduleToEmployeeParam extends MinaScheduleToEmployee {
+
+    @ApiModelProperty(value = "场地名称", example = "xx中转场", hidden = true, allowEmptyValue = true)
+    private String transferStationName;
+
+    @ApiModelProperty(value = "场地ID", example = "2", hidden = true, allowEmptyValue = true)
+    private String transferStationId;
+
+    @ApiModelProperty(value = "工作小组ID (多个)", example = "[2,4]", hidden = true, allowEmptyValue = true)
+    private List<Integer> workGroupIds;
+
+    @ApiModelProperty(value = "工作小组名称 (多个)", example = "['XX 组']", hidden = true, allowEmptyValue = true)
+    private List<String> workGroupName;
+
+    // 班次的开始日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @ApiModelProperty(value = "开始日期", example = "2020-05-06 ")
+    private Date startDate;
+
+    // 班次的结束日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @ApiModelProperty(value = "开始日期", example = "2020-05-06 ")
+    private Date endDate;
+
+    // 选择班次的某个日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @ApiModelProperty(value = "开始日期", example = "2020-05-06 ")
+    private Date someDay;
+
+    // 是否属于小组
+    Integer hasGroup;
+
+    // 项目 Id
+    Integer projectId;
+
+    //排班信息
+    private MinaClassesGenerate minaClassesGenerate;
+
+   /* @ApiModelProperty(value = "排班列表")
+    private List<MinaClassesGenerate> minaClassesGenerateList;*/
+}

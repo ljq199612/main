@@ -1,0 +1,288 @@
+<template>
+  <div>
+    <cf-panel :title="pageTitle" :back-to="onBackTo">
+      <el-form
+        ref="form"
+        :model="form"
+        label-width="180px"
+        class="bpoForm"
+      >
+        <fieldset>
+          <legend>用户信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="用户头像：" prop="avatar">
+                <!--<el-avatar shape="circle" :size="60" src="https://empty" @error="errorHandler">
+                  <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
+                </el-avatar>-->
+                <el-upload class="avatar-uploader" :action="imgAddUrl" :show-file-list="false" :multiple="false" accept="image/*" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                  <img v-if="form.avatar" :src="form.avatar" class="avatar">
+                  <img v-else src="../../../assets/systemManage/icon-user.png" class="avatar">
+                </el-upload>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="用户状态：">
+                {{ form.status==1?'启用':'禁用' }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="用户名：" prop="username">
+                {{ form.username }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="真实姓名：" prop="realName">
+                {{ form.realName }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="联系电话1：" prop="phone">
+                {{ form.phone }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系电话2：" prop="backupsPhone">
+                {{ form.backupsPhone }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="邮箱：" prop="email">
+                {{ form.email }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="备注：">
+                {{ form.describe }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+        <fieldset>
+          <legend>组织信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="组织类型：" prop="orgKey">
+                {{ form.orgName }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="组织名称：" prop="companyName">
+                {{ form.companyName }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="组织角色：" prop="roleId">
+                {{ form.roleName }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+      </el-form>
+    </cf-panel>
+  </div>
+</template>
+<script>
+import { Loading } from 'element-ui'
+import CfPanel from '@/components/Panel'
+import Rules from '../rules'
+import { getUser, UpdateUser, addUser } from '@/api/user'
+import { getRolesNoPage } from '../../../api/role'
+import { findOrgType } from '../../../api/orgnization'
+export default {
+  components: {
+    CfPanel
+  },
+  data() {
+    return {
+      userId: this.$route.query.userId,
+      readonly: this.$route.query.readonly || false,
+      pageTitle: '新增用户',
+      loading: null,
+      imgAddUrl: process.env.BASE_API + '/sysUser/uploadPic',
+      form: {
+        name: '',
+        status: 1,
+        password: '',
+        email: '',
+        mobile: '',
+        describe: null,
+        avatar: ''
+      },
+      orgOptions: [],
+      roleOptions: [],
+      rules: Rules
+    }
+  },
+  watch: {
+  },
+  created() {
+    this.getRemoteOptions()
+  },
+  mounted() {
+    this.loadData()
+  },
+  methods: {
+    getRemoteOptions() {
+      getRolesNoPage().then(res => {
+        this.roleOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    errorHandler() {
+      return true
+    },
+    handleAvatarSuccess(res, file) {
+      res.code === 20000
+        ? (this.form.avatar = res.data.url)
+        : this.$message.error('上传头像出错!')
+      this.loading.close()
+    },
+    beforeAvatarUpload(file) {
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isLt2M) {
+        this.$message.error('上传图片大小不能超过 2MB!')
+      }
+      this.loading = Loading.service({ text: '努力上传中，请稍后。。。' })
+      return isLt2M
+    },
+    onEditSubmit(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          var option = addUser
+          if (this.form.id) {
+            option = UpdateUser
+          }
+          option(this.form).then(res => {
+            this.onBackTo()
+          }).catch(() => {
+            console.log('用户详情提交失败')
+          })
+        } else {
+          this.$notify({
+            title: '失败',
+            duration: '2000',
+            message: '填写信息有误，请优化后再提交!',
+            type: 'error'
+          })
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    onBackTo() {
+      this.$router.go(-1)
+    },
+    loadData() {
+      if (this.userId) {
+        this.pageTitle = '用户详情'
+
+        this.listLoading = true
+        getUser({ userId: this.userId }).then(res => {
+          this.listLoading = false
+          this.form = res.data.data
+          this.$set(this.form, 'password', '')
+        }).catch(() => {
+          this.listLoading = false
+          console.log('用户详情获取失败')
+        })
+      }
+    }
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+  fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+  }
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+  }
+  legend {
+    border: 0;
+    padding: 0;
+  }
+  legend {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0px;
+    padding: 20px 20px;
+    font-size: 14px;
+    line-height: inherit;
+    color: #333333;
+    border: 0;
+    border-top: 1px solid #e5e5e5;
+  }
+  legend::before {
+    content: "";
+    background: red;
+    border-left: 3px solid #FF6B00;
+    margin-right: 10px;
+  }
+  fieldset:first-child{
+    legend{
+      border-top: none;
+      padding-top: 0px;
+    }
+  }
+
+  .toobar {
+    margin-bottom: 10px;
+    text-align: right;
+  }
+  .electricBoxes {
+    margin-bottom: 20px;
+  }
+
+  .avatar-uploader{
+    width: 64px;
+    height: 64px;
+    border: none;
+    //border-radius: 50%;
+    border: 1px dashed #F2F4F5;
+    overflow: hidden;
+    background-size: 100% 100%;
+    background-size: contain;
+  }
+  /deep/ .el-upload {
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+  .avatar{
+    width: 100%;
+    height: 100%;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 64px;
+    height: 64px;
+    line-height: 64px;
+    text-align: center;
+  }
+  .el-form-item{
+    margin-bottom: 0px;
+  }
+</style>

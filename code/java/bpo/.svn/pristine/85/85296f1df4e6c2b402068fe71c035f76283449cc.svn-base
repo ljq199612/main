@@ -1,0 +1,149 @@
+package com.rz.iot.bpo.mina.model;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+
+public class MinaAbnormal {
+
+    private Integer id;
+
+    @NotNull(message = "未选择场地")
+    private Integer transfrerStationId;
+    @NotNull(message = "未选择所属供应商")
+    private Integer supplierId;
+    @NotNull(message = "未选择项目")
+    private Integer projectId;
+    @NotNull(message = "未选择异常类型")
+    private Integer abnormalTpye;
+    @NotBlank(message = "未选择异常级别")
+    private String abnormalLevel;
+    @NotBlank(message = "未填写描述")
+    private String describe;
+    @NotBlank(message = "未选择产生时间")
+    private Date generationTime;
+
+    private String deduction;
+
+    private String punishMoney;
+
+    private String isPerson;
+
+    private String personMoney;
+
+    private String personLiable;
+
+    private String remark;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getTransfrerStationId() {
+        return transfrerStationId;
+    }
+
+    public void setTransfrerStationId(Integer transfrerStationId) {
+        this.transfrerStationId = transfrerStationId;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public Integer getAbnormalTpye() {
+        return abnormalTpye;
+    }
+
+    public void setAbnormalTpye(Integer abnormalTpye) {
+        this.abnormalTpye = abnormalTpye;
+    }
+
+    public String getAbnormalLevel() {
+        return abnormalLevel;
+    }
+
+    public void setAbnormalLevel(String abnormalLevel) {
+        this.abnormalLevel = abnormalLevel == null ? null : abnormalLevel.trim();
+    }
+
+    public String getDescribe() {
+        return describe;
+    }
+
+    public void setDescribe(String describe) {
+        this.describe = describe == null ? null : describe.trim();
+    }
+
+    public Date getGenerationTime() {
+        return generationTime;
+    }
+
+    public void setGenerationTime(Date generationTime) {
+        this.generationTime = generationTime;
+    }
+
+    public String getDeduction() {
+        return deduction;
+    }
+
+    public void setDeduction(String deduction) {
+        this.deduction = deduction == null ? null : deduction.trim();
+    }
+
+    public String getPunishMoney() {
+        return punishMoney;
+    }
+
+    public void setPunishMoney(String punishMoney) {
+        this.punishMoney = punishMoney == null ? null : punishMoney.trim();
+    }
+
+    public String getIsPerson() {
+        return isPerson;
+    }
+
+    public void setIsPerson(String isPerson) {
+        this.isPerson = isPerson == null ? null : isPerson.trim();
+    }
+
+    public String getPersonMoney() {
+        return personMoney;
+    }
+
+    public void setPersonMoney(String personMoney) {
+        this.personMoney = personMoney == null ? null : personMoney.trim();
+    }
+
+    public String getPersonLiable() {
+        return personLiable;
+    }
+
+    public void setPersonLiable(String personLiable) {
+        this.personLiable = personLiable == null ? null : personLiable.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+}

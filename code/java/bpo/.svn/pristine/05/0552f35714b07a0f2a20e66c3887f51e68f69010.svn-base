@@ -1,0 +1,662 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.alibaba.excel.metadata.Sheet;
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.ExcelUtil;
+import com.rz.iot.bpo.common.utils.FastDFSClientWrapper;
+import com.rz.iot.bpo.common.utils.PicUtils;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.bpoPerson.BpoPersonParam;
+import com.rz.iot.bpo.model.show.bpoPerson.*;
+import com.rz.iot.bpo.service.BpoPersonService;
+import com.sun.deploy.net.HttpResponse;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.Buffer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * 描述 : 人员信息业务实现
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/29 10:07
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Service
+@Log4j2
+@Transactional
+public class BpoPersonServiceImpl implements BpoPersonService {
+    @Resource
+    private SysCompanyMapper sysCompanyMapper;
+    @Resource
+    private BpoPersonMapper bpoPersonMapper;
+    @Resource
+    private FastDFSClientWrapper fastDFSClientWrapper;
+    @Resource
+    private BpoPersonCheckMapper bpoPersonCheckMapper;
+    @Resource
+    private SysDeptMapper sysDeptMapper;
+    @Resource
+    private BpoPersonContractInfoMapper contractInfoMapper;
+    @Resource
+    private BpoPersonWageMapper personWageMapper;
+    @Resource
+    private BpoAccountInfoMapper accountInfoMapper;
+    @Resource
+    private BpoPersonIdFileMapper fileMapper;
+    @Resource
+    private PicUtils picUtils;
+    @Resource
+    private FastDFSClientWrapper wrapper;
+
+    /**
+     * 查找所有人员所属公司
+     * @return
+     */
+    @Override
+    public Result findPersonCom() {
+        List<Map<String,String>> personCom = sysCompanyMapper.findPersonCom();
+        return Result.success(personCom);
+    }
+
+    /**
+     * 查询所有人员信息
+     * @param personParam 查询参数
+     * @return
+     */
+    @Override
+    public List<BpoPersonShow> findAllPerson(BpoPersonParam personParam) {
+        // 身份证信息加密
+        List<BpoPersonShow> list = bpoPersonMapper.findAllPerson(personParam);
+        for(BpoPersonShow bpoPersonShow : list){
+            String idCard = bpoPersonShow.getIdCard();
+            int idCardLength  = idCard.length();
+            String showIdCard = idCard.substring(0,3) + "***********" + idCard.substring(idCardLength - 4,idCardLength);
+            bpoPersonShow.setIdCard(showIdCard);
+        }
+        return list;
+    }
+
+    /**
+     * 查看身份证
+     * @param personId 人员id
+     * @return
+     */
+    @Override
+    public Result lookIdCard(Integer personId) {
+        if(personId == null)
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+
+        // 查询人员
+        BpoPerson bpoPerson = bpoPersonMapper.selectByPrimaryKey(personId);
+        String idCard = bpoPerson.getIdCard();
+        // 定义返回参数
+        Map<String,String> map = new HashMap<>();
+        map.put("idCard",idCard);
+        return Result.success(map);
+    }
+
+    /**
+     * 根据id查询人员详情
+     * @param id id
+     * @return
+     */
+    @Override
+    public Result detailPerson(Integer id) {
+        if(id == null)
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        BpoPersonDetailShow bpoPersonDetailShow = bpoPersonMapper.findBasePerson(id);
+
+        // 对查询结果进行处理,由于合同路径存储是通过字符串拼接,文件表与合同通过url关联
+        List<Map<String,String>> resultMap = bpoPersonDetailShow.getBpoContractPerson().getContractFile();
+        // 定义一个接收拼接url的字符串
+        String concatStr = "";
+        if(resultMap != null && resultMap.size() > 0){
+            for(Map<String,String> map : resultMap){
+                if(map != null){
+                    concatStr = map.get("filePath");
+                }
+            }
+        }
+        // url集合
+        List<String> splitList = new ArrayList<>();
+        if(concatStr.indexOf(',') > 0){
+            String[] strings = concatStr.split(",");
+            for(String temp : strings){
+                splitList.add(temp);
+            }
+        }
+
+        // 通过url去查询文件名
+        List<Map<String,String>> nameUrlMap = contractInfoMapper.findFileNameByUrls(splitList);
+        bpoPersonDetailShow.getBpoContractPerson().setContractFile(nameUrlMap);
+
+
+        // 通过部门id查询出整个往上的组织架构
+        Integer deptId = bpoPersonDetailShow.getBpoWorkPerson().getDeptId();
+
+        SysDept sysDept = sysDeptMapper.selectByPrimaryKey(deptId);
+
+        // 向上查询出组织架构
+        SysDeptShow sysDeptShow = sysDeptMapper.upFindOrgByDeptId(deptId,sysDept.getIsTop());
+        List<SysDeptShow> list = new ArrayList<>();
+        list.add(sysDeptShow);
+        bpoPersonDetailShow.getBpoWorkPerson().setDeptShows(list);
+        return Result.success(bpoPersonDetailShow);
+    }
+
+    /**
+     * 修改人员信息
+     * @param bpoPersonDetailShow 人员信息
+     * @return
+     */
+    @Override
+    public Result updatePerson(BpoPersonDetailShow bpoPersonDetailShow) {
+        if(bpoPersonDetailShow.getBpoBasePerson() == null || bpoPersonDetailShow.getBpoBasePerson().getPersonId() == null)
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+
+        // 分别获取 基本信息,人员属性,合同信息,薪酬信息
+        BpoBasePerson bpoBasePerson = bpoPersonDetailShow.getBpoBasePerson();
+        BpoWorkPerson bpoWorkPerson = bpoPersonDetailShow.getBpoWorkPerson();
+        BpoContractPerson bpoContractPerson = bpoPersonDetailShow.getBpoContractPerson();
+        BpoWagePerson bpoWagePerson = bpoPersonDetailShow.getBpoWagePerson();
+
+        // 修改基本信息以及人员属性
+        bpoPersonCheckMapper.updateBaseProp(bpoBasePerson,bpoWorkPerson);
+
+        // 人员附件信息更新
+        List<Map<String,String>> personFile = bpoBasePerson.getFile();
+
+        // 定义人员url集合
+        List<BpoPersonIdFile> urlPersons = new ArrayList<>();
+        if(personFile != null && personFile.size() > 0){
+            for(Map<String,String> map : personFile){
+                BpoPersonIdFile bpoPersonIdFile = new BpoPersonIdFile();
+                bpoPersonIdFile.setPersonId(bpoBasePerson.getPersonId());
+                bpoPersonIdFile.setUrl(map.get("url"));
+                urlPersons.add(bpoPersonIdFile);
+            }
+        }
+        // 更新
+        fileMapper.updatePerFiles(urlPersons);
+
+
+        // 查询查人员信息表中是否包含合同信息和薪酬信息以及开户行
+        BpoPerson person = bpoPersonMapper.selectByPrimaryKey(bpoPersonDetailShow.getBpoBasePerson().getPersonId());
+
+        // 合同id
+        Integer contractId = person.getContractId();
+        // 薪酬id
+        Integer wageId = person.getWageId();
+        // 账户id
+        Integer accountId = person.getAccountId();
+
+        // 合同
+        BpoPersonContractInfo bpoPersonContractInfo = new BpoPersonContractInfo();
+        bpoPersonContractInfo.setId(contractId);
+        bpoPersonContractInfo.setName(bpoContractPerson.getContractName());
+        bpoPersonContractInfo.setYiId(bpoBasePerson.getPersonId());
+        bpoPersonContractInfo.setType(bpoContractPerson.getContractType());
+        bpoPersonContractInfo.setJiaId(bpoContractPerson.getJiaCompanyId());
+        bpoPersonContractInfo.setIsSocialSecurity(bpoContractPerson.getIsSocialSecurity());
+        bpoPersonContractInfo.setIsFixedDueTime(bpoContractPerson.getContractLimit());
+
+        // 日期格式yyyy-mm-dd
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        try {
+            bpoPersonContractInfo.setStartTime(dateFormat.parse(bpoContractPerson.getStartTime()));
+            bpoPersonContractInfo.setEndTime(dateFormat.parse(bpoContractPerson.getEndTime()));
+            bpoPersonContractInfo.setContractCode(bpoContractPerson.getContractCode());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        // 获取人员合同文件信息
+        List<Map<String, String>> mapList = bpoContractPerson.getContractFile();
+        String filePath = concatContractInfo(mapList);
+        bpoPersonContractInfo.setFilePath(filePath);
+
+        if(contractId == null){
+            // 则新增
+            contractInfoMapper.insertSelective(bpoPersonContractInfo);
+        }else {
+            // 则修改
+            contractInfoMapper.updateByPrimaryKeySelective(bpoPersonContractInfo);
+        }
+
+        // 薪酬
+        BpoPersonWage bpoPersonWage = new BpoPersonWage();
+        bpoPersonWage.setId(wageId);
+        bpoPersonWage.setNightAllowance(bpoWagePerson.getNightAllowance());
+        bpoPersonWage.setOtherAllowance(bpoWagePerson.getOtherAllowance());
+        bpoPersonWage.setMealAllowance(bpoWagePerson.getMealAllowance());
+        bpoPersonWage.setPayType(bpoWagePerson.getPayType());
+        bpoPersonWage.setPayChannels(bpoWagePerson.getPayChannels());
+        bpoPersonWage.setWage(bpoWagePerson.getWage());
+        bpoPersonWage.setWageType(bpoWagePerson.getWageType());
+
+        if(wageId == null){
+            // 则新增
+            personWageMapper.insertSelective(bpoPersonWage);
+        }else {
+            // 则修改
+            personWageMapper.updateByPrimaryKey(bpoPersonWage);
+        }
+
+
+        // 账户
+        BpoAccountInfo bpoAccountInfo = new BpoAccountInfo();
+        bpoAccountInfo.setId(accountId);
+        bpoAccountInfo.setName(bpoBasePerson.getPersonName());
+        bpoAccountInfo.setBankNumber(bpoWagePerson.getAccountNumber());
+        bpoAccountInfo.setBank(bpoWagePerson.getBank());
+        if(accountId == null){
+            // 则新增
+            accountInfoMapper.insertSelective(bpoAccountInfo);
+        }else {
+            // 则修改
+            accountInfoMapper.updateByPrimaryKeySelective(bpoAccountInfo);
+        }
+
+
+        return Result.success();
+    }
+
+    /**
+     * 拼接合同url
+     * @param mapList 合同url集合
+     * @return
+     */
+    private String concatContractInfo(List<Map<String, String>> mapList) {
+        // 定义两个临时StringBuffer
+        StringBuffer contractUrlBuffer = new StringBuffer();
+        if(mapList != null && mapList.size() > 0){
+            for(int i = 0;i < mapList.size();i++){
+                contractUrlBuffer.append(mapList.get(i).get("contractUrl"));
+                if(i != (mapList.size()-1)){
+                    contractUrlBuffer.append(',');
+                }
+            }
+        }
+        return contractUrlBuffer.toString();
+    }
+
+    /**
+     * 下载文件
+     * @param url 文件url
+     * @return
+     */
+    @Override
+    public Result downLoadContractFile(String url,String fileName,HttpServletResponse response) {
+        // 获取响应流
+        try {
+            OutputStream outputStream = response.getOutputStream();
+
+            // 获取文件后缀
+            // int index = url.lastIndexOf('.');
+            // String suffix = url.substring(index);
+
+            byte[] bts = fastDFSClientWrapper.downloadFile(url);
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            outputStream.write(bts);
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Result.success();
+    }
+
+    /**
+     * 根据当前用户查询组织架构
+     * @return
+     */
+    @Override
+    public Result findSysDeptShow() {
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+        Integer adminId = DictDataConstants.SYS_ORG_ADMIN;
+        if(userId == adminId){
+            // 如果是超级管理员,查询所有组织架构
+            // 获取所有顶级部门
+            List<SysDept> topDept = sysDeptMapper.findAllTopDept();
+            List<List<SysDeptShow>> strings = sysDeptMapper.adminFindAllSysDept(topDept);
+            return Result.success(strings);
+        }
+        List<SysDeptShow> list = sysDeptMapper.findAllSysDeptByUserId(userId);
+        return Result.success(list);
+    }
+
+    /**
+     * 新增人员信息
+     * @param bpoPersonDetailShow 人员信息
+     * @return
+     */
+    @Override
+    public Result addPerson(BpoPersonDetailShow bpoPersonDetailShow) {
+        if(bpoPersonDetailShow == null || bpoPersonDetailShow.getBpoBasePerson() == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+
+        // 获取基本信息、员工属性、合同信息、薪酬信息
+        BpoBasePerson bpoBasePerson = bpoPersonDetailShow.getBpoBasePerson();
+        BpoWorkPerson bpoWorkPerson = bpoPersonDetailShow.getBpoWorkPerson();
+        BpoContractPerson bpoContractPerson = bpoPersonDetailShow.getBpoContractPerson();
+        BpoWagePerson bpoWagePerson = bpoPersonDetailShow.getBpoWagePerson();
+
+        // 新增加基本信息和员工属性
+        // 基本信息
+        BpoPerson bpoPerson = new BpoPerson();
+        bpoPerson.setIdCard(bpoBasePerson.getIdCard());// 身份证
+        bpoPerson.setBirth(bpoBasePerson.getBirth());// 生日
+        bpoPerson.setIdCardAddress(bpoBasePerson.getIdCardAddress());// 籍贯
+        bpoPerson.setNation(bpoBasePerson.getNation());// 民族
+        bpoPerson.setPersonName(bpoBasePerson.getPersonName());// 名称
+        bpoPerson.setAge(bpoBasePerson.getAge());// 年龄
+        bpoPerson.setSex(bpoBasePerson.getSex());// 性别
+        bpoPerson.setAddress(bpoBasePerson.getAddress());// 地址
+        bpoPerson.setWorkNo(bpoBasePerson.getWorkNo());// 工号
+        bpoPerson.setPhone(bpoBasePerson.getPhone());// 电话
+        bpoPerson.setSfWorkNo(bpoBasePerson.getSfWorkNo());// 客户工号
+        bpoPerson.setRemark(bpoBasePerson.getRemark());// 备注
+
+        // 员工属性
+        bpoPerson.setCompanyId(bpoWorkPerson.getCompanyId());// 所属公司
+        bpoPerson.setDeptId(bpoWorkPerson.getDeptId());// 所属部门
+        bpoPerson.setPersonType(new Byte(bpoWorkPerson.getPersonType().toString()));// 人员类型
+        bpoPerson.setStation(bpoWorkPerson.getStation());// 工作岗位
+        bpoPerson.setStationLevel(bpoWorkPerson.getStationLevel());// 岗位级别
+        bpoPerson.setProjectId(bpoWorkPerson.getProjectId());// 项目id
+        bpoPerson.setStatus(bpoWorkPerson.getStatus());// 状态
+
+        // 定义时间格式
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            bpoPerson.setCreateTime(dateFormat.parse(bpoWorkPerson.getCreateTime()));// 入职时间
+            bpoPerson.setDimissionTime(dateFormat.parse(bpoWorkPerson.getDimissionTime()));//离职时间
+            bpoPerson.setDimissionType(bpoWorkPerson.getDimissionType());// 离职类型
+            bpoPerson.setDimissionReason(bpoWorkPerson.getDimissionReason());// 离职原因
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 新增人员信息
+        bpoPersonMapper.insertSelective(bpoPerson);
+
+        // 人员附件信息更新
+        List<Map<String,String>> personFile = bpoBasePerson.getFile();
+
+        // 定义人员url集合
+        List<BpoPersonIdFile> urlPersons = new ArrayList<>();
+        if(personFile != null && personFile.size() > 0){
+            for(Map<String,String> map : personFile){
+                BpoPersonIdFile bpoPersonIdFile = new BpoPersonIdFile();
+                bpoPersonIdFile.setPersonId(bpoPerson.getId());
+                bpoPersonIdFile.setUrl(map.get("url"));
+                urlPersons.add(bpoPersonIdFile);
+            }
+        }
+        // 更新
+        fileMapper.updatePerFiles(urlPersons);
+
+
+        // 新增合同信息
+        BpoPersonContractInfo bpoPersonContractInfo = new BpoPersonContractInfo();
+        bpoPersonContractInfo.setType(bpoContractPerson.getContractType());// 类型
+        bpoPersonContractInfo.setName(bpoContractPerson.getContractName());// 名称
+        bpoPersonContractInfo.setContractCode(bpoContractPerson.getContractCode());// 编号
+        bpoPersonContractInfo.setJiaId(bpoWorkPerson.getCompanyId());// 甲方
+        bpoPersonContractInfo.setYiId(bpoPerson.getId());
+        bpoPersonContractInfo.setIsFixedDueTime(bpoContractPerson.getContractLimit());// 固定期限
+        bpoPersonContractInfo.setIsSocialSecurity(bpoContractPerson.getIsSocialSecurity());// 社保
+        try {
+            bpoPersonContractInfo.setStartTime(dateFormat.parse(bpoContractPerson.getStartTime()));// 开始时间
+            bpoPersonContractInfo.setEndTime(dateFormat.parse(bpoContractPerson.getEndTime()));// 结束时间
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 获取人员合同文件信息
+        List<Map<String, String>> mapList = bpoContractPerson.getContractFile();
+         String filePath = concatContractInfo(mapList);
+
+        bpoPersonContractInfo.setRemark(bpoContractPerson.getRemark());// 备注
+
+        bpoPersonContractInfo.setFilePath(filePath);// 文件url
+        contractInfoMapper.insertSelective(bpoPersonContractInfo);
+
+        // 新增薪资信息
+        BpoPersonWage bpoPersonWage = new BpoPersonWage();
+        bpoPersonWage.setWageType(bpoWagePerson.getWageType());// 薪资类型
+        bpoPersonWage.setWage(bpoWagePerson.getWage());// 薪资
+        bpoPersonWage.setPayChannels(bpoWagePerson.getPayChannels());// 支付渠道
+        bpoPersonWage.setPayType(bpoWagePerson.getPayType());// 支付方式
+        bpoPersonWage.setMealAllowance(bpoWagePerson.getMealAllowance());// 餐补
+        bpoPersonWage.setOtherAllowance(bpoWagePerson.getOtherAllowance());// 其他补助
+        bpoPersonWage.setNightAllowance(bpoWagePerson.getNightAllowance());// 晚餐补助
+
+        personWageMapper.insertSelective(bpoPersonWage);
+        // 银行信息
+        BpoAccountInfo bpoAccountInfo = new BpoAccountInfo();
+        bpoAccountInfo.setName(bpoBasePerson.getPersonName());// 账户名称 默认使用人员名称
+        bpoAccountInfo.setBank(bpoWagePerson.getBank());// 开户行信息
+        bpoAccountInfo.setBankNumber(bpoWagePerson.getAccountNumber());// 账户
+        accountInfoMapper.insertSelective(bpoAccountInfo);
+
+        // 更新人员合同、薪资、银行信息
+        BpoPerson bpoPerson1 = new BpoPerson();
+        bpoPerson1.setId(bpoPerson.getId());
+        bpoPerson1.setContractId(bpoPersonContractInfo.getId());
+        bpoPerson1.setWageId(bpoPersonWage.getId());
+        bpoPerson1.setAccountId(bpoAccountInfo.getId());
+        bpoPersonMapper.updateByPrimaryKeySelective(bpoPerson1);
+
+        return Result.success();
+    }
+
+    /**
+     * 查询当前用户所属公司,以及组织架构
+     * @return
+     */
+    @Override
+    public Result currentUserComOrg() {
+        // 当前用户公司
+        SysCompany sysCompany = sysCompanyMapper.findCompanyByUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+
+        // 获取用户与部门之间的关系
+        List<SysDeptShow> list = sysDeptMapper.findAllSysDeptByUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+        Map<String,Object> map = new HashMap<>();
+
+        map.put("companyId",sysCompany.getId());
+        map.put("companyName",sysCompany.getCompanyName());
+        map.put("dept",list);
+        return Result.success(map);
+    }
+
+    /**
+     * 导出人员信息
+     * @param personParam 查询参数
+     * @return
+     */
+    @Override
+    public Result exportPerson(BpoPersonParam personParam,HttpServletResponse response) {
+        // 定义下载路径
+        // 获取今日时间
+        LocalDate localDate = LocalDate.now();
+
+
+        try(OutputStream out = response.getOutputStream()) {
+
+            String fileName = new String(("人员信息"+localDate.toString())
+                    .getBytes(), "UTF-8");
+            response.setContentType("multipart/form-data");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName + ".xlsx"));
+
+            List<BpoPersonShow> shows = findAllPerson(personParam);
+
+
+            ExcelUtil.writeExl(out, shows, 3, 5000, BpoPersonShow.class);
+
+            out.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return Result.success();
+    }
+
+    /**
+     * 导出人员模板
+     * @return
+     */
+    @Override
+    public Result exportPersonModel(HttpServletResponse response) {
+        // 定义下载路径
+        // 获取今日时间
+        LocalDate localDate = LocalDate.now();
+
+
+        try(OutputStream out = response.getOutputStream()) {
+
+            String fileName = new String(("人员信息"+localDate.toString())
+                    .getBytes(), "UTF-8");
+            response.setContentType("multipart/form-data");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName + ".xlsx"));
+
+            // 定义模块数据
+            List<BpoBasePerson> list = new ArrayList<>();
+            // 定义两条模板数据
+            BpoBasePerson bpoBasePerson1 = new BpoBasePerson();
+            bpoBasePerson1.setPersonName("小明");
+            bpoBasePerson1.setSex(1);
+            bpoBasePerson1.setNation("柯尔克孜族");
+            bpoBasePerson1.setIdCard("431021201002013654");
+            bpoBasePerson1.setAge(10);
+            bpoBasePerson1.setBirth("2010-02-01");
+            bpoBasePerson1.setIdCardAddress("广东省深圳市西乡63区162号");
+            bpoBasePerson1.setWorkNo("123456");
+            bpoBasePerson1.setSfWorkNo("sf-123456");
+            bpoBasePerson1.setPhone("13955441122");
+            bpoBasePerson1.setAddress("西丽地跌站青青小区6栋303");
+
+            BpoBasePerson bpoBasePerson2 = new BpoBasePerson();
+            bpoBasePerson2.setPersonName("小红");
+            bpoBasePerson2.setSex(2);
+            bpoBasePerson2.setNation("彝族");
+            bpoBasePerson2.setIdCard("431021201103061023");
+            bpoBasePerson2.setAge(9);
+            bpoBasePerson2.setBirth("2011-03-06");
+            bpoBasePerson2.setIdCardAddress("广东省深圳市西乡63区163号");
+            bpoBasePerson2.setWorkNo("234567");
+            bpoBasePerson2.setSfWorkNo("sf-234567");
+            bpoBasePerson2.setPhone("13822110310");
+            bpoBasePerson2.setAddress("西丽地跌站青青小区6栋303");
+
+            list.add(bpoBasePerson1);
+            list.add(bpoBasePerson2);
+
+            ExcelUtil.writeExl(out, list, 3, 6000, BpoBasePerson.class);
+
+            out.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return Result.success();
+    }
+
+    /**
+     * 导入人员信息
+     * @param files 人员文件
+     * @return
+     */
+    @Override
+    public Result importPerson(MultipartFile files) {
+        MultipartFile[] multipartFiles = {files};
+        Map<String,String> fileMap = picUtils.upload(multipartFiles);
+
+        // 定义一个临时的路径集合
+        String filePath = fileMap.get("url");
+        byte[] bytes = wrapper.downloadFile(filePath);
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+
+
+        // 从第二行开始
+        Sheet sheet = new Sheet(1,1);
+        List<Object> list = ExcelUtil.readMoreThan1000RowBySheetStream(inputStream,sheet);
+
+        List<BpoBasePerson> importPerson = new ArrayList<>();
+
+        // 定义限定,限定整型列中不能传字符串
+        Pattern pattern = Pattern.compile("[0-9]*");
+        if(list != null && list.size() > 0){
+            for(int i = 0;i < list.size();i++){
+                List<String> stringList = (List<String>) list.get(i);
+
+                if(stringList != null && stringList.size() > 0){
+                    // 根据模板顺序可以获取各个列对应数据
+                    String personName = stringList.get(0);
+                    Matcher matcher = pattern.matcher(stringList.get(1));
+                    Matcher matcher2 = pattern.matcher(stringList.get(4));
+                    if(!matcher.matches() || !matcher2.matches()){
+                        return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+                    }
+
+                    Integer sex = Integer.parseInt(stringList.get(1));
+                    String nation = stringList.get(2);
+                    String idCard = stringList.get(3);
+                    Integer age = Integer.parseInt(stringList.get(4));
+                    String birth = stringList.get(5);
+                    String idCardAddress = stringList.get(6);
+                    String workNo = stringList.get(7);
+                    String sfWorkNo = stringList.get(8);
+                    String phone = stringList.get(9);
+                    String address = stringList.get(10);
+
+
+                    BpoBasePerson bpoBasePerson = new BpoBasePerson();
+                    bpoBasePerson.setPersonName(personName);
+                    bpoBasePerson.setSex(sex);
+                    bpoBasePerson.setNation(nation);
+                    bpoBasePerson.setIdCard(idCard);
+                    bpoBasePerson.setAge(age);
+                    bpoBasePerson.setBirth(birth);
+                    bpoBasePerson.setIdCardAddress(idCardAddress);
+                    bpoBasePerson.setWorkNo(workNo);
+                    bpoBasePerson.setSfWorkNo(sfWorkNo);
+                    bpoBasePerson.setPhone(phone);
+                    bpoBasePerson.setAddress(address);
+                    importPerson.add(bpoBasePerson);
+                }
+            }
+        }
+
+        // 新增多个人员信息
+        bpoPersonMapper.addPersonsBaseInfo(importPerson);
+
+
+        return Result.success();
+    }
+}

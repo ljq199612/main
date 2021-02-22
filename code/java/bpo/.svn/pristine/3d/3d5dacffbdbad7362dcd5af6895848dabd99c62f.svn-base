@@ -1,0 +1,258 @@
+<template>
+  <div>
+    <cf-panel :title="pageTitle" :back-to="backTo">
+      <el-form
+        ref="form"
+        :model="form"
+        class="bpoForm"
+        label-width="180px"
+      >
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="供应商名称：" prop="orgType">
+
+              <el-input v-model="form.companyName" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="供应商编码：" prop="companyName">
+              <el-input v-model="form.companyName" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="供应商简称：" prop="companyCode">
+              <el-input v-model="form.companyCode" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系人：" prop="creditCode">
+              <el-input v-model="form.contacts" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="统一社会信用代码：" prop="contacts">
+              <el-input v-model="form.phone" type="email" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系人：" prop="phone">
+              <el-input v-model="form.parentName" type="email" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="供应商归属：" prop="address">
+              <SelectTree
+                v-model="form.parentId"
+                :props="props"
+                :options="options"
+                :value="valueEditId"
+                :accordion="isAccordion"
+                class="half"
+                placeholder="请选择上级部门"
+                @getValue="getEditValue($event)"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系地址：" prop="status">
+              <el-input v-model="form.bankCard" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="成立时间：" prop="address">
+              <el-date-picker
+                v-model="form.startTime"
+                type="date"
+                placeholder="请选择成立时间"
+                class="half"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="公司规模：" prop="status">
+              <el-input v-model="form.bankCard" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="所属行业：">
+              <el-input v-model="form.projectName" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="营业执照：">
+              <el-input v-model="form.projectName" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              <el-input v-model="form.projectName" type="textarea" :rows="5" class="half" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item class="bpoButtonGroup">
+              <el-button type="primary" size="medium" @click="submit('form')">提交</el-button>
+              <el-button size="medium" @click="backTo">关闭</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+      </el-form>
+    </cf-panel>
+  </div>
+</template>
+<script>
+import CfPanel from '@/components/Panel'
+import { getBySupplierOrgId, downloadContract } from '@/api/supplierManage'
+import Pagination from '@/components/Pagination'
+import SelectTree from '@/components/treeSelect'
+
+import { getAllByDUserId } from '@/api/systemManage/departmentManage'
+
+export default {
+  components: {
+    // eslint-disable-next-line vue/no-unused-components
+    CfPanel, Pagination, SelectTree
+  },
+  data() {
+    return {
+      primaryKey: this.$route.params.primaryKey,
+      entity: this.$route.params.entity,
+      readonly: this.$route.params.readonly || true,
+      pageTitle: '新增供应商',
+      loading: null,
+
+      listLoading: false,
+      total: 0,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      contractList: [],
+
+      form: {
+        status: 1
+      },
+      orgOptions: [{ value: '0', label: '超级管理员' }, { value: '1', label: '甲方' }, { value: '2', label: '乙方' }, { value: '3', label: '供应商' }],
+      roleOptions: [{ value: '0', label: '管理人员' }, { value: '1', label: '驻场人员' }, { value: '2', label: '财务人员' }, { value: '3', label: '个人' }],
+      settlementTypeMap: { 1: '按件结算', 2: '按小时结算' },
+
+      isClearable: true, // 可清空（可选）
+      isAccordion: false, // 可收起（可选）
+      valueId: '0', // 初始ID（可选）
+      valueEditId: '',
+      props: { // 配置项（必选）
+        value: 'deptId',
+        label: 'deptName',
+        children: 'depts'
+      },
+      options: []
+    }
+  },
+  watch: {
+  },
+  created() {
+    this.init()
+    this.getRemoteOptions()
+  },
+  mounted() {
+    this.loadData()
+    this.getList()
+  },
+  methods: {
+    getRemoteOptions() {
+      getAllByDUserId().then(res => {
+        this.options = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    getformClass() {
+      if (this.readonly) {
+        return 'cf-form cf-form-readonly'
+      }
+      return 'cf-form'
+    },
+    downloadContract(id) {
+      downloadContract({ id: id }).then(res => {
+
+      })
+    },
+    sortChange() {
+
+    },
+    getList() {
+      getBySupplierOrgId({ supplierOrgId: this.form.id }).then(res => {
+        this.contractList = res.data.data
+        this.listLoading = false
+      // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.listLoading = false
+      })
+    },
+    init() {
+      if (this.primaryKey) {
+        this.form = JSON.parse(this.entity)
+      }
+    },
+    loadData() {
+      if (this.primaryKey) {
+        this.pageTitle = '供应商信息'
+        this.form = JSON.parse(this.entity)
+      /* this.listLoading = true
+        getUser().then(res => {
+          this.listLoading = false
+          this.form = res.data
+          this.$set(this.form, 'password', '')
+        }).catch(() => {
+          this.listLoading = false
+          console.log('用户详情获取失败')
+        })*/
+      }
+    },
+    backTo() {
+      this.$router.go(-1)
+    }
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+  fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+  }
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+  }
+  fieldset:first-child{
+    legend{
+      border-top: none;
+      padding-top: 0px;
+    }
+  }
+</style>

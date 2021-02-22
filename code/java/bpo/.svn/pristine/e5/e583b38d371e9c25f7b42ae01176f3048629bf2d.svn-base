@@ -1,0 +1,57 @@
+<template>
+  <CfPanel title="供应商考核详情" :back-to="backTo" class="main">
+    <div class="client-info-body">
+      <ul class="rule-list">
+        <li v-for="(item, key) of infoForm" :key="key" :style="{display: key==='remark' ? 'block':'inline-block'}">
+          <span class="rule-label">{{ item.label }}：</span>
+          <div v-if="key === 'type'" class="rule-value">{{ item.value|filterType }}</div>
+          <div v-else-if="key !== 'remark'" class="rule-value">{{ item.value }}</div>
+          <pre v-else class="rule-value">{{ item.value }}</pre>
+        </li>
+      </ul>
+    </div>
+  </CfPanel>
+</template>
+<script>
+import { getResult } from '@/api/supplierManage'
+import CfPanel from '@/components/Panel'
+export default {
+  name: 'AssessmentDetail',
+  components: {
+    CfPanel
+  },
+  data() {
+    return {
+      infoForm: {
+        cusCompany: {
+          label: '项目名称',
+          value: ''
+        }
+      }
+    }
+  },
+  created() {
+    this.getResult()
+  },
+  methods: {
+    backTo() {
+      this.$router.go(-1)
+    },
+    // 获取考核结果
+    getResult() {
+      getResult({
+        supplierInfoId: this.supplierInfoId,
+        evaluationTime: this.evaluationTime
+      }).then((res) => {
+        const data = res.data.data || []
+        this.calcForm = data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    }
+  }
+}
+</script>

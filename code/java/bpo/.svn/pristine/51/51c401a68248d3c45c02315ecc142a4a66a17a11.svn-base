@@ -1,0 +1,28 @@
+package com.rz.iot.bpo.model;
+
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class BpoOutput {
+
+    private Integer id;
+
+    private Integer transferStationId;
+
+    private Integer projectId;
+
+    private Integer supplierId;
+
+    private Byte type;
+
+    private Date periodStartTime;
+
+    private Date periodEndTime;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+}

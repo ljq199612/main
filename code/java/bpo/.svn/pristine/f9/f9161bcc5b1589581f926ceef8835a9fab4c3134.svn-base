@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysLoginLogMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysLoginLog" >
+    <id column="info_id" property="infoId" jdbcType="BIGINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="ipaddr" property="ipaddr" jdbcType="VARCHAR" />
+    <result column="login_location" property="loginLocation" jdbcType="VARCHAR" />
+    <result column="browser" property="browser" jdbcType="VARCHAR" />
+    <result column="os" property="os" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="msg" property="msg" jdbcType="VARCHAR" />
+    <result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    info_id, user_name, ipaddr, login_location, browser, os, status, msg, login_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_login_log
+    where info_id = #{infoId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_login_log
+    where info_id = #{infoId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysLoginLog" >
+    insert into sys_login_log (info_id, user_name, ipaddr, 
+      login_location, browser, os, 
+      status, msg, login_time
+      )
+    values (#{infoId,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{ipaddr,jdbcType=VARCHAR}, 
+      #{loginLocation,jdbcType=VARCHAR}, #{browser,jdbcType=VARCHAR}, #{os,jdbcType=VARCHAR}, 
+      #{status,jdbcType=CHAR}, #{msg,jdbcType=VARCHAR}, #{loginTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysLoginLog" >
+    insert into sys_login_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="infoId != null" >
+        info_id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="ipaddr != null" >
+        ipaddr,
+      </if>
+      <if test="loginLocation != null" >
+        login_location,
+      </if>
+      <if test="browser != null" >
+        browser,
+      </if>
+      <if test="os != null" >
+        os,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="msg != null" >
+        msg,
+      </if>
+      <if test="loginTime != null" >
+        login_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="infoId != null" >
+        #{infoId,jdbcType=BIGINT},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="ipaddr != null" >
+        #{ipaddr,jdbcType=VARCHAR},
+      </if>
+      <if test="loginLocation != null" >
+        #{loginLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="browser != null" >
+        #{browser,jdbcType=VARCHAR},
+      </if>
+      <if test="os != null" >
+        #{os,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="msg != null" >
+        #{msg,jdbcType=VARCHAR},
+      </if>
+      <if test="loginTime != null" >
+        #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysLoginLog" >
+    update sys_login_log
+    <set >
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="ipaddr != null" >
+        ipaddr = #{ipaddr,jdbcType=VARCHAR},
+      </if>
+      <if test="loginLocation != null" >
+        login_location = #{loginLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="browser != null" >
+        browser = #{browser,jdbcType=VARCHAR},
+      </if>
+      <if test="os != null" >
+        os = #{os,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="msg != null" >
+        msg = #{msg,jdbcType=VARCHAR},
+      </if>
+      <if test="loginTime != null" >
+        login_time = #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where info_id = #{infoId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysLoginLog" >
+    update sys_login_log
+    set user_name = #{userName,jdbcType=VARCHAR},
+      ipaddr = #{ipaddr,jdbcType=VARCHAR},
+      login_location = #{loginLocation,jdbcType=VARCHAR},
+      browser = #{browser,jdbcType=VARCHAR},
+      os = #{os,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      msg = #{msg,jdbcType=VARCHAR},
+      login_time = #{loginTime,jdbcType=TIMESTAMP}
+    where info_id = #{infoId,jdbcType=BIGINT}
+  </update>
+  <select id="findAll" resultType="com.rz.iot.bpo.model.show.SysLoginLogShow" parameterType="com.rz.iot.bpo.model.param.BpoOptLoginLogParam">
+    select
+    lg.user_name as userName, lg.ipaddr, lg.login_location as loginLocation,lg.browser,lg.msg, lg.login_time as loginTime,org.org_name as orgName
+    from
+    sys_login_log lg
+    left join sys_user u ON lg.user_name =u.username and u.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_company_role_user role_user ON role_user.user_id = u.user_id and role_user.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_role role ON role.id = role_user.role_id AND role.status =   ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_company com ON com.id = role_user.company_id and com.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_org org ON com.org_type = org.id AND org.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    where
+    true
+    <if test="startDate != null and startDate != ''">
+      AND date_format(lg.login_time,"%Y-%m-%d") &gt;= #{startDate}
+    </if>
+    <if test="endDate != null and endDate != ''">
+      AND date_format(lg.login_time,"%Y-%m-%d") &lt;= #{endDate}
+    </if>
+    <if test="type != null and type != ''">
+      AND role.role_key = #{type}
+    </if>
+  </select>
+
+  <select id="findLoginLog" resultType="com.rz.iot.bpo.model.show.SysLoginLogShow">
+    select
+    log.user_name as username, log.ipaddr as ipaddr, log.login_location as loginLocation, log.browser as browser,log.msg, log.login_time as loginTime,org.org_name as orgName
+    from
+    sys_login_log log
+    left join sys_user usr ON log.user_name = usr.username AND usr.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+	  left join sys_company_role_user rel ON rel.user_id = usr.user_id AND rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_company com ON com.id = rel.company_id AND com.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    left join sys_org org ON org.org_key = com.org_type AND org.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+</mapper>

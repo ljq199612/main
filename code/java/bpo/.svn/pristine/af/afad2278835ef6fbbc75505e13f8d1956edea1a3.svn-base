@@ -1,0 +1,46 @@
+<template>
+  <!-- 强制规范： 以公共组件CfPanel作为包裹层； 包裹层占位样式采用模块名命名--->
+  <!-- 强制规范： 包裹层添加功能样式.main--->
+  <!-- 强制规范： 采用公共组件CfPanel实现布局，自己不要添加任何影响布局间距的样式 --->
+  <CfPanel title="布局范例" class="layout main">
+
+    <CfPanel title="普通范例" />
+    <CfPanel title="带返回按钮的范例" :back-to="onBackTo" />
+
+    <h2>强制规范：</h2>
+    <p>添加公共样式：包裹层添加公共样式<mark>.main</mark></p>
+    <p>减少页面缩进：以公共组件CfPanel作为包裹层； 包裹层占位样式采用模块名命名</p>
+    <p>采用布局组件：采用公共组件CfPanel实现布局，自己不要添加任何影响布局间距的样式</p>
+    <p>减少全局样式：尽可能使用局部样式，采用模块名作为命名空间</p>
+
+    <h2>建议规范：</h2>
+    <p>驼峰命名：css样式，JS变量、函数名等建议采用小驼峰命名法</p>
+
+  </CfPanel>
+
+</template>
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+
+export default {
+  name: 'Layout',
+  components: { CfPanel },
+  methods: {
+    onBackTo() {
+
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+/* 强制规范：尽可能使用局部样式，采用模块名作为命名空间 */
+.main {
+  height: 100%;
+  h2 {
+    font-size: 14px;
+  }
+  p {
+    font-size: 12px;
+  }
+}
+</style>

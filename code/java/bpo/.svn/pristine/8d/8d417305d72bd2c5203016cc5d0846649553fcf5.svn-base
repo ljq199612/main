@@ -1,0 +1,37 @@
+package com.rz.iot.bpo.model.show.bpoBill;
+
+import lombok.Data;
+
+/**
+ * @program: bpo-preview
+ * @description: 用于展示月账单 应收
+ * @author: YangShun
+ * @create: 2020-07-28 16:54
+ **/
+@Data
+public class BpoBillMonthShow {
+    //场地
+    private String transName;
+    //项目
+    private String projectName;
+    //客户
+    private String customerName;
+    //账单周期
+    private String billCycle;
+    //计价方式
+    private Integer feeRuleType;
+    //总件数
+    private Integer totalCount;
+    //总工时
+    private Double totalTime;
+    //结算标准
+    private Double standard;
+    //总人数
+    private Integer totalPeaple;
+    //扣款
+    private Double debit;
+    //实际账单金额
+    private Double relBillMoney;
+    //账单状态
+    private Integer status;
+}

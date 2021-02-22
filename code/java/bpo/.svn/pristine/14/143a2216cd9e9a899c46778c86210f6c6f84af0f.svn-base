@@ -1,0 +1,89 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillReconciliationShow;
+import com.rz.iot.bpo.service.BpoBillReceivableService;
+import com.rz.iot.bpo.service.BpoPublicService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+/**
+ * @program: bpo-preview
+ * @description: 账单应收
+ * @author: YangShun
+ * @create: 2020-07-28 17:09
+ **/
+@RestController
+@RequestMapping("BpoBillReceivable")
+public class BpoBillReceivableController {
+
+    @Resource
+    private BpoBillReceivableService bpoBillReceivableService;
+
+    @Resource
+    private BpoPublicService bpoPublicService;
+
+    /**
+     * 获取对账信息
+     * @return
+     */
+    @GetMapping("getCheckMessage")
+    public Result getCheckMessage(Integer monthId){
+        BpoBillReconciliationShow checkMessage = bpoBillReceivableService.getCheckMessage (monthId);
+        return Result.success (checkMessage);
+    }
+
+    /**
+     * 进行对账
+     * @param bpoBillMonthShow
+     * @return
+     */
+    @PostMapping("checkBill")
+    public Result checkBill(BpoBillReconciliationShow bpoBillMonthShow){
+        Result result = bpoBillReceivableService.startCheck (bpoBillMonthShow);
+        return result;
+    }
+
+    /**
+     * 对账信息中修改单条信息
+     * @return
+     */
+    @PostMapping("saveMessage")
+    public Result saveMessage(BpoBillReconciliationTimeDetailed detailed){
+        return bpoBillReceivableService.saveMessage (detailed);
+    }
+
+    /**
+     * 获取当前用户下的项目
+     * @return
+     */
+    @GetMapping("getProject")
+    public Result getProject(){
+        return bpoPublicService.getProject (new BaseEntity ());
+    }
+
+    /**
+     * 获取当前用户下的场地
+     * @return
+     */
+    @GetMapping("getTransferStation")
+    public Result getTransferStation(){
+        return bpoPublicService.getTransferStation (new BaseEntity ());
+    }
+
+    /**
+     * 获取所有付款方
+     * @return
+     */
+    @GetMapping("getPayer")
+    public Result getPayer(){
+        return bpoPublicService.getPayer (new BaseEntity ());
+    }
+
+}

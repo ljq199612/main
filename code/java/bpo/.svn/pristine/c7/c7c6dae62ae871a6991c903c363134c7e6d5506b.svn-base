@@ -1,0 +1,355 @@
+<template>
+  <div>
+    <CfPanel title="合同信息" :back-to="onBackTo">
+      <el-form ref="contractForm" label-width="180px" class="bpoForm">
+        <fieldset>
+          <legend class="bpo-legend">基本信息</legend>
+          <el-col :span="12">
+            <el-form-item label="合同类型：">
+              <span class="text-item">{{ typeMap[entity.type] }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同名称：">
+              <span class="text-item">{{ entity.name }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同编号：">
+              <span class="text-item">{{ entity.contractCode }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="客户合同编号：">
+              <span class="text-item">{{ entity.customerCode }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="kehuTitle+'：'">
+              <span class="text-item">{{ entity.jiaOrgName }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="kehuTitle+'归属：'">
+              <span class="text-item">{{ entity.jiaDeptName }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="甲方：">
+              <span class="text-item">{{ entity.jiaName }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="甲方统一社会信用代码：">
+              <span class="text-item">{{ entity.jiaUscc }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="乙方：">
+              <span class="text-item">{{ entity.yiName }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="乙方统一社会信用代码：">
+              <span class="text-item">{{ entity.yiUscc }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="保证金：">
+              <span class="text-item"> {{ entity.cashDeposit }}</span>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label="合同签订日期：">
+              <span class="text-item">{{ entity.signTime }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同开始时间：">
+              <span class="text-item">{{ entity.startTime }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同结束时间：">
+              <span class="text-item">{{ entity.endTime }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              <span class="text-item">{{ entity.remark }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="附件：">
+              <el-upload
+                class="contract-upload"
+                action=""
+                multiple
+                :file-list="fileList"
+                disabled
+              >
+                <div slot="file" slot-scope="{file}">
+                  <span @click="handleDownload(file)">{{ file.name }}</span>
+                  <span class="el-upload-list__item-actions">
+                    <!--<el-button type="text" style="color: #4794F7;" @click="handleDownload(file)">下载</el-button>-->
+                    <!--<span
+                      @click="handleDownload(file)"
+                    >
+                      <i class="el-icon-download" />
+                    </span>-->
+                  </span>
+                </div>
+                <!--<el-button type="text">添加附件</el-button>-->
+                <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+              </el-upload>
+            </el-form-item>
+          </el-col>
+        </fieldset>
+        <fieldset>
+          <legend class="bpo-legend">财务结算信息</legend>
+          <el-col :span="12">
+            <el-form-item label="结算类型：">
+              <span class="text-item">{{ setypeMap[entity.bpoContractSettlementInfo.type] }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="结算日期：">
+              <span class="text-item">{{ entity.bpoContractSettlementInfo.settlementDate }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="备注：">
+              <span class="text-item">{{ entity.bpoContractSettlementInfo.remark }}</span>
+            </el-form-item>
+          </el-col>
+        </fieldset>
+        <fieldset>
+          <legend class="bpo-legend">财务付款信息</legend>
+          <el-row v-for="(item,index) in entity.bpoContractPaymentInfoList" :key="index" class="payment-row">
+            <template v-if="item.status != 9">
+              <el-col :span="7">
+                <el-form-item label="乙方开户行：">
+                  <el-input v-model="item.yiOpeningBank" disabled placeholder="请输入乙方开户行" class="half" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="7">
+                <el-form-item label="乙方开户账号：">
+                  <el-input v-model="item.yiOpeningBankAccount" disabled class="half" placeholder="请输入乙方开户账号" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="7">
+                <el-form-item label="乙方名称：">
+                  <el-input v-model="item.yiName" disabled placeholder="请输入乙方名称" class="half" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="3">
+                <el-form-item class="tableData-operation" />
+              </el-col>
+            </template>
+          </el-row>
+        </fieldset>
+        <fieldset>
+          <legend class="bpo-legend">开票信息</legend>
+          <el-col :span="12">
+            <el-form-item label="公司名称：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.companyName }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="法人：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.artificialPerson }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="纳税人识别号：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.taxId }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="开户行：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.openingBank }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="账户：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.openingBankAccount }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="税率：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.taxRate }}</span> %
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系电话：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.phone }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="地址：">
+              <span class="text-item">{{ entity.bpoContractInvoiceInfo.address }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item class="bpoButtonGroup" label="">
+              <el-button type="primary" @click="onBackTo">返回</el-button>
+            </el-form-item>
+          </el-col>
+        </fieldset>
+      </el-form>
+    </CfPanel>
+  </div>
+</template>
+
+<script>
+import CfPanel from '@/components/Panel'
+import { detailContract, findAllCustomerByLoginUserId, findAllSupplierByLoginUserId } from '@/api/contract'
+
+export default {
+  name: '',
+  components: { CfPanel },
+  data() {
+    return {
+      entity: {
+        bpoContractSettlementInfo: {},
+        bpoContractPaymentInfoList: [],
+        bpoContractInvoiceInfo: {}
+      },
+      fileList: [],
+      tableData: [],
+      setypeMap: { 1: '按工序计费', 2: '按小时计费' },
+      typeMap: { 1: '客户', 2: '供应商' }
+    }
+  },
+  computed: {
+    kehuTitle() {
+      if (this.entity.type === 2) {
+        return '供应商'
+      } else {
+        return '客户'
+      }
+    }
+  },
+  created() {
+    this.init()
+  },
+  mounted() {
+  },
+  methods: {
+    filterOptions(options, key, value, label, children) {
+      for (var i in options) {
+        if (options[i][key] === value) {
+          return options[i][label]
+        }
+        if (options[i][children || 'depts'] && options[i][children || 'depts'].length > 0) {
+          return this.filterOptions(options[i][children || 'depts'], key, value, label, children)
+        }
+      }
+    },
+    getSupplierList() {
+      // 获取供应商列表
+      findAllSupplierByLoginUserId().then(res => {
+        res.data.data.forEach(item => {
+          item.name = item.companyName
+        })
+        this.entity.jiaOrgName = this.filterOptions(res.data.data, 'id', this.entity.jiaOrgId, 'name', '')
+      })
+    },
+    getCustomerList() {
+      // 获取客户列表
+      findAllCustomerByLoginUserId().then(res => {
+        this.entity.jiaOrgName = this.filterOptions(res.data.data, 'id', this.entity.jiaOrgId, 'name', '')
+      })
+    },
+    handleDownload(file) {
+      var aLink = document.createElement('a')
+      aLink.download = file.name
+      aLink.href = file.url
+      aLink.click()
+    },
+    init() {
+      // 获取初始化数据
+      detailContract({ id: 'id' }).then(res => {
+        this.entity = res.data.data
+        this.tableData = this.entity.bpoContractPaymentInfoList
+        this.fileList = this.entity.fileList
+        this.fileList.forEach(item => {
+          item.name = item.fileName
+        })
+
+        /*
+        if (this.entity.type === 1) {
+          this.getCustomerList()
+        } else {
+          this.getSupplierList()
+        }*/
+      })
+
+      /* findCanControl().then(res => {
+        this.options = res.data.data
+        this.entity.jiaDeptName = this.filterOptions(res.data.data, 'deptId', this.entity.jiaDeptId, 'deptName', 'depts')
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })*/
+    },
+    onBackTo() {
+      this.$router.go(-1)
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .payment-row{
+    background: #F1F2F6;
+    padding-top: 10px;
+  }
+  .tableData-operation{
+    /deep/ .el-form-item__content{
+      margin-left: 0px !important;
+      float:right;
+      padding-right: 40px;
+    }
+  }
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+  }
+  fieldset:first-child{
+    legend{
+      border-top: none;
+      padding-top: 0px;
+    }
+  }
+  .contract-upload{
+    width: 400px;
+    /deep/.el-upload{
+      display: none;
+    }
+    /deep/.el-upload-list{
+      .el-upload-list__item-name{
+        color: #FF6B00;
+      }
+      .el-icon-document{
+        color: #FF6B00;
+      }
+      .el-upload-list__item-status-label{
+        display: none;
+      }
+    }
+  }
+  /deep/.el-textarea textarea{
+    height: 100%;
+  }
+  .el-upload-list__item-actions{
+    margin-left: 20px;
+  }
+  .contract-upload{
+    margin-top: -5px;
+  }
+  /deep/.el-upload-list{
+    width: 50%;
+  }
+</style>

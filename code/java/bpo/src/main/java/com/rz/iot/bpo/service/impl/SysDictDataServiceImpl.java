@@ -1,0 +1,110 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.SysDictDataMapper;
+import com.rz.iot.bpo.model.SysDictData;
+import com.rz.iot.bpo.model.SysDictType;
+import com.rz.iot.bpo.service.SysDictDataService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * @Description 系统字典数据业务实现
+ * @Author Rycony
+ * @Date 2020/6/17 14:36
+ */
+@Service
+public class SysDictDataServiceImpl implements SysDictDataService {
+    @Resource
+    private SysDictDataMapper sysDictDataMapper;
+
+    /**
+     * 新增字典数据
+     * @param sysDictData 字典数据
+     */
+    @Override
+    public Result insert(SysDictData sysDictData) {
+        // 判断字典编码是否重复
+        if(sysDictData.getDictValue() == null || sysDictData.getDictId() == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+        if(isExsitType(sysDictData))
+            return Result.error(ResultConstants.SYS_TYPE_SAME);
+        sysDictDataMapper.insertSelective(sysDictData);
+        return Result.success(null,"字典数据新增成功");
+    }
+
+    /**
+     * 分页查询字典数据
+     * @param sysDictData 字典数据
+     * @return 结果集
+     */
+    @Override
+    public List<SysDictData> findAll( SysDictData sysDictData) {
+        List<SysDictData> list = sysDictDataMapper.selectBySysDictData(sysDictData);
+        return list;
+    }
+
+    /**
+     * 更新字典数据
+     * @param sysDictData 字典数据
+     */
+    @Override
+    public Result update(SysDictData sysDictData) {
+        // 判断字典编码是否重复
+        if(sysDictData.getId() == null || sysDictData.getDictValue() == null || sysDictData.getDictId() == null){
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+
+        if(isExsitType(sysDictData)){
+            return Result.error(ResultConstants.SYS_TYPE_SAME);
+        }
+        sysDictDataMapper.updateByPrimaryKeySelective(sysDictData);
+        return Result.success(null,"更新成功");
+    }
+
+    /**
+     * 根据字典类型查询所有字典数据
+     * @param type 字典类型
+     * @return
+     */
+    @Override
+    public List<SysDictData> findAllByType(String type) {
+        List<SysDictData> list = sysDictDataMapper.findAllByType(type);
+        return list;
+    }
+
+    @Override
+    public Result delete(SysDictData sysDictData) {
+        sysDictData.setStatus((byte)DictDataConstants.DELETE_STATUS);
+        sysDictDataMapper.updateByPrimaryKeySelective(sysDictData);
+        return Result.success(null,"数据字典删除成功");
+    }
+
+    @Override
+    public Result getValueByKey(String key) {
+        String value = sysDictDataMapper.getValueByKey(key);
+
+        return Result.success(value);
+    }
+
+    /**
+     * 判断是否有重复的编码
+     * @param sysDictData
+     * @return
+     */
+    public boolean isExsitType(SysDictData sysDictData){
+        SysDictData sysDictData1 = sysDictDataMapper.isExsitType(sysDictData);
+        boolean flag = false;
+        if(sysDictData1 != null){
+            flag = true;
+        }
+        return flag;
+    }
+}

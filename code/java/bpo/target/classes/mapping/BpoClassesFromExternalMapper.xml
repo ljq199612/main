@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoClassesFromExternalMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoClassesFromExternal">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="BpoClassesShowMap" type="com.rz.iot.bpo.model.show.BpoClassesShow">
+        <id column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <collection property="bpoClassesFromExternals" ofType="com.rz.iot.bpo.model.BpoClassesFromExternal">
+            <result column="id" property="id" jdbcType="INTEGER"/>
+            <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+            <result column="class_name" property="className" jdbcType="VARCHAR"/>
+            <result column="start_date" property="startDate" jdbcType="DATE"/>
+            <result column="end_date" property="endDate" jdbcType="DATE"/>
+            <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+            <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+            <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+            <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+            <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+            <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+            <result column="source" property="source" jdbcType="INTEGER"/>
+            <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+            <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+            <result column="status" property="status" jdbcType="INTEGER"/>
+            <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, class_sn, class_name, start_date, end_date, start_time, end_time, arrive_time,exclude_hour,
+    people_number, project_id, source, schedule_status, batch_id, status, create_time,
+    update_time
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_classes_from_external
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByProjectId" resultMap="BpoClassesShowMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_classes_from_external
+        where project_id = #{projectId,jdbcType=INTEGER}
+        and status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from bpo_classes_from_external
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoClassesFromExternal">
+        insert into bpo_classes_from_external (id, class_sn, class_name,
+                                               start_date, end_date, start_time,
+                                               end_time, arrive_time,exclude_hour, people_number,
+                                               project_id, source, schedule_status,
+                                               batch_id, status, create_time,
+                                               update_time)
+        values (#{id,jdbcType=INTEGER}, #{classSn,jdbcType=VARCHAR}, #{className,jdbcType=VARCHAR},
+                #{startDate,jdbcType=DATE}, #{endDate,jdbcType=DATE}, #{startTime,jdbcType=TIMESTAMP},
+                #{endTime,jdbcType=TIMESTAMP}, #{arriveTime,jdbcType=TIMESTAMP},#{excludeHour,jdbcType=INTEGER}, #{peopleNumber,jdbcType=INTEGER},
+                #{projectId,jdbcType=INTEGER}, #{source,jdbcType=INTEGER}, #{scheduleStatus,jdbcType=TINYINT},
+                #{batchId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoClassesFromExternal">
+        insert into bpo_classes_from_external
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="classSn != null">
+                class_sn,
+            </if>
+            <if test="className != null">
+                class_name,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="arriveTime != null">
+                arrive_time,
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour,
+            </if>
+            <if test="peopleNumber != null">
+                people_number,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status,
+            </if>
+            <if test="batchId != null">
+                batch_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="classSn != null">
+                #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="className != null">
+                #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="batchId != null">
+                #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoClassesFromExternal">
+        update bpo_classes_from_external
+        <set>
+            <if test="classSn != null">
+                class_sn = #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="className != null">
+                class_name = #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                arrive_time = #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour = #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                people_number = #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status = #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="batchId != null">
+                batch_id = #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoClassesFromExternal">
+        update bpo_classes_from_external
+        set class_sn        = #{classSn,jdbcType=VARCHAR},
+            class_name      = #{className,jdbcType=VARCHAR},
+            start_date      = #{startDate,jdbcType=DATE},
+            end_date        = #{endDate,jdbcType=DATE},
+            start_time      = #{startTime,jdbcType=TIMESTAMP},
+            end_time        = #{endTime,jdbcType=TIMESTAMP},
+            arrive_time     = #{arriveTime,jdbcType=TIMESTAMP},
+            exclude_hour    = #{excludeHour,jdbcType=INTEGER},
+            people_number   = #{peopleNumber,jdbcType=INTEGER},
+            project_id      = #{projectId,jdbcType=INTEGER},
+            source          = #{source,jdbcType=INTEGER},
+            schedule_status = #{scheduleStatus,jdbcType=TINYINT},
+            batch_id        = #{batchId,jdbcType=INTEGER},
+            status          = #{status,jdbcType=INTEGER},
+            create_time     = #{createTime,jdbcType=TIMESTAMP},
+            update_time     = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

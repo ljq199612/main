@@ -1,0 +1,38 @@
+package com.rz.iot.bpo.mina.model.param;
+
+import com.rz.iot.bpo.mina.model.MinaClassesFromExternal;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.util.List;
+
+
+/**
+ * @Description: 班次参数
+ * @Author: Liu Jiaqi
+ * @Create: 2020-07-24
+ */
+@Data
+public class MinaClassesParam {
+
+    @ApiModelProperty(value = "项目编号", example = "3")
+    private Integer projectId;
+
+    @ApiModelProperty(value = "排班规则ID", example = "1")
+    private Integer scheduleRuleId;
+
+    @ApiModelProperty(value = "项目名称", example = "XX 项目")
+    private String projectName;
+
+    @ApiModelProperty(value = "场地 ID", example = "3")
+    private Integer transferStationId;
+
+    @ApiModelProperty(value = "场地名称", example = "XX 场")
+    private String transferStationName;
+
+    @ApiModelProperty(value = "班次ID", example = "3")
+    private Integer classId;
+
+    private List<MinaClassesFromExternal> minaClassesList;
+
+}

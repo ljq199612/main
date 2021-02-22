@@ -1,0 +1,45 @@
+package com.rz.iot.bpo.model.show.BpoOutput;
+
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class BpoOutputDetailShow {
+
+    private Integer transferStationId;
+
+    private Integer projectId;
+
+    private Integer supplierId;
+
+    private Byte type;
+
+    private Date periodStartTime;
+
+    private Date periodEndTime;
+
+    private Integer workModelId;
+
+    private String workModelName;
+
+    private Integer workGroupId;
+
+    private String workGroupName;
+
+    private Integer processId;
+
+    private String processName;
+
+    private Integer productId;
+
+    private String productName;
+
+    private Integer productPriceId;
+
+    private Integer lowerLimit;
+
+    private Integer upperLimit;
+
+    private Integer output;
+}

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.WorkflowConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.WorkflowConfig" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="wf_code" property="wfCode" jdbcType="VARCHAR" />
+    <result column="wf_name" property="wfName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER" />
+    <result column="category" property="category" jdbcType="TINYINT" />
+    <result column="payer" property="payer" jdbcType="VARCHAR" />
+    <result column="payee" property="payee" jdbcType="VARCHAR" />
+    <result column="reserve1" property="reserve1" jdbcType="INTEGER" />
+    <result column="reserve2" property="reserve2" jdbcType="VARCHAR" />
+    <result column="reserve3" property="reserve3" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, wf_code, wf_name, create_time, update_time, type, project_id, supplier_info_id,
+    category, payer, payee, reserve1, reserve2, reserve3
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from workflow_config
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from workflow_config
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.WorkflowConfig" >
+    insert into workflow_config (id, wf_code, wf_name,
+      create_time, update_time, type, 
+      project_id, supplier_info_id, category, 
+      payer, payee, reserve1, 
+      reserve2, reserve3)
+    values (#{id,jdbcType=INTEGER}, #{wfCode,jdbcType=VARCHAR}, #{wfName,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=TINYINT},
+      #{projectId,jdbcType=INTEGER}, #{supplierInfoId,jdbcType=INTEGER}, #{category,jdbcType=TINYINT},
+      #{payer,jdbcType=VARCHAR}, #{payee,jdbcType=VARCHAR}, #{reserve1,jdbcType=INTEGER}, 
+      #{reserve2,jdbcType=VARCHAR}, #{reserve3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective"  useGeneratedKeys="true" keyProperty="id" parameterType="com.rz.iot.bpo.model.WorkflowConfig" >
+    insert into workflow_config
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="wfCode != null" >
+        wf_code,
+      </if>
+      <if test="wfName != null" >
+        wf_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id,
+      </if>
+      <if test="category != null" >
+        category,
+      </if>
+      <if test="payer != null" >
+        payer,
+      </if>
+      <if test="payee != null" >
+        payee,
+      </if>
+      <if test="reserve1 != null" >
+        reserve1,
+      </if>
+      <if test="reserve2 != null" >
+        reserve2,
+      </if>
+      <if test="reserve3 != null" >
+        reserve3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="wfCode != null" >
+        #{wfCode,jdbcType=VARCHAR},
+      </if>
+      <if test="wfName != null" >
+        #{wfName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="category != null" >
+        #{category,jdbcType=TINYINT},
+      </if>
+      <if test="payer != null" >
+        #{payer,jdbcType=VARCHAR},
+      </if>
+      <if test="payee != null" >
+        #{payee,jdbcType=VARCHAR},
+      </if>
+      <if test="reserve1 != null" >
+        #{reserve1,jdbcType=INTEGER},
+      </if>
+      <if test="reserve2 != null" >
+        #{reserve2,jdbcType=VARCHAR},
+      </if>
+      <if test="reserve3 != null" >
+        #{reserve3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.WorkflowConfig" >
+    update workflow_config
+    <set >
+      <if test="wfCode != null" >
+        wf_code = #{wfCode,jdbcType=VARCHAR},
+      </if>
+      <if test="wfName != null" >
+        wf_name = #{wfName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="category != null" >
+        category = #{category,jdbcType=TINYINT},
+      </if>
+      <if test="payer != null" >
+        payer = #{payer,jdbcType=VARCHAR},
+      </if>
+      <if test="payee != null" >
+        payee = #{payee,jdbcType=VARCHAR},
+      </if>
+      <if test="reserve1 != null" >
+        reserve1 = #{reserve1,jdbcType=INTEGER},
+      </if>
+      <if test="reserve2 != null" >
+        reserve2 = #{reserve2,jdbcType=VARCHAR},
+      </if>
+      <if test="reserve3 != null" >
+        reserve3 = #{reserve3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.WorkflowConfig" >
+    update workflow_config
+    set wf_code = #{wfCode,jdbcType=VARCHAR},
+      wf_name = #{wfName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=TINYINT},
+      project_id = #{projectId,jdbcType=INTEGER},
+      supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      category = #{category,jdbcType=TINYINT},
+      payer = #{payer,jdbcType=VARCHAR},
+      payee = #{payee,jdbcType=VARCHAR},
+      reserve1 = #{reserve1,jdbcType=INTEGER},
+      reserve2 = #{reserve2,jdbcType=VARCHAR},
+      reserve3 = #{reserve3,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByProjectSupplierId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from workflow_config
+    where project_id = #{projectId}
+    and supplier_info_id = #{supplierId}
+  </select>
+
+  <select id="findAll" resultType="com.rz.iot.bpo.model.show.workflow.WorkflowConfigShow">
+    select
+    wc.id,
+    wc.wf_name as wfName,
+    wc.wf_code as wfCode,
+    bp.project_name as projectName,
+    sc.company_name as supplierName,
+    wc.type,
+    wc.create_time as createTime
+    from workflow_config wc
+    left join bpo_project bp on wc.project_id = bp.id
+    left join sys_company sc on wc.supplier_info_id = sc.id
+    where 1 = 1
+    <if test="projectName != null and projectName != ''">
+      and bp.project_name like concat('%',#{projectName},'%')
+    </if>
+    <if test="companyName != null and companyName != ''">
+      and sc.company_name like concat('%',#{companyName},'%')
+    </if>
+    <if test="type != null">
+      and wc.type = #{type}
+    </if>
+  </select>
+
+  <select id="configDetail" resultType="com.rz.iot.bpo.model.show.workflow.WorkflowConfigShow">
+    select
+    wc.id,
+    wc,wf_code,
+    wc.wf_name,
+    wc.type,
+    bp.project_name,
+    bp.company_name,
+    wc.category,
+    wc.payer,
+    wc.payee,
+    wc.create_time,
+    from workflow_config wc
+    left join bpo_project bp on wc.project_id = bp.id
+    left join sys_company sc on wc.supplier_info_id = sc.id
+  </select>
+</mapper>

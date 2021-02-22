@@ -1,0 +1,17 @@
+package com.rz.iot.bpo.mina.mapper;
+
+import com.rz.iot.bpo.mina.model.MinaClassesFromExternal;
+import com.rz.iot.bpo.mina.model.show.MinaClassesShow;
+
+public interface MinaClassesFromExternalMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(MinaClassesFromExternal record);
+
+    MinaClassesFromExternal selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKey(MinaClassesFromExternal record);
+
+    MinaClassesShow selectByProjectId(Integer projectId);
+
+}

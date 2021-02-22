@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoAttendanceAuditRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoAttendanceAuditRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="attendance_info_id" property="attendanceInfoId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR"/>
+    <result column="audit_type" property="auditType" jdbcType="TINYINT"/>
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="audit_result" property="auditResult" jdbcType="TINYINT"/>
+    <result column="approval_wage_hours" property="approvalWageHours" jdbcType="REAL"/>
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, attendance_info_id, person_id, person_name, audit_type,
+    audit_time, audit_result, approval_wage_hours, remark, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_attendance_audit_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_attendance_audit_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoAttendanceAuditRecord" >
+    insert into bpo_attendance_audit_record (id, attendance_info_id, person_id,
+      person_name, audit_type, audit_time, audit_result, approval_wage_hours, remark, status,
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{attendanceInfoId,jdbcType=INTEGER}, #{personId,jdbcType=INTEGER},
+      #{personName,jdbcType=VARCHAR}, #{auditType,jdbcType=TINYINT}, #{auditTime,jdbcType=TIMESTAMP}, #{auditResult,jdbcType=TINYINT},
+      #{approvalWageHours,jdbcType=DOUBLE}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoAttendanceAuditRecord" >
+    insert into bpo_attendance_audit_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="attendanceInfoId != null" >
+        attendance_info_id,
+      </if>
+      <if test="personId != null" >
+        person_id,
+      </if>
+      <if test="personName != null">
+        person_name,
+      </if>
+      <if test="auditType != null" >
+        audit_type,
+      </if>
+      <if test="auditTime != null" >
+        audit_time,
+      </if>
+      <if test="auditResult != null">
+        audit_result,
+      </if>
+      <if test="approvalWageHours != null" >
+        approval_wage_hours,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceInfoId != null" >
+        #{attendanceInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="personId != null" >
+        #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="personName != null">
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditType != null" >
+        #{auditType,jdbcType=TINYINT},
+      </if>
+      <if test="auditTime != null" >
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditResult != null">
+        #{auditResult,jdbcType=TINYINT},
+      </if>
+      <if test="approvalWageHours != null" >
+        #{approvalWageHours,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoAttendanceAuditRecord" >
+    update bpo_attendance_audit_record
+    <set >
+      <if test="attendanceInfoId != null" >
+        attendance_info_id = #{attendanceInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="personId != null" >
+        person_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="personName != null">
+        person_name = #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditType != null" >
+        audit_type = #{auditType,jdbcType=TINYINT},
+      </if>
+      <if test="auditTime != null" >
+        audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditResult != null">
+        audit_result = #{auditResult,jdbcType=TINYINT},
+      </if>
+      <if test="approvalWageHours != null" >
+        approval_wage_hours = #{approvalWageHours,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoAttendanceAuditRecord" >
+    update bpo_attendance_audit_record
+    set attendance_info_id = #{attendanceInfoId,jdbcType=INTEGER},
+      person_id = #{personId,jdbcType=INTEGER},
+      person_name = #{personName,jdbcType=VARCHAR},
+      audit_type = #{auditType,jdbcType=TINYINT},
+      audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      audit_result = #{auditResult,jdbcType=TINYINT},
+      approval_wage_hours = #{approvalWageHours,jdbcType=DOUBLE},
+      remark = #{remark,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="auditDetail" resultType="java.util.Map">
+    select p.person_name as personName,p.work_no as workNo,aar.audit_time as auditTime,aar.remark
+    from bpo_attendance_audit_record aar
+    left join bpo_person p on aar.person_id = p.id
+    where aar.attendance_info_id = #{attendanceInfoId,jdbcType=INTEGER}
+    order by aar.audit_time
+  </select>
+
+  <select id="mpAuditDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_attendance_audit_record
+    where attendance_info_id = #{attendanceInfoId,jdbcType=INTEGER}
+  </select>
+</mapper>

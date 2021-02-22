@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaScheduleRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaScheduleRule" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="max_work_hour" property="maxWorkHour" jdbcType="INTEGER" />
+    <result column="min_work_hour" property="minWorkHour" jdbcType="INTEGER" />
+    <result column="schedule_number" property="scheduleNumber" jdbcType="INTEGER" />
+    <result column="priority_workers" property="priorityWorkers" jdbcType="INTEGER" />
+    <result column="deviation_rate" property="deviationRate" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="MinaScheduleRuleShowMap" type="com.rz.iot.bpo.mina.model.show.MinaScheduleRuleShow" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="max_work_hour" property="maxWorkHour" jdbcType="INTEGER" />
+    <result column="min_work_hour" property="minWorkHour" jdbcType="INTEGER" />
+    <result column="schedule_number" property="scheduleNumber" jdbcType="INTEGER" />
+    <result column="priority_workers" property="priorityWorkers" jdbcType="INTEGER" />
+    <result column="deviation_rate" property="deviationRate" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, max_work_hour, min_work_hour, schedule_number, priority_workers, deviation_rate,project_id,
+    status, update_time, create_time
+  </sql>
+
+  <insert id="insertSelected" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleRule" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into bpo_schedule_rule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="maxWorkHour != null" >
+        max_work_hour,
+      </if>
+      <if test="minWorkHour != null" >
+        min_work_hour,
+      </if>
+      <if test="scheduleNumber != null" >
+        schedule_number,
+      </if>
+      <if test="priorityWorkers != null" >
+        priority_workers,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="deviationRate != null" >
+        deviation_rate,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="maxWorkHour != null" >
+        #{maxWorkHour,jdbcType=INTEGER},
+      </if>
+      <if test="minWorkHour != null" >
+        #{minWorkHour,jdbcType=INTEGER},
+      </if>
+      <if test="scheduleNumber != null" >
+        #{scheduleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="priorityWorkers != null" >
+        #{priorityWorkers,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="deviationRate != null" >
+        #{deviationRate,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+
+
+
+<!-- ###################### -->
+
+
+
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_schedule_rule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByProjectId" resultMap="MinaScheduleRuleShowMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_schedule_rule
+    where project_id = #{projectId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_schedule_rule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleRule" >
+    insert into bpo_schedule_rule (id, max_work_hour, min_work_hour,
+      schedule_number, priority_workers, deviation_rate,
+      status, update_time, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{maxWorkHour,jdbcType=INTEGER}, #{minWorkHour,jdbcType=INTEGER},
+      #{scheduleNumber,jdbcType=INTEGER}, #{priorityWorkers,jdbcType=INTEGER}, #{deviationRate,jdbcType=VARCHAR},
+      #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleRule" >
+    update bpo_schedule_rule
+    <set >
+      <if test="maxWorkHour != null" >
+        max_work_hour = #{maxWorkHour,jdbcType=INTEGER},
+      </if>
+      <if test="minWorkHour != null" >
+        min_work_hour = #{minWorkHour,jdbcType=INTEGER},
+      </if>
+      <if test="scheduleNumber != null" >
+        schedule_number = #{scheduleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="priorityWorkers != null" >
+        priority_workers = #{priorityWorkers,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="deviationRate != null" >
+        deviation_rate = #{deviationRate,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleRule" >
+    update bpo_schedule_rule
+    set max_work_hour = #{maxWorkHour,jdbcType=INTEGER},
+      min_work_hour = #{minWorkHour,jdbcType=INTEGER},
+      schedule_number = #{scheduleNumber,jdbcType=INTEGER},
+      priority_workers = #{priorityWorkers,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=INTEGER},
+      deviation_rate = #{deviationRate,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

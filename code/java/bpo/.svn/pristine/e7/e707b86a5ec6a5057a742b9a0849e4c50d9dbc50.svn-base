@@ -1,0 +1,425 @@
+<template>
+  <div class="step-1-form">
+    <el-form
+      ref="step1Form"
+      label-width="100px"
+      class="bpoForm"
+      :model="step1FormData"
+      :rules="step1FormRules"
+    >
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="项目名称：" prop="projectName">
+            <el-input
+              v-model.trim="step1FormData.projectName"
+              class="half"
+              placeholder="请输入项目名称"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="甲方：" prop="firstParty">
+            <el-select
+              v-model="step1FormData.firstParty"
+              class="half"
+              placeholder="请选择"
+              @focus="getPartyAData"
+              @change="selectFirstCompanyName"
+            >
+              <el-option
+                v-for="item in partyAData"
+                :key="item.id"
+                :label="item.companyName"
+                :value="item.id"
+              />
+            </el-select>
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              class="add-a"
+              plain
+              @click="addPartA"
+            >添加甲方</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="乙方：" prop="secondCompanyName">
+            <el-input
+              v-model="step1FormData.secondCompanyName"
+              class="half"
+              placeholder="请输入乙方"
+              :disabled="true"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item prop="projectSn" label="项目编号：">
+            <el-input
+              v-model="step1FormData.projectSn"
+              class="half"
+              placeholder="请输入项目编号"
+              :disabled="true"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item prop="firstPartyLink" label="甲方负责人：">
+            <el-input
+              v-model.trim="step1FormData.firstPartyLink"
+              class="half"
+              placeholder="请输入甲方负责人"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item prop="firstPartyMobile" label="甲方联系方式：">
+            <el-input
+              v-model.trim="step1FormData.firstPartyMobile"
+              class="half"
+              placeholder="请输入甲方联系方式"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item prop="secondPartyLink" label="乙方负责人：">
+            <el-input
+              v-model.trim="step1FormData.secondPartyLink"
+              class="half"
+              placeholder="请输入乙方负责人"
+            />
+            <input v-model="step1FormData.secondParty" type="hidden" name="">
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item prop="secondPartyMobile" label="乙方联系方式：">
+            <el-input
+              v-model.trim="step1FormData.secondPartyMobile"
+              class="half"
+              placeholder="请输入乙方联系方式"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item prop="contractName" label="项目合同：">
+            <el-select
+              v-model="step1FormData.contractId"
+              class="half"
+              placeholder="请选择"
+              @focus="getContractList"
+              @change="selectContract"
+            >
+              <el-option
+                v-for="item in contractList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+            <input v-model="step1FormData.contractName" type="hidden" name="">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              class="add-a"
+              plain
+              @click="addContract"
+            >添加合同</el-button>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item prop="startDate" label="开始日期：">
+            <el-input
+              v-model="step1FormData.startDate"
+              class="half"
+              placeholder="开始日期"
+              :disabled="true"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item prop="endDate" label="结束日期：">
+            <el-input
+              v-model="step1FormData.endDate"
+              class="half"
+              placeholder="结束日期"
+              :disabled="true"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item prop="cashDeposit" label="保证金：">
+            <el-input
+              v-model="step1FormData.cashDeposit"
+              class="half"
+              placeholder="请输入保证金额"
+              :disabled="true"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item prop="remark" label="备注：">
+            <el-input
+              v-model.trim="step1FormData.remark"
+              class="half"
+              type="textarea"
+              :rows="8"
+              placeholder="请输入内容"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-form-item class="bpoButtonGroup">
+        <el-button
+          type="primary"
+          size="medium"
+          @click="handlerNext"
+        >下一步</el-button>
+      </el-form-item>
+    </el-form>
+    <addPartyA
+      :dialog-form-visible="addPartADialogFormVisible"
+      @hideDialog="hideAddPartA"
+    />
+  </div>
+</template>
+
+<script>
+// 新增项目step1
+import {
+  getPartyAData,
+  getProjectSnToCreate,
+  getContractList,
+  getUserCompany,
+  addProjectBasicInformation
+} from '@/api/projectManage/projectManage'
+import addPartyA from './addPartyA'
+
+export default {
+  components: {
+    addPartyA
+  },
+  data() {
+    return {
+      contractList: [], // 合同数据
+      addPartADialogFormVisible: false, // 添加甲方弹窗标识
+      partyAData: [], // 甲方数据
+      step1FormData: {
+        cashDeposit: '', // 项目保证金
+        contractId: '', // 合同id
+        contractName: '', // 合同名字
+        endDate: '', // 项目结束日期
+        firstCompanyName: '', // 甲方公司名字
+        firstParty: '', // 甲方id
+        firstPartyLink: '', // 甲方联系人姓名
+        firstPartyMobile: '', // 甲方联系电话
+        nickName: '', // 甲方公司简称
+        projectName: '', // 项目名称
+        projectSn: '', // 项目编号
+        remark: '', // 备注
+        secondCompanyName: '', // 乙方公司名称
+        secondParty: '', // 乙方id
+        secondPartyLink: '', // 乙方联系人
+        secondPartyMobile: '', // 乙方联系方式
+        startDate: '' // 项目开始日期
+      },
+      step1FormRules: {
+        // 第一步校验规则
+        projectName: [
+          { required: true, message: '请输入项目名称', trigger: 'blur' }
+        ],
+        firstParty: [
+          { required: true, message: '请选择甲方', trigger: 'blur' }
+        ],
+        secondCompanyName: [
+          { required: true, message: '请输入乙方名称', trigger: 'blur' }
+        ],
+        projectSn: [
+          { required: true, message: '请输入项目编号', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  created() {
+    this.getUserCompany()
+  },
+  methods: {
+    /**
+     * 获取甲方列表数据
+     */
+    getPartyAData() {
+      getPartyAData()
+        .then((res) => {
+          // 获取成功
+          const data = res['data']
+          const list = data['data']['companyList'] || []
+          this.partyAData = list
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取甲方数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 选中甲方公司
+     */
+    selectFirstCompanyName(value) {
+      // 通过id获取甲方名字
+      let obj = {}
+      obj = this.partyAData.find((item) => {
+        return item.id === value
+      })
+      this.step1FormData.nickName = obj.nickName // 获取简称
+      this.step1FormData.firstCompanyName = obj.companyName // 获取公司名字
+      // 生成项目编号
+      this.getProjectSnToCreate()
+    },
+    /**
+     * 获取生成项目编号
+     */
+    getProjectSnToCreate() {
+      // 校验数据
+      const data = {
+        partyAName: this.step1FormData.firstCompanyName,
+        partyBName: this.step1FormData.secondCompanyName,
+        nickName: this.step1FormData.nickName
+      }
+      if (!data['partyAName'] || !data['partyBName']) {
+        return
+      }
+      // 生成项目编号
+      getProjectSnToCreate(data)
+        .then((res) => {
+          // 获取成功
+          const result = res['data']
+          this.step1FormData.projectSn = result['data']
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '生成项目编号失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 添加甲方
+     */
+    addPartA() {
+      this.addPartADialogFormVisible = true
+    },
+    /**
+     * 隐藏添加甲方弹窗
+     */
+    hideAddPartA() {
+      this.addPartADialogFormVisible = false
+    },
+    /**
+     * 获取合同数据
+     */
+    getContractList() {
+      getContractList()
+        .then((res) => {
+          // 获取成功
+          const data = res['data']
+          const list = data['data']['bpoContractInfoList'] || []
+          this.contractList = list
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取合同数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 选中合同
+     */
+    selectContract(value) {
+      let obj = {}
+      obj = this.contractList.find((item) => {
+        return item.id === value
+      })
+      // 设置开始结束时间
+      this.step1FormData.startDate = obj.startTime
+      this.step1FormData.endDate = obj.endTime
+      // 保证金
+      this.step1FormData.cashDeposit = obj.cashDeposit
+      // 合同名
+      this.step1FormData.contractName = obj.name
+    },
+    /**
+     * 添加合同
+     */
+    addContract() {
+      // TODO:跳转合同管理
+      // this.$router.push({
+      //   path: '/'
+      // })
+    },
+    /**
+     * 获取当前用户所在组织（乙方数据）
+     */
+    getUserCompany() {
+      getUserCompany()
+        .then((res) => {
+          // 获取成功
+          const data = res['data']['data']
+          // 乙方公司名字
+          this.step1FormData.secondCompanyName = data['companyName']
+          // 乙方id
+          this.step1FormData.secondParty = data['id']
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '乙方数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 下一步
+     */
+    handlerNext() {
+      // 表单校验
+      this.$refs['step1Form'].validate((valid) => {
+        if (valid) {
+          // 校验成功提交
+          addProjectBasicInformation(this.step1FormData)
+            .then((res) => {
+              // 保存成功
+              // 提交数据
+              this.$emit('handlerNext', {
+                step: 1,
+                formData: this.step1FormData
+              })
+            })
+            .catch((err) => {
+              this.$message({
+                type: 'error',
+                message:
+                  err.message || '保存基本信息失败，服务端错误，请联系管理员'
+              })
+            })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped></style>

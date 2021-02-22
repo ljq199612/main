@@ -1,0 +1,297 @@
+<template>
+  <CfPanel title="表单范例" class="form main">
+    <!-- 强制规范： 查询表单采用ElementUI行内表单写法--->
+    <!-- 强制规范： 需要给表单添加公共样式bpoFormInline --->
+    <!-- 强制规范： 按钮固定搜索、重置俩名称，搜索为主按钮，在左边 --->
+    <!-- 建议规范： 优先选择ElementUI的表单组件，有需自定义的需在群里进行通知 --->
+    <!-- 建议规范： 搜索按钮的执行函数命名建议统一为：submit、重置执行函数名建议统一为：reset --->
+    <h1>搜索表单规范：</h1>
+    <el-form :inline="true" :model="formInline" class="bpoFormInline">
+      <el-form-item label="组织类型：">
+        <el-select v-model="formInline.orgType" placeholder="请选择组织类型">
+          <el-option label="组织一" value="shanghai" />
+          <el-option label="组织二" value="beijing" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="组织名称：">
+        <el-input v-model="formInline.companyName" placeholder="请输入组织名称" />
+      </el-form-item>
+      <el-form-item label="状态：">
+        <el-select v-model="formInline.orgType" placeholder="请选择状态">
+          <el-option label="状态一" value="1" />
+          <el-option label="状态二" value="2" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <div>
+      <h2>强制规范：</h2>
+      <p>
+        行内表单写法：查询表单参考ElementUI行内表单
+        <mark>:inline="true"</mark>
+      </p>
+      <p>
+        添加公共样式：需要给表单添加公共样式
+        <mark>bpoFormInline</mark>
+      </p>
+      <p>固定按钮名称：按钮固定搜索、重置俩名称，搜索为主按钮，在左边</p>
+      <p>
+        主按钮样式：搜索主按钮需要应用
+        <mark>.bpoBtn</mark>
+      </p>
+
+      <h2>建议规范：</h2>
+      <p>组件选择：优先选用ElementUI的表单组件，有需自定义的需在群里进行通知</p>
+      <p>
+        统一函数命名：搜索按钮的执行函数命名建议统一为：
+        <mark>submit</mark>、重置执行函数名建议统一为：
+        <mark>reset</mark>
+      </p>
+    </div>
+    <hr>
+    <h1>多行搜索表单</h1>
+    <el-form ref="search_from" :inline="true" class="bpoFormInline">
+      <el-row>
+        <el-form-item label="员工归属：">
+          <el-cascader placeholder="请选择所属部门" />
+        </el-form-item>
+        <el-form-item label="姓名：">
+          <el-input placeholder="请输入姓名" />
+        </el-form-item>
+        <el-form-item label="工号：">
+          <el-input placeholder="请输入工号" />
+        </el-form-item>
+        <el-form-item label="岗位：">
+          <el-select placeholder="请选择岗位" />
+        </el-form-item>
+        <el-form-item label="民族：">
+          <el-select filterable placeholder="请选择民族（可搜索）" />
+        </el-form-item>
+        <el-form-item label="状态：">
+          <el-select placeholder="请选择类型" />
+        </el-form-item>
+        <el-form-item label="类型：">
+          <el-select placeholder="请选择类型" />
+        </el-form-item>
+        <el-form-item label="户籍：">
+          <el-input placeholder="请输入户籍" />
+        </el-form-item>
+        <el-form-item label="供应商员工：">
+          <el-select placeholder="请选择状态" />
+        </el-form-item>
+        <el-form-item label="开始时间：">
+          <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" />
+        </el-form-item>
+        <el-form-item label="结束时间：">
+          <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bpoBtn" @click="search_button">搜索</el-button>
+          <el-button @click="reset_button">重置</el-button>
+        </el-form-item>
+      </el-row>
+    </el-form>
+    <div>
+      <h2>强制规范：</h2>
+      <p>
+        label字数：不超过<mark>5</mark>个字符，否则截断，要添加title
+      </p>
+      <p>日历控件：搜索表单由于长度限制，开始时间和结束时间使用<mark>两个输入框</mark>；弹框或者编辑表单可以用一个日期范围选择</p>
+    </div>
+    <hr>
+    <h1>弹框表单规范：</h1>
+    <div>
+      <el-button type="primary" icon="el-icon-plus" @click="openDetailDialog">新增</el-button>
+    </div>
+    <el-dialog
+      class="bpoDialog"
+      title="弹框表单规范"
+      :visible.sync="detailDialogVisible"
+      @close="closeDetailDialog"
+    >
+      <el-form ref="entity" label-width="90px" :model="entity">
+        <el-form-item label="角色类型：">
+          <el-input v-model="entity.roleName" />
+        </el-form-item>
+        <el-form-item label="角色编码：">
+          <el-input v-model="entity.roleKey" />
+        </el-form-item>
+        <el-form-item label="状态：">
+          <el-radio-group v-model="entity.status">
+            <el-radio :label="1">启用</el-radio>
+            <el-radio :label="2">禁用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注：">
+          <el-input v-model="entity.remark" autosize type="textarea" :rows="2" />
+        </el-form-item>
+        <el-form-item class="bpoButtonGroup pull-right">
+          <el-button type="primary" @click="submit('form')">提交</el-button>
+          <el-button @click="backTo">关闭</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <div>
+      <h2>强制规范：</h2>
+      <p>
+        添加公共样式：需要给表单添加公共样式
+        <mark>bpoDialog</mark>, 宽度将有该样式统一控制
+      </p>
+      <p>典型表单表单写法：弹框表单参考ElementUI典型表单写法</p>
+      <p>
+        统一label宽度：文本长度统一为90px
+        <mark>label-width="90px"</mark>
+      </p>
+      <p>文本域高度：textarea统一采用rows来控制高度</p>
+      <p>按钮右对齐：弹框表单按钮统一右对齐</p>
+      <p>统一按钮大小：弹框表单按钮统一为正常大小</p>
+      <p>固定按钮文字：按钮固定提交、关闭俩名称，提交为主按钮，在左边</p>
+    </div>
+    <hr>
+    <h1>编辑表单规范：</h1>
+    <div>
+      <el-form ref="form" :model="form" label-width="180px" class="bpoForm">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="组织类型：">
+              <el-select class="half">
+                <el-option label="组织一" value="shanghai" />
+                <el-option label="组织二" value="beijing" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="组织名称：">
+              <el-input v-model="form.companyName" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="组织简称：">
+              <el-input v-model="form.nickName" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="组织编码：">
+              <el-input v-model="form.companyCode" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系人：">
+              <el-input v-model="form.contacts" type="email" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="统一信用代码：">
+              <el-input v-model="form.creditCode" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系地址：">
+              <el-input v-model="form.address" maxlength="200" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系方式：">
+              <el-input v-model="form.phone" type="email" class="half" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              <el-input v-model="form.remark" type="textarea" class="half" rows="5" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否启用：">
+              <el-radio-group v-model="form.status">
+                <el-radio :label="1">启用</el-radio>
+                <el-radio :label="2">禁用</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item class="bpoButtonGroup">
+          <el-button type="primary" size="medium" @click="submit('form')">提交</el-button>
+          <el-button size="medium" @click="backTo">关闭</el-button>
+        </el-form-item>
+      </el-form>
+      <div>
+        <h2>强制规范：</h2>
+        <p>
+          添加公共样式：编辑表单需添加
+          <mark>bpoForm</mark>样式;表单按钮需添加
+          <mark>bpoButtonGroup</mark>样式
+        </p>
+        <p>
+          添加公共样式：编辑表单文本模式需添加
+          <mark>textmode</mark>样式;减少表单元素间间距
+        </p>
+
+        <p>固定按钮名称：按钮固定提交、关闭俩名称，提交为主按钮，在左边</p>
+        <p>
+          固定按钮大小：编辑表单按钮需要采用
+          <mark>size="medium"</mark>大小
+        </p>
+        <p>
+          统一表单元素长度：编辑表单label长度统一为
+          <mark>label-width="180px"</mark>， 元素采用
+          <mark>class="half"</mark>控制为宽度的一半
+        </p>
+        <h2>建议规范：</h2>
+        <p>简洁规范：表单如无设计上的特别需要，请尽量保持表单项的干净，减少无作用的配置项属性</p>
+        <p>统一函数命名：提交按钮的执行函数命名建议统一为：submit、重置执行函数名建议统一为：backTo</p>
+      </div>
+    </div>
+  </CfPanel>
+</template>
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+
+export default {
+  components: { CfPanel },
+  data() {
+    return {
+      formInline: {
+        companyName: '',
+        orgType: ''
+      },
+      form: {
+        status: 1
+      },
+      detailDialogVisible: false,
+      entity: {}
+    }
+  },
+  methods: {
+    submit() {
+      console.log('submit!')
+    },
+    reset() {},
+    backTo() {},
+    openDetailDialog() {
+      this.detailDialogVisible = true
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+/* 强制规范：尽可能使用局部样式，采用模块名作为命名空间 */
+.main {
+  height: 100%;
+  h1 {
+    font-size: 16px;
+  }
+  h2 {
+    font-size: 14px;
+  }
+  p {
+    font-size: 12px;
+  }
+}
+</style>

@@ -1,0 +1,16 @@
+package com.rz.iot.bpo.mina.mapper;
+
+import com.rz.iot.bpo.mina.model.MinaProject;
+import com.rz.iot.bpo.model.BpoProject;
+import com.rz.iot.bpo.model.show.*;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface MinaProjectMapper {
+
+    int insertSelective(MinaProject record);
+
+    MinaProject selectByPrimaryKey(Integer id);
+
+}

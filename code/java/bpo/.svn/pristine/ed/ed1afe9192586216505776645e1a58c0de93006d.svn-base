@@ -1,0 +1,288 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.FastDFSClientWrapper;
+import com.rz.iot.bpo.common.utils.PicUtils;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.common.utils.StringUtils;
+import com.rz.iot.bpo.common.utils.bean.BeanUtils;
+import com.rz.iot.bpo.framework.redis.RedisCache;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.framework.web.entity.ZipModel;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.BpoContractInfoParam;
+import com.rz.iot.bpo.model.param.ContractInfoParam;
+import com.rz.iot.bpo.model.show.BpoContractDetailShow;
+import com.rz.iot.bpo.model.show.BpoContractQueryShow;
+import com.rz.iot.bpo.model.show.SysCompanyShow;
+import com.rz.iot.bpo.service.ContractInfoService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipOutputStream;
+
+@Service
+public class ContractInfoServiceImpl implements ContractInfoService {
+
+    @Resource
+    private BpoFileUploadMapper fileUploadMapper;
+
+    @Resource
+    private PicUtils picUtils;
+
+    @Resource
+    private BpoContractInfoMapper bpoContractInfoMapper;
+
+    @Resource
+    private BpoContractSettlementInfoMapper bpoContractSettlementInfoMapper;
+
+    @Resource
+    private BpoContractPaymentInfoMapper bpoContractPaymentInfoMapper;
+
+    @Resource
+    private BpoContractInvoiceInfoMapper bpoContractInvoiceInfoMapper;
+
+    @Resource
+    private SysCompanyMapper sysCompanyMapper;
+
+    @Resource
+    private SysDeptMapper deptMapper;
+
+    @Resource
+    private FastDFSClientWrapper fastDFSClientWrapper;
+
+
+    @Override
+    public List<BpoContractQueryShow> findAll(ContractInfoParam contractInfoParam) {
+        return bpoContractInfoMapper.findAll(contractInfoParam);
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public Result insert(BpoContractInfoParam bpoContractInfoParam) {
+        if(bpoContractInfoParam == null) {
+            return Result.error(ResultConstants.REQUEST_PARAM_ERROR);
+        }
+
+        Integer userId = SecurityUtils.getLoginUser().getUser().getUserId();
+        SysCompany company = sysCompanyMapper.findCompanyByUserId(userId);
+        BpoContractInfo contractInfo = new BpoContractInfo();
+        BeanUtils.copyProperties(bpoContractInfoParam,contractInfo);
+        contractInfo.setYiOrgId(company.getId());
+        if (bpoContractInfoParam.getFileList() != null) {
+            StringBuilder filePath = new StringBuilder();
+            for (BpoFileUpload file: bpoContractInfoParam.getFileList()) {
+                filePath.append(file.getUrl()).append(",");
+            }
+            contractInfo.setFilePath(filePath.toString());
+        }
+        bpoContractInfoMapper.insertSelective(contractInfo);
+        if (DictDataConstants.COMPANY_COMPANY == bpoContractInfoParam.getType()) {
+            if (bpoContractInfoParam.getBpoContractSettlementInfo() != null) {
+                BpoContractSettlementInfo contractSettlementInfo = bpoContractInfoParam.getBpoContractSettlementInfo();
+                contractSettlementInfo.setContractId(contractInfo.getId());
+                bpoContractSettlementInfoMapper.insertSelective(contractSettlementInfo);
+            }
+            if (bpoContractInfoParam.getBpoContractPaymentInfoList() != null) {
+                for (BpoContractPaymentInfo bpoContractPaymentInfo:bpoContractInfoParam.getBpoContractPaymentInfoList()) {
+                    bpoContractPaymentInfo.setContractId(contractInfo.getId());
+                    bpoContractPaymentInfoMapper.insertSelective(bpoContractPaymentInfo);
+                }
+            }
+            if (bpoContractInfoParam.getBpoContractInvoiceInfo() != null) {
+                BpoContractInvoiceInfo bpoContractInvoiceInfo = bpoContractInfoParam.getBpoContractInvoiceInfo();
+                bpoContractInvoiceInfo.setContractId(contractInfo.getId());
+                bpoContractInvoiceInfoMapper.insertSelective(bpoContractInvoiceInfo);
+            }
+        }
+        return Result.success();
+    }
+
+    @Override
+    public BpoContractDetailShow selectDetailById(Integer id) {
+        BpoContractDetailShow contractDetailShow = bpoContractInfoMapper.selectDetailById(id);
+        if (contractDetailShow != null) {
+            if (contractDetailShow.getFilePath() != null) {
+                String[] files = contractDetailShow.getFilePath().split(",");
+                List<BpoFileUpload> fileList = fileUploadMapper.selectListByFilePath(files);
+//                List<BpoFileUpload> fileList = fileUploadMapper.selectListByFilePath(StringUtils.replace(contractDetailShow.getFilePath(),",",""));
+                contractDetailShow.setFileList(fileList);
+            }
+            List<BpoContractPaymentInfo> paymentInfoList = bpoContractPaymentInfoMapper.selectByContractId(id);
+            contractDetailShow.setBpoContractPaymentInfoList(paymentInfoList);
+        }
+        return contractDetailShow;
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void update(BpoContractDetailShow contractDetailShow) {
+        BpoContractInfo contractInfo = new BpoContractInfo();
+        BeanUtils.copyProperties(contractDetailShow,contractInfo);
+        StringBuilder filePath = new StringBuilder();
+        if (contractDetailShow.getFileList() != null) {
+            for (BpoFileUpload file: contractDetailShow.getFileList()) {
+                filePath.append(file.getUrl()).append(",");
+            }
+            contractInfo.setFilePath(filePath.toString());
+        }
+        bpoContractInfoMapper.updateByPrimaryKeySelective(contractInfo);
+        //合同关联表
+        BpoContractSettlementInfo settlementInfo = contractDetailShow.getBpoContractSettlementInfo();
+        BpoContractInvoiceInfo invoiceInfo = contractDetailShow.getBpoContractInvoiceInfo();
+        List<BpoContractPaymentInfo> paymentInfoList = contractDetailShow.getBpoContractPaymentInfoList();
+
+        bpoContractSettlementInfoMapper.updateByPrimaryKeySelective(settlementInfo);
+        bpoContractInvoiceInfoMapper.updateByPrimaryKeySelective(invoiceInfo);
+
+        for (BpoContractPaymentInfo paymentInfo:paymentInfoList) {
+            if (paymentInfo.getId() == null) {
+                paymentInfo.setContractId(contractInfo.getId());
+                bpoContractPaymentInfoMapper.insert(paymentInfo);
+            } else {
+                bpoContractPaymentInfoMapper.updateByPrimaryKeySelective(paymentInfo);
+            }
+        }
+    }
+
+    @Override
+    public void delete(Integer id) {
+        BpoContractInfo contractInfo = new BpoContractInfo();
+        contractInfo.setStatus((byte) DictDataConstants.DELETE_STATUS);
+        contractInfo.setId(id);
+        bpoContractInfoMapper.updateByPrimaryKeySelective(contractInfo);
+    }
+
+    @Override
+    public void deletePaymentInfo(Integer id) {
+        BpoContractPaymentInfo paymentInfo = new BpoContractPaymentInfo();
+        paymentInfo.setStatus((byte) DictDataConstants.DELETE_STATUS);
+        paymentInfo.setId(id);
+        bpoContractPaymentInfoMapper.updateByPrimaryKeySelective(paymentInfo);
+    }
+
+    @Override
+    public List<Map<String,Object>> getBySupplierOrgId(Integer supplierOrgId) {
+        List<SysCompanyShow> companies = sysCompanyMapper.findAll(new SysCompanyShow());
+        Set<Integer> companyIds = new HashSet<>();
+        companyIds.add(supplierOrgId);
+        buildCompanyIdList(companies,supplierOrgId,companyIds);
+        List<Map<String,Object>> contractInfoList = bpoContractInfoMapper.getBySupplierOrgId(supplierOrgId,companyIds);
+        return contractInfoList;
+    }
+
+    @Override
+    public Result upload(MultipartFile file) {
+        // 获取文件名
+        String fileName = file.getOriginalFilename();
+        MultipartFile[] multipartFiles = {file};
+        // 上传图片
+        Map<String,String> map = picUtils.upload(multipartFiles);
+        map.put("fileName",fileName);
+        String url = map.get("url");
+        BpoFileUpload fileUpload = new BpoFileUpload();
+        fileUpload.setUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+        fileUpload.setFileName(fileName);
+        fileUpload.setUrl(url);
+        fileUploadMapper.insertSelective(fileUpload);
+        return Result.success(map);
+    }
+
+    @Override
+    public void download(String path, String contractName, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        List<ZipModel> zipModelList = new ArrayList<>();
+        String[] files = path.split(",");
+        for (String file:files) {
+            ZipModel zipModel = new ZipModel();
+            BpoFileUpload fileUpload = fileUploadMapper.selectByUrl(file);
+            if (fileUpload == null) {
+                continue;
+            }
+            String filePath = fileUpload.getUrl();
+            String fileName = fileUpload.getFileName();
+            byte[] data = fastDFSClientWrapper.downloadFile(file);
+            zipModel.setData(data);
+            zipModel.setFileName(fileName);
+            zipModel.setFilePath(filePath);
+            zipModelList.add(zipModel);
+        }
+
+        String fileName = contractName + ".zip";
+        String globalUploadPath = request.getSession().getServletContext().getRealPath("/");
+        String outFilePath = globalUploadPath + File.separator + fileName;
+        File file = new File(outFilePath);
+        //文件输出流
+        FileOutputStream outStream = new FileOutputStream(file);
+        //压缩流
+        ZipOutputStream toClient = new ZipOutputStream(outStream);
+        fastDFSClientWrapper.zipFile(zipModelList, toClient);
+        toClient.close();
+        outStream.close();
+        response.setHeader("content-disposition", "attachment;fileName=" + fileName);
+        fastDFSClientWrapper.downloadZip(file, response);
+    }
+
+    @Override
+    public Result<BpoContractInfo> getbySupplierInfoId(Integer supplierInfoId) {
+        if (supplierInfoId == null)
+            return Result.requestParamError();
+        BpoContractInfo info =  bpoContractInfoMapper.getbySupplierInfoId(supplierInfoId);
+        return Result.success(info);
+    }
+
+    @Override
+    public BpoContractInfo selectByContractId(Integer id) {
+        return bpoContractInfoMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public void buildQueryParams(ContractInfoParam contractInfoParam) {
+        if (contractInfoParam.getDeptId() != null) {
+            List<SysDept> deptList = deptMapper.getAll();
+            List<Integer> deptIds = new ArrayList<>();
+            deptIds.add(contractInfoParam.getDeptId());
+            buildDeptIdList(deptList,contractInfoParam.getDeptId(),deptIds);
+            contractInfoParam.setDeptIds(deptIds);
+        }
+    }
+
+    /**
+     * 递归查找子节点
+     * @param
+     * @return
+     */
+    public void buildDeptIdList(List<SysDept> deptList,Integer parentId,List<Integer> ids) {
+        for (SysDept dept:deptList) {
+            if (dept.getParentId().equals(parentId)) {
+                ids.add(dept.getDeptId());
+                buildDeptIdList(deptList,dept.getDeptId(),ids);
+            }
+        }
+    }
+    /**
+     * 递归查找子节点
+     * @param
+     * @return
+     */
+    public void buildCompanyIdList(List<SysCompanyShow> sysCompanies,Integer parent,Set<Integer> ids) {
+        for (SysCompanyShow company:sysCompanies) {
+            if (company.getParent().equals(parent)) {
+                ids.add(company.getId());
+                buildCompanyIdList(sysCompanies,company.getId(),ids);
+            }
+        }
+    }
+
+}

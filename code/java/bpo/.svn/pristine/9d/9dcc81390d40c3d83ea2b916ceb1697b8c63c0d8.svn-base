@@ -1,0 +1,19 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoSupplier;
+
+public interface BpoSupplierMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoSupplier record);
+
+    int insertSelective(BpoSupplier record);
+
+    BpoSupplier selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoSupplier record);
+
+    int updateByCompanyId(BpoSupplier record);
+
+    int updateByPrimaryKey(BpoSupplier record);
+}

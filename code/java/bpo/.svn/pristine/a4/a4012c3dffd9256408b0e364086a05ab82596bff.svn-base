@@ -1,0 +1,284 @@
+package com.rz.iot.bpo.mina.service.impl;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.mapper.*;
+import com.rz.iot.bpo.mina.model.*;
+import com.rz.iot.bpo.mina.model.param.*;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+import com.rz.iot.bpo.mina.model.show.MinaClassesGroupRelShow;
+import com.rz.iot.bpo.mina.model.show.MinaClassesShow;
+import com.rz.iot.bpo.mina.service.MinaScheduleService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static com.rz.iot.bpo.common.constant.DictDataConstants.*;
+
+@Slf4j
+@Service("minaScheduleService")
+public class MinaScheduleServiceImpl implements MinaScheduleService {
+
+    @Resource
+    MinaScheduleRuleMapper minaScheduleRuleMapper;
+
+    @Resource
+    MinaClassesFromExternalMapper minaClassesFromExternalMapper;
+
+    @Resource
+    MinaClassesGenerateMapper minaClassesGenerateMapper;
+
+    @Resource
+    MinaClassesGroupRelMapper minaClassesGroupRelMapper;
+
+    @Resource
+    MinaScheduleToEmployeeMapper minaScheduleToEmployeeMapper;
+
+    @Resource
+    MinaBatchMapper minaBatchMapper;
+
+    @Resource
+    MinaProjectMapper minaProjectMapper;
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addClassFromExternal(MinaClassesParam minaClassesParam) {
+
+        MinaClassesFromExternal minaClassesFromExternal = minaClassesParam.getMinaClasses();
+        minaClassesFromExternalMapper.insert(minaClassesFromExternal);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result getClassFromExternal(MinaClassesParam minaClassesParam) {
+        Integer id = minaClassesParam.getClassId();
+        MinaClassesShow minaClassesShow = minaClassesFromExternalMapper.selectByPrimaryKey(id);
+        Result result = new Result(ResultConstants.REQUEST_SUCCESS);
+        result.setData(minaClassesShow);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result getClassFromExternalList(MinaClassesParam minaClassesParam) {
+        String transferStationName = minaClassesParam.getTransferStationName();
+        Integer projectId = minaClassesParam.getProjectId();
+        List<MinaClassesShow> classList = null;
+        if (StringUtils.isEmpty(transferStationName)) {
+            classList = minaClassesFromExternalMapper.findAll();
+        } else {
+           List<Integer> projectIds = minaClassesFromExternalMapper.selectProjectIdByTransferStationName(transferStationName);
+           if(projectIds.size()==0){
+               return new Result(ResultConstants.REQUEST_SUCCESS);
+           }else{
+               classList = minaClassesFromExternalMapper.selectByProjectIds(projectIds);
+           }
+        }
+        Result result = new Result(ResultConstants.REQUEST_SUCCESS);
+        result.setData(classList);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateClassFromExternal(MinaUpdateClassesParam bpoClassesParam) {
+        minaClassesFromExternalMapper.updateByPrimaryKey(bpoClassesParam);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addScheduleRule(MinaScheduleRuleParam scheduleRuleParam) {
+        minaScheduleRuleMapper.insertSelective(scheduleRuleParam);
+        MinaScheduleRule scheduleRule = new MinaScheduleRule();
+        scheduleRule.setId(scheduleRuleParam.getId());
+        return Result.success(scheduleRule);
+    }
+
+    @Override
+    public Result<MinaClassGenerateShow> getClassGenerateList(MinaClassesGenerateParam minaClassesGenerateParam) {
+        String transferStationName = minaClassesGenerateParam.getTransferStationName();
+        List<MinaClassGenerateShow> classGenerateList = null;
+        if (StringUtils.isEmpty(transferStationName)) {
+            classGenerateList = minaClassesGenerateMapper.findAll();
+        } else {
+            List<Integer> projectIds = minaClassesFromExternalMapper.selectProjectIdByTransferStationName(transferStationName);
+            if(projectIds.size()==0){
+                return new Result(ResultConstants.REQUEST_SUCCESS);
+            }else{
+                classGenerateList = minaClassesGenerateMapper.selectByProjectIds(projectIds);
+            }
+        }
+        Result result = new Result<>(ResultConstants.REQUEST_SUCCESS);
+        result.setData(classGenerateList);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result<MinaClassGenerateShow> getClassGenerate(MinaClassesGenerateParam minaClassesGenerateParam) {
+        Integer minaClassId = minaClassesGenerateParam.getId();
+        MinaClassGenerateShow minaClassGenerateShow = minaClassesGenerateMapper.selectByPrimaryKey(minaClassId);
+        if(minaClassGenerateShow.getIsClassGroupRel() == NORMAL_STATUS){
+            List<MinaClassesGroupRelShow>  minaClassesGroupRelShows =
+                minaClassesGroupRelMapper.selectWorkGroupByClassesGenerateId(minaClassId);
+            minaClassGenerateShow.setMinaClassesGroupRelShows(minaClassesGroupRelShows);
+        }
+        Result result = new Result<>(ResultConstants.REQUEST_SUCCESS);
+        result.setData(minaClassGenerateShow);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addClassGenerate(MinaClassesGenerateParam classesGenerateParam) {
+
+        List<MinaClassesGroupRel> minaClassesGroupRels = new ArrayList<>();
+        List<Integer> ids = classesGenerateParam.getWorkGroupIds();
+        if(ids != null && ids.size()!=0) {
+            classesGenerateParam.setIsClassGroupRel(NORMAL_STATUS);
+            minaClassesGenerateMapper.insert(classesGenerateParam);
+            for (Integer id : ids) {
+                MinaClassesGroupRel classesGroupRel = new MinaClassesGroupRel();
+                classesGroupRel.setWorkGroupId(id);
+                classesGroupRel.setClassGenerateId(classesGenerateParam.getId());
+                classesGroupRel.setClassSn(classesGenerateParam.getClassSn());
+                classesGroupRel.setProjectId(classesGenerateParam.getProjectId());
+                minaClassesGroupRels.add(classesGroupRel);
+                classesGroupRel.setStatus(NORMAL_STATUS);
+            }
+            minaClassesGroupRelMapper.insertBatch(minaClassesGroupRels);
+            classesGenerateParam.setIsClassGroupRel(NORMAL_STATUS);
+        }else{
+            classesGenerateParam.setIsClassGroupRel(NOT_VERIFY_STATUS);
+            minaClassesGenerateMapper.insert(classesGenerateParam);
+        }
+
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addClassGenerateList(MinaClassesParam classesParam) {
+
+        List<MinaClassesGenerate> classesGenerates = new ArrayList<>();
+        for (MinaClassesFromExternal classesFromExternal: classesParam.getMinaClassesList() ) {
+
+            MinaClassesGenerate minaClassesGenerate = new MinaClassesGenerate();
+            minaClassesGenerate.setClassName(classesFromExternal.getClassName());
+            minaClassesGenerate.setClassSn(classesFromExternal.getClassSn());
+            minaClassesGenerate.setBatchId(classesFromExternal.getBatchId());
+            minaClassesGenerate.setClassType(classesFromExternal.getClassType());
+            minaClassesGenerate.setStartDate(classesFromExternal.getStartDate());
+            minaClassesGenerate.setEndDate(classesFromExternal.getEndDate());
+            minaClassesGenerate.setStartTime(classesFromExternal.getStartTime());
+            minaClassesGenerate.setEndTime(classesFromExternal.getEndTime());
+            minaClassesGenerate.setArriveTime(classesFromExternal.getArriveTime());
+            minaClassesGenerate.setContents(classesFromExternal.getContents());
+            minaClassesGenerate.setPeopleNumber(classesFromExternal.getPeopleNumber());
+            minaClassesGenerate.setProjectId(classesFromExternal.getProjectId());
+            minaClassesGenerate.setExcludeHour(classesFromExternal.getExcludeHour());
+            minaClassesGenerate.setSource(classesFromExternal.getSource());
+            minaClassesGenerate.setStatus(classesFromExternal.getStatus());
+            minaClassesGenerate.setScheduleStatus(classesFromExternal.getScheduleStatus());
+
+            classesGenerates.add(minaClassesGenerate);
+        }
+        minaClassesGenerateMapper.insertBatch(classesGenerates);
+        return Result.success();
+    }
+
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateClassGenerate(MinaClassesGenerateParam minaClassesGenerateParam) {
+        minaClassesGenerateParam.setUpdateUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+        minaClassesGenerateMapper.updateByPrimaryKey(minaClassesGenerateParam);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteClassFromExternal(MinaClassesParam minaClassesParam) {
+        MinaClassesFromExternal minaClassesFromExternal = new MinaClassesFromExternal();
+        minaClassesFromExternal.setStatus(DELETE_STATUS);
+        minaClassesFromExternal.setId(minaClassesParam.getClassId());
+        minaClassesFromExternalMapper.updateByPrimaryKey(minaClassesFromExternal);
+        return Result.success();
+    }
+
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result getProjectNamesByTransferStationName(MinaClassesParam minaClassesParam) {
+        String transferStationName =   minaClassesParam.getTransferStationName();
+        List<String> projectNames = minaClassesFromExternalMapper.selectProjectNameByTransferStationName(transferStationName);
+        Result result = new Result<>(ResultConstants.REQUEST_SUCCESS);
+        result.setData(projectNames);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteClassGenerate(Integer scheduleId) {
+        if (scheduleId == null || scheduleId < 0) {
+            return Result.requestParamError("scheduleId is invalid");
+        }
+        MinaClassesGenerate classesGenerate = new MinaClassesGenerate();
+        classesGenerate.setStatus(DELETE_STATUS);
+        classesGenerate.setId(scheduleId);
+        minaClassesGenerateMapper.updateByPrimaryKey(classesGenerate);
+        minaScheduleToEmployeeMapper.deleteStatusByScheduleId(scheduleId);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteScheduleRule(Integer scheduleRuleId) {
+        if (scheduleRuleId == null || scheduleRuleId < 0) {
+            return Result.requestParamError("scheduleRuleId is invalid");
+        }
+        MinaScheduleRule minaScheduleRule = new MinaScheduleRule();
+        minaScheduleRule.setStatus(DELETE_STATUS);
+        minaScheduleRule.setId(scheduleRuleId);
+        minaScheduleRuleMapper.updateByPrimaryKeySelective(minaScheduleRule);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result  addScheduleEmployee(MinaScheduleToEmployeeParam minaScheduleToEmployeeParam) {
+        return Result.success();
+    }
+
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result  getScheduleEmployee(MinaScheduleToEmployeeParam minaScheduleToEmployeeParam) {
+        return Result.success();
+    }
+
+
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result  getScheduleEmployeeList(MinaScheduleToEmployeeParam minaScheduleToEmployeeParam) {
+        return Result.success();
+    }
+
+
+
+
+}

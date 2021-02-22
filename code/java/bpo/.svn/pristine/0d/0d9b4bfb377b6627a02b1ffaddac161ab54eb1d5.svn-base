@@ -1,0 +1,28 @@
+import Layout from '@/views/layout/Layout'
+
+const attendanceManageRouter = {
+  path: '/attendance',
+  component: Layout,
+  // redirect: '/attendance/xxx',
+  name: 'attendanceManage',
+  meta: {
+    title: '考勤管理',
+    icon: 'attendance',
+    childrenFilter: false
+  },
+  children: [
+    {
+      path: 'attendanceManage',
+      component: () => import('@/views/attendanceManage/attendanceManage'),
+      name: 'attendanceManage',
+      meta: { title: '考勤管理' }
+    },
+    {
+      path: 'abnormalAdc',
+      component: () => import('@/views/attendanceManage/abnormalAdc'),
+      name: 'AbnormalAdc',
+      meta: { title: '异常考勤' }
+    }
+  ]
+}
+export default attendanceManageRouter

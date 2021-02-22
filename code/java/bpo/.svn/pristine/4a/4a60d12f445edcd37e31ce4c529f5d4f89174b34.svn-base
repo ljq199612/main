@@ -1,0 +1,318 @@
+<template>
+  <CfPanel title="表格范例">
+    <el-table
+      v-loading="listLoading"
+      :data="userList"
+      class="bpoTable"
+      fit
+      @sort-change="sortChange"
+      @cell-mouse-enter="currentRowChange"
+    >
+      <el-table-column align="center" label="编号" type="index" width="80" />
+      <el-table-column label="组织名称" min-width="120">
+        <template slot-scope="scope">{{ scope.row.companyName }}</template>
+      </el-table-column>
+      <el-table-column label="简称" min-width="80">
+        <template slot-scope="scope">{{ scope.row.companyName }}</template>
+      </el-table-column>
+      <el-table-column label="组织编码" min-width="80">
+        <template slot-scope="scope">{{ scope.row.companyCode }}</template>
+      </el-table-column>
+      <el-table-column label="组织类型" min-width="80">
+        <template slot-scope="scope">{{ scope.row.orgName }}</template>
+      </el-table-column>
+
+      <el-table-column label="统一社会信用代码" min-width="120">
+        <!-- 1.启用 2.禁用 -->
+        <template slot-scope="scope">{{ scope.row.creditCode }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="创建时间" min-width="120">
+        <!-- 1.启用 2.禁用 -->
+        <template slot-scope="scope">{{ scope.row.createTime }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="状态" width="80">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            :active-value="1"
+            :inactive-value="2"
+            @change="statusChange"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="150">
+        <template slot-scope="scope">
+          <el-button type="text" style="color:#4794F7" size="mini" @click="handleView(scope.row)">详情</el-button>
+          <el-button
+            type="text"
+            style="color:#19D185"
+            size="mini"
+            @click="handleUpdate(scope.row)"
+          >修改</el-button>
+          <el-button
+            v-if="scope.row.status != 'deleted'"
+            size="mini"
+            type="text"
+            style="color:#F52222"
+            @click="handleDelete(scope.row, 'deleted')"
+          >删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      lang-type="zh"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.limit"
+      @pagination="getList"
+    />
+    <div>
+      <h2>强制规范：</h2>
+      <p>
+        表格样式：表格应统一添加
+        <mark>class="bpoTable"</mark>样式以控制表格边线
+      </p>
+      <p>表格对齐：内容长度不固定的左对齐，内容长度固定居中对齐；金额、数量等特殊内容右对齐</p>
+      <p>表格操作列：表格操作列应统一采用链接形式的按钮</p>
+    </div>
+    <hr>
+    <h1>动态表格</h1>
+    <div class="app-container">
+      <div class="filter-container">
+        <el-checkbox-group v-model="checkboxVal">
+          <el-checkbox label="apple">apple</el-checkbox>
+          <el-checkbox label="banana">banana</el-checkbox>
+          <el-checkbox label="orange">orange</el-checkbox>
+        </el-checkbox-group>
+      </div>
+
+      <el-table :key="key" :data="tableData" border fit highlight-current-row style="width: 100%">
+        <el-table-column prop="name" label="fruitName" width="180" />
+        <el-table-column v-for="fruit in formThead" :key="fruit" :label="fruit">
+          <template slot-scope="scope">{{ scope.row[fruit] }}</template>
+        </el-table-column>
+      </el-table>
+    </div>
+  </CfPanel>
+</template>
+
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import {
+  getAllItem,
+  deleteItem,
+  findOrgType,
+  updateItem
+} from '@/api/orgnization'
+const defaultFormThead = ['apple', 'banana']
+export default {
+  name: 'Table',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      entity: {},
+      total: 0,
+      searchParam: {},
+      userList: [],
+      currentRow: {},
+      orgOptions: [],
+      orgMap: {},
+      stateOptions: [
+        { value: '1', label: '启用' },
+        { value: '2', label: '禁用' }
+      ],
+      detailDialogVisible: false,
+      dialogTitle: '新增角色',
+      tableData: [
+        {
+          name: 'fruit-1',
+          apple: 'apple-10',
+          banana: 'banana-10',
+          orange: 'orange-10'
+        },
+        {
+          name: 'fruit-2',
+          apple: 'apple-20',
+          banana: 'banana-20',
+          orange: 'orange-20'
+        }
+      ],
+      key: 1, // table key
+      formTheadOptions: ['apple', 'banana', 'orange'],
+      checkboxVal: defaultFormThead, // checkboxVal
+      formThead: defaultFormThead // 默认表头 Default header
+    }
+  },
+  computed: {},
+  watch: {
+    checkboxVal(valArr) {
+      this.formThead = this.formTheadOptions.filter(i => valArr.indexOf(i) >= 0)
+      this.key = this.key + 1 // 为了保证table 每次都会重渲 In order to ensure the table will be re-rendered each time
+    }
+  },
+  created() {
+    this.getOrgType()
+  },
+  mounted() {
+    this.getList()
+  },
+  methods: {
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    statusChange(status) {
+      this.currentRow.status = status
+      updateItem(this.currentRow).then(res => {
+        this.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '修改成功！',
+          type: 'success'
+        })
+      })
+    },
+    getOrgType() {
+      findOrgType()
+        .then(res => {
+          this.orgOptions = res.data.data
+          this.orgOptions.forEach(item => {
+            this.orgMap[item.id] = item.orgName
+          })
+          // eslint-disable-next-line handle-callback-err
+        })
+        .catch(() => {})
+    },
+    error() {
+      this.$notify({
+        title: '失败',
+        duration: '2000',
+        message: '操作失败！',
+        type: 'fail'
+      })
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getAllItem(this.searchParam)
+        .then(res => {
+          this.userList = res.data.data.list
+          this.total = res.data.data.total
+          this.listLoading = false
+          // eslint-disable-next-line handle-callback-err
+        })
+        .catch(() => {
+          this.listLoading = false
+        })
+    },
+    addUser() {
+      this.$router.push({
+        name: 'orgInfo'
+      })
+    },
+    search() {},
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleView(row) {
+      this.$router.push({
+        name: 'orgDetail',
+        params: {
+          primaryKey: row.id,
+          entity: JSON.stringify(row),
+          readonly: true
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.$router.push({
+        name: 'orgInfo',
+        params: { primaryKey: row.id, entity: JSON.stringify(row) }
+      })
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该组织？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      })
+        .then(() => {
+          deleteItem({ id: row.id }).then(() => {
+            this.$notify({
+              title: '成功',
+              duration: '2000',
+              message: '删除组织成功！',
+              type: 'success'
+            })
+            this.getList()
+          })
+        })
+        .catch(() => {})
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.orgManage {
+  .el-table th {
+    background-color: #e8e9f3;
+  }
+  /*.el-table {
+      /deep/ .cell{
+        white-space: nowrap;
+      }
+    }*/
+  .el-select {
+    width: 100%;
+  }
+  .searchForm {
+    .el-form-item__label {
+      padding: 0px;
+    }
+  }
+  .el-dialog__header {
+    background: #f6f7fb;
+  }
+  .cover {
+    width: 100%;
+  }
+  .half {
+    width: 50%;
+    min-width: 200px;
+  }
+  .cf-button-group {
+    margin-bottom: 0;
+    text-align: right;
+  }
+  .dialog-cover {
+    width: 300px;
+  }
+  .el-textarea__inner {
+    min-height: 54px !important;
+  }
+}
+</style>

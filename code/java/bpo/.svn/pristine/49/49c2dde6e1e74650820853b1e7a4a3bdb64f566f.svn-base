@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoPersonWageMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoPersonWage" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="wage_type" property="wageType" jdbcType="INTEGER" />
+    <result column="pay_type" property="payType" jdbcType="INTEGER" />
+    <result column="wage" property="wage" jdbcType="VARCHAR" />
+    <result column="pay_channels" property="payChannels" jdbcType="INTEGER" />
+    <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR" />
+    <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR" />
+    <result column="other_allowance" property="otherAllowance" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, wage_type, pay_type, wage, pay_channels, meal_allowance, night_allowance, other_allowance, 
+    status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_person_wage
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_person_wage
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoPersonWage" >
+    insert into bpo_person_wage (id, wage_type, pay_type, 
+      wage, pay_channels, meal_allowance, 
+      night_allowance, other_allowance, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{wageType,jdbcType=INTEGER}, #{payType,jdbcType=INTEGER}, 
+      #{wage,jdbcType=VARCHAR}, #{payChannels,jdbcType=INTEGER}, #{mealAllowance,jdbcType=VARCHAR}, 
+      #{nightAllowance,jdbcType=VARCHAR}, #{otherAllowance,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoPersonWage" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into bpo_person_wage
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="wageType != null" >
+        wage_type,
+      </if>
+      <if test="payType != null" >
+        pay_type,
+      </if>
+      <if test="wage != null" >
+        wage,
+      </if>
+      <if test="payChannels != null" >
+        pay_channels,
+      </if>
+      <if test="mealAllowance != null" >
+        meal_allowance,
+      </if>
+      <if test="nightAllowance != null" >
+        night_allowance,
+      </if>
+      <if test="otherAllowance != null" >
+        other_allowance,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="wageType != null" >
+        #{wageType,jdbcType=INTEGER},
+      </if>
+      <if test="payType != null" >
+        #{payType,jdbcType=INTEGER},
+      </if>
+      <if test="wage != null" >
+        #{wage,jdbcType=VARCHAR},
+      </if>
+      <if test="payChannels != null" >
+        #{payChannels,jdbcType=INTEGER},
+      </if>
+      <if test="mealAllowance != null" >
+        #{mealAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="nightAllowance != null" >
+        #{nightAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="otherAllowance != null" >
+        #{otherAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoPersonWage" >
+    update bpo_person_wage
+    <set >
+      <if test="wageType != null" >
+        wage_type = #{wageType,jdbcType=INTEGER},
+      </if>
+      <if test="payType != null" >
+        pay_type = #{payType,jdbcType=INTEGER},
+      </if>
+      <if test="wage != null" >
+        wage = #{wage,jdbcType=VARCHAR},
+      </if>
+      <if test="payChannels != null" >
+        pay_channels = #{payChannels,jdbcType=INTEGER},
+      </if>
+      <if test="mealAllowance != null" >
+        meal_allowance = #{mealAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="nightAllowance != null" >
+        night_allowance = #{nightAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="otherAllowance != null" >
+        other_allowance = #{otherAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoPersonWage" >
+    update bpo_person_wage
+    set wage_type = #{wageType,jdbcType=INTEGER},
+      pay_type = #{payType,jdbcType=INTEGER},
+      wage = #{wage,jdbcType=VARCHAR},
+      pay_channels = #{payChannels,jdbcType=INTEGER},
+      meal_allowance = #{mealAllowance,jdbcType=VARCHAR},
+      night_allowance = #{nightAllowance,jdbcType=VARCHAR},
+      other_allowance = #{otherAllowance,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

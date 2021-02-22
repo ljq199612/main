@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoCustomerInfosMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoCustomerInfos">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="abbreviations" property="abbreviations" jdbcType="VARCHAR"/>
+        <result column="cus_company" property="cusCompany" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="business_area" property="businessArea" jdbcType="VARCHAR"/>
+        <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
+        <result column="charge_man_phone" property="chargeManPhone" jdbcType="VARCHAR"/>
+        <result column="charge_man" property="chargeMan" jdbcType="VARCHAR"/>
+        <result column="region" property="region" jdbcType="VARCHAR"/>
+        <result column="credit_code" property="creditCode" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="customer_name" property="customerName" jdbcType="VARCHAR"/>
+        <result column="legal_name" property="legalName" jdbcType="VARCHAR"/>
+        <result column="legal_man_id" property="legalManId" jdbcType="CHAR"/>
+        <result column="link_man" property="linkMan" jdbcType="VARCHAR"/>
+        <result column="link_man_phone" property="linkManPhone" jdbcType="CHAR"/>
+        <result column="group_id" property="groupId" jdbcType="VARCHAR"/>
+        <result column="belog_group_name" property="belogGroupName" jdbcType="VARCHAR"/>
+        <result column="area_id" property="areaId" jdbcType="VARCHAR"/>
+        <result column="belong_area" property="belongArea" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="CHAR"/>
+        <result column="group_name" property="groupName" jdbcType="VARCHAR"/>
+        <result column="detail_address" property="detailAddress" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="org_id" property="orgId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="create_name" property="createName" jdbcType="VARCHAR"/>
+        <result column="update_name" property="updateName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, abbreviations, cus_company, type, business_area, dept_id, charge_man_phone, 
+    charge_man, region, credit_code, code, customer_name, legal_name, legal_man_id, link_man, 
+    link_man_phone, group_id, belog_group_name, area_id, belong_area, status, group_name, 
+    detail_address, remark, org_id, create_time, update_time, create_name, update_name
+  </sql>
+    <sql id="Column_List">
+        infos.id, infos.name, infos.abbreviations, infos.cus_company, infos.type, infos.business_area,
+            infos.dept_id, infos.charge_man_phone, infos.charge_man, infos.region, infos.credit_code,
+            infos.code, infos.customer_name, infos.legal_name, infos.legal_man_id, infos.link_man,
+            infos.link_man_phone, infos.group_id, infos.belog_group_name, infos.area_id, infos.belong_area,
+            infos.status, infos.group_name,infos.detail_address, infos.remark,
+            infos.org_id, infos.create_time, infos.update_time, infos.create_name, infos.update_name
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_customer_infos
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bpo_customer_infos
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoCustomerInfos">
+    insert into bpo_customer_infos (id, name, abbreviations, 
+      cus_company, type, business_area, 
+      dept_id, charge_man_phone, charge_man, 
+      region, credit_code, code, 
+      customer_name, legal_name, legal_man_id, 
+      link_man, link_man_phone, group_id, 
+      belog_group_name, area_id, belong_area, 
+      status, group_name, detail_address, 
+      remark, org_id, create_time, 
+      update_time, create_name, update_name
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{abbreviations,jdbcType=VARCHAR}, 
+      #{cusCompany,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{businessArea,jdbcType=VARCHAR},
+      #{deptId,jdbcType=INTEGER}, #{chargeManPhone,jdbcType=VARCHAR}, #{chargeMan,jdbcType=VARCHAR}, 
+      #{region,jdbcType=VARCHAR}, #{creditCode,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{customerName,jdbcType=VARCHAR}, #{legalName,jdbcType=VARCHAR}, #{legalManId,jdbcType=CHAR}, 
+      #{linkMan,jdbcType=VARCHAR}, #{linkManPhone,jdbcType=CHAR}, #{groupId,jdbcType=VARCHAR}, 
+      #{belogGroupName,jdbcType=VARCHAR}, #{areaId,jdbcType=VARCHAR}, #{belongArea,jdbcType=VARCHAR}, 
+      #{status,jdbcType=CHAR}, #{groupName,jdbcType=VARCHAR}, #{detailAddress,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{orgId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{createName,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoCustomerInfos" useGeneratedKeys="true" keyProperty="id">
+        insert into bpo_customer_infos
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="abbreviations != null">
+                abbreviations,
+            </if>
+            <if test="cusCompany != null">
+                cus_company,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="businessArea != null">
+                business_area,
+            </if>
+            <if test="deptId != null">
+                dept_id,
+            </if>
+            <if test="chargeManPhone != null">
+                charge_man_phone,
+            </if>
+            <if test="chargeMan != null">
+                charge_man,
+            </if>
+            <if test="region != null">
+                region,
+            </if>
+            <if test="creditCode != null">
+                credit_code,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="legalName != null">
+                legal_name,
+            </if>
+            <if test="legalManId != null">
+                legal_man_id,
+            </if>
+            <if test="linkMan != null">
+                link_man,
+            </if>
+            <if test="linkManPhone != null">
+                link_man_phone,
+            </if>
+            <if test="groupId != null">
+                group_id,
+            </if>
+            <if test="belogGroupName != null">
+                belog_group_name,
+            </if>
+            <if test="areaId != null">
+                area_id,
+            </if>
+            <if test="belongArea != null">
+                belong_area,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="groupName != null">
+                group_name,
+            </if>
+            <if test="detailAddress != null">
+                detail_address,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="orgId != null">
+                org_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createName != null">
+                create_name,
+            </if>
+            <if test="updateName != null">
+                update_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="abbreviations != null">
+                #{abbreviations,jdbcType=VARCHAR},
+            </if>
+            <if test="cusCompany != null">
+                #{cusCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="businessArea != null">
+                #{businessArea,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null">
+                #{deptId,jdbcType=INTEGER},
+            </if>
+            <if test="chargeManPhone != null">
+                #{chargeManPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="chargeMan != null">
+                #{chargeMan,jdbcType=VARCHAR},
+            </if>
+            <if test="region != null">
+                #{region,jdbcType=VARCHAR},
+            </if>
+            <if test="creditCode != null">
+                #{creditCode,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="legalName != null">
+                #{legalName,jdbcType=VARCHAR},
+            </if>
+            <if test="legalManId != null">
+                #{legalManId,jdbcType=CHAR},
+            </if>
+            <if test="linkMan != null">
+                #{linkMan,jdbcType=VARCHAR},
+            </if>
+            <if test="linkManPhone != null">
+                #{linkManPhone,jdbcType=CHAR},
+            </if>
+            <if test="groupId != null">
+                #{groupId,jdbcType=VARCHAR},
+            </if>
+            <if test="belogGroupName != null">
+                #{belogGroupName,jdbcType=VARCHAR},
+            </if>
+            <if test="areaId != null">
+                #{areaId,jdbcType=VARCHAR},
+            </if>
+            <if test="belongArea != null">
+                #{belongArea,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=CHAR},
+            </if>
+            <if test="groupName != null">
+                #{groupName,jdbcType=VARCHAR},
+            </if>
+            <if test="detailAddress != null">
+                #{detailAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="orgId != null">
+                #{orgId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createName != null">
+                #{createName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateName != null">
+                #{updateName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoCustomerInfos">
+        update bpo_customer_infos
+        <set>
+            <if test="name != null and name!=''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="abbreviations != null and abbreviations!=''">
+                abbreviations = #{abbreviations,jdbcType=VARCHAR},
+            </if>
+            <if test="cusCompany != null and cusCompany!=''">
+                cus_company = #{cusCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null and type!=''">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="businessArea != null and businessArea!=''">
+                business_area = #{businessArea,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId!=''">
+                dept_id = #{deptId,jdbcType=INTEGER},
+            </if>
+            <if test="chargeManPhone != null and chargeManPhone!=''">
+                charge_man_phone = #{chargeManPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="chargeMan != null and chargeMan!=''">
+                charge_man = #{chargeMan,jdbcType=VARCHAR},
+            </if>
+            <if test="region != null and region!=''">
+                region = #{region,jdbcType=VARCHAR},
+            </if>
+            <if test="creditCode != null and creditCode!=''">
+                credit_code = #{creditCode,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null and code!=''">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null and customerName!=''">
+                customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="legalName != null and legalName!=''">
+                legal_name = #{legalName,jdbcType=VARCHAR},
+            </if>
+            <if test="legalManId != null and legalManId!=''">
+                legal_man_id = #{legalManId,jdbcType=CHAR},
+            </if>
+            <if test="linkMan != null and linkMan!=''">
+                link_man = #{linkMan,jdbcType=VARCHAR},
+            </if>
+            <if test="linkManPhone != null and linkManPhone!=''">
+                link_man_phone = #{linkManPhone,jdbcType=CHAR},
+            </if>
+            <if test="groupId != null and groupId!=''">
+                group_id = #{groupId,jdbcType=VARCHAR},
+            </if>
+            <if test="belogGroupName != null and belogGroupName!=''">
+                belog_group_name = #{belogGroupName,jdbcType=VARCHAR},
+            </if>
+            <if test="areaId != null and areaId!=''">
+                area_id = #{areaId,jdbcType=VARCHAR},
+            </if>
+            <if test="belongArea != null and belongArea!=''">
+                belong_area = #{belongArea,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null and status!=''">
+                status = #{status,jdbcType=CHAR},
+            </if>
+            <if test="groupName != null and groupName!=''">
+                group_name = #{groupName,jdbcType=VARCHAR},
+            </if>
+            <if test="detailAddress != null and detailAddress!=''">
+                detail_address = #{detailAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="orgId != null and orgId!=''">
+                org_id = #{orgId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createName != null">
+                create_name = #{createName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateName != null">
+                update_name = #{updateName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoCustomerInfos">
+    update bpo_customer_infos
+    set name = #{name,jdbcType=VARCHAR},
+      abbreviations = #{abbreviations,jdbcType=VARCHAR},
+      cus_company = #{cusCompany,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      business_area = #{businessArea,jdbcType=VARCHAR},
+      dept_id = #{deptId,jdbcType=INTEGER},
+      charge_man_phone = #{chargeManPhone,jdbcType=VARCHAR},
+      charge_man = #{chargeMan,jdbcType=VARCHAR},
+      region = #{region,jdbcType=VARCHAR},
+      credit_code = #{creditCode,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      customer_name = #{customerName,jdbcType=VARCHAR},
+      legal_name = #{legalName,jdbcType=VARCHAR},
+      legal_man_id = #{legalManId,jdbcType=CHAR},
+      link_man = #{linkMan,jdbcType=VARCHAR},
+      link_man_phone = #{linkManPhone,jdbcType=CHAR},
+      group_id = #{groupId,jdbcType=VARCHAR},
+      belog_group_name = #{belogGroupName,jdbcType=VARCHAR},
+      area_id = #{areaId,jdbcType=VARCHAR},
+      belong_area = #{belongArea,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      group_name = #{groupName,jdbcType=VARCHAR},
+      detail_address = #{detailAddress,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      org_id = #{orgId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_name = #{createName,jdbcType=VARCHAR},
+      update_name = #{updateName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <resultMap id="MyBaseResultMap" type="com.rz.iot.bpo.model.BpoCustomerInfos" extends="BaseResultMap">
+        <association property="project" column="projectId" select="com.rz.iot.bpo.mapper.BpoProjectMapper.selectByPrimaryKey" />
+        <association property="company" column="org_id" select="com.rz.iot.bpo.mapper.SysCompanyMapper.selectByPrimaryKey"/>
+        <association property="transferStation" column="transId" select="com.rz.iot.bpo.mapper.BpoTransferStationMapper.selectByPrimaryKey"/>
+        <collection property="dept" column="deptId" select="com.rz.iot.bpo.mapper.SysDeptMapper.getByDeptId"/>
+    </resultMap>
+
+
+    <!--模糊查询根据用户id查询所有部门下的客户-->
+    <select id="CustomerByCondition" resultMap="MyBaseResultMap" >
+       SELECT
+        <include refid="Column_List"/>,project.id projectId,transer.id transId,dept.dept_id deptId
+        FROM
+            bpo_customer_infos infos
+        LEFT JOIN sys_company company ON infos.org_id = company.id
+        LEFT JOIN bpo_project project  ON project.first_party = company.id
+        left join bpo_transfer_station transer on project.transfer_station_id = transer.id
+        left join sys_dept_sub_rel dept_sub_rel on dept_sub_rel.sub_id = infos.org_id
+        left join sys_dept dept on dept.dept_id = dept_sub_rel.dept_id
+        where company.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="entity.dataScope!=null and entity.dataScope!=''">
+            and #{entity.dataScope}
+        </if>
+        <if test="infos.deptId!=null and infos.deptId!=''">
+            and infos.dept_id = #{infos.deptId}
+        </if>
+        <if test="infos.type!=null and infos.type !=''">
+            and infos.type = #{infos.type}
+        </if>
+        <if test="infos.name!=null and infos.name!=''">
+            and infos.name like concat('%',concat(#{infos.name},'%'))
+        </if>
+        <if test="infos.transferStation.name!=null and infos.transferStation.name!=''">
+            and transer.name like concat('%',concat(#{infos.transferStation.name},'%'))
+        </if>
+        <if test="infos.project.projectName!=null and infos.project.projectName!=''">
+            and project.project_name like concat('%',concat(#{infos.project.projectName},'%'))
+        </if>
+    </select>
+
+
+    <resultMap id="ResultMap" type="com.rz.iot.bpo.model.BpoCustomerInfos" extends="BaseResultMap">
+        <association property="project" column="projectId" select="com.rz.iot.bpo.mapper.BpoProjectMapper.selectByPrimaryKey"/>
+        <association property="transferStation" column="transId" select="com.rz.iot.bpo.mapper.BpoTransferStationMapper.selectByPrimaryKey"/>
+        <association property="company" column="org_id" select="com.rz.iot.bpo.mapper.SysCompanyMapper.selectByPrimaryKey"/>
+        <association property="bpoContractInfo" column="contractId" select="com.rz.iot.bpo.mapper.BpoContractInfoMapper.selectByPrimaryKey"/>
+        <association property="dept" column="dept_id" select="com.rz.iot.bpo.mapper.SysDeptMapper.getByDeptId"/>
+    </resultMap>
+    <select id="findByIdAndProjectID" resultMap="ResultMap" parameterType="com.rz.iot.bpo.model.BpoCustomerInfos">
+        SELECT
+        <include refid="Column_List"/>,project.id projectId,transer.id transId,dept.dept_id deptId,project.contract_id contractId
+        FROM
+        bpo_customer_infos infos
+        LEFT JOIN sys_company company ON infos.org_id = company.id
+        LEFT JOIN bpo_project project  ON project.first_party = company.id
+        left join bpo_transfer_station transer on project.transfer_station_id = transer.id
+        left join sys_dept_sub_rel dept_sub_rel on dept_sub_rel.sub_id = infos.org_id
+        left join sys_dept dept on dept.dept_id = dept_sub_rel.dept_id
+        WHERE
+        company.id = #{orgId}
+        <if test="project.id!=null and project.id!=''">
+            and  project.id = #{project.id}
+        </if>
+
+    </select>
+
+    <select id="findIsCanBeDelete" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      SELECT
+        <include refid="Column_List"/>
+      FROM
+            bpo_customer_infos infos
+            LEFT JOIN sys_company company ON infos.org_id = company.id
+            LEFT JOIN bpo_project project ON company.id = project.first_party
+      WHERE
+            infos.id = #{id}
+            AND project.id IS NOT NULL
+    </select>
+
+    <select id="findAllByLoginUserId" resultMap="BaseResultMap">
+        SELECT
+            customer.*
+        FROM
+            sys_company company
+            INNER JOIN bpo_customer_infos customer ON customer.org_id = company.id
+            AND company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_JF}
+            LEFT JOIN sys_dept_sub_rel dept_sub_rel ON dept_sub_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            AND dept_sub_rel.sub_id = company.id
+            AND dept_sub_rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_CUSTOM}
+        WHERE
+            company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            AND company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_JF}
+            <if test="param.dataScope != null and param.dataScope != ''">
+                AND ${param.dataScope}
+            </if>
+    </select>
+    <select id="selectByOrgId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from bpo_customer_infos
+        where org_id = #{orgId}
+    </select>
+
+</mapper>

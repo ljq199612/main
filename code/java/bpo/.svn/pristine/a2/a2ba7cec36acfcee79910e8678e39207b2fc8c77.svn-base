@@ -1,0 +1,18 @@
+import { checkPhone } from '@/utils/validate'
+
+export default {
+  region: [{ required: true, message: '请选择归属地' }], // 归属地
+  type: [{ required: true, message: '请选择场地类型' }], // 场地类型value
+  transferName: [{ required: true, message: '请输入场地名称' }], // 场地名称
+  transferCode: [{ required: true, message: '请输入场地编码' }], // 场地编码
+  linkMan: [{ required: true, message: '请输入场地负责人' }], // 联系人
+  status: [{ required: true, message: '请选择状态' }], // 状态
+  phone: [{ required: true, message: '请输入场地负责人联系方式' }, // 联系电话
+    {
+      required: true,
+      validator: checkPhone,
+      message: '联系电话格式不正确，请输入正确的中国大陆手机号或本地固定电话',
+      trigger: 'blur'
+    }
+  ]
+}

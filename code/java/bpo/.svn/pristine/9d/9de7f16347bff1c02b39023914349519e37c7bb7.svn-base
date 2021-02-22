@@ -1,0 +1,168 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.web.controller.BaseController;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.SysCompany;
+import com.rz.iot.bpo.model.SysOrg;
+import com.rz.iot.bpo.model.param.SysCompanyParam;
+import com.rz.iot.bpo.model.show.SysCompanyShow;
+import com.rz.iot.bpo.service.SysCompanyService;
+import com.rz.iot.bpo.service.SysOrgService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+/**
+ * 描述 : 系统组织管理Controller
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/21 12:50
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@RestController
+@RequestMapping("/sysCompany")
+public class SysCompanyController extends BaseController {
+    @Resource
+    private SysCompanyService sysCompanyService;
+    @Resource
+    private SysOrgService sysOrgService;
+
+    /**
+     * 查询所有组织,分页查询
+     * @param sysCompanyShow 组织参数
+     * @return
+     */
+    @RequestMapping("/findAll")
+    @PreAuthorize("@ss.hasPermi('org:list')")
+    public Result findAll(SysCompanyShow sysCompanyShow){
+        startPage();
+        List<SysCompanyShow> list = sysCompanyService.findAll(sysCompanyShow);
+        return getDataTable(list);
+    }
+
+    /**
+     * 公司详情
+     * @param companyId 公司id
+     * @return
+     */
+    @RequestMapping("/detail")
+    public Result detail(Integer companyId){
+        return sysCompanyService.detail(companyId);
+    }
+
+    /**
+     * 新增组织
+     * @param param 组织参数
+     * @return
+     */
+    @Log(title = "新增组织",businessType = BusinessType.INSERT)
+    @RequestMapping("/insert")
+    @PreAuthorize("@ss.hasPermi('org:add')")
+    public Result insert(@RequestBody SysCompanyParam param){
+        return sysCompanyService.insert(param);
+
+    }
+
+    /**
+     * 更改组织
+     * @param param 更改组织
+     * @return
+     */
+    @Log(title = "更新组织",businessType = BusinessType.UPDATE)
+    @RequestMapping("/update")
+    @PreAuthorize("@ss.hasPermi('sysCompany:update')")
+    public Result update(@RequestBody SysCompanyParam param){
+        return sysCompanyService.update(param);
+    }
+
+    /**
+     * 删除组织
+     * @param sysCompany 组织参数
+     * @return
+     */
+    @Log(title = "删除组织",businessType = BusinessType.DELETE)
+    @RequestMapping("/delete")
+    @PreAuthorize("@ss.hasPermi('sysCompany:delete')")
+   public Result delete(SysCompany sysCompany){
+       return sysCompanyService.delete(sysCompany);
+   }
+
+    /**
+     * 查询组织类型
+     * @return 组织类型
+     */
+    @RequestMapping("/findOrgType")
+    @PreAuthorize("@ss.hasPermi('sysCompany:findOrgType')")
+   public Result findOrgType(){
+        return sysOrgService.findAllType();
+   }
+
+    /**
+     * 根据组织类型查询所有组织
+     */
+    @RequestMapping("/findAllComByKey")
+    @PreAuthorize("@ss.hasPermi('sysCompany:findAllComByKey')")
+    public Result findAllComByKey(Integer orgType){
+        return sysCompanyService.findAllComByKey(orgType);
+    }
+
+    /**
+     * 根据类型查询组织信息（1.当前用户 2客户 3供应商）
+     */
+    @GetMapping("/getInfoByType")
+    public Result getInfoByType(Integer id,Integer type) {
+        return sysCompanyService.getInfoByType(id,type);
+    }
+
+
+    /**
+     * 上传营业执照
+     * @param files 营业执照
+     * @return
+     */
+    @RequestMapping("/uploadFileUrl")
+    @Log(title = "组织模块上传营业执照",businessType = BusinessType.DELETE)
+    public Result uploadFileUrl(MultipartFile[] files){
+        return sysCompanyService.uploadFileUrl(files);
+    }
+
+    /**
+     * 删除营业执照
+     * @param url 文件路径
+     * @return
+     */
+    @RequestMapping("/deleteFileUrl")
+    @Log(title = "组织模块删除营业执照",businessType = BusinessType.DELETE)
+    public Result deleteFileUrl(String url){
+        return sysCompanyService.deleteFileUrl(url);
+    }
+
+    /**
+     * 下载营业执照
+     * @param fileName 文件名称
+     * @param url 文件路径
+     * @return
+     */
+    @RequestMapping("/downloadFileUrl")
+    @Log(title = "组织模块下载营业执照",businessType = BusinessType.EXPORT)
+    public Result downloadFileUrl(String fileName,String url, HttpServletResponse response){
+        return sysCompanyService.downloadFileUrl(fileName,url,response);
+    }
+
+    @RequestMapping("/findBelongBusiness")
+    public Result findBelongBusiness(){
+        return sysCompanyService.findBelongBusiness();
+    }
+}

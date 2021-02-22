@@ -1,0 +1,36 @@
+package com.rz.iot.bpo.model.show;
+
+import lombok.Data;
+
+import java.util.Date;
+
+/**
+ * 描述 : 展示前端列表组织实体类
+ * 作者 : Rycony
+ * 创建时间 : 2020/7/15 16:15
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Data
+public class SysCompanyShow {
+    // id
+    private Integer id;
+    // 名称
+    private String companyName;
+    // 编码
+    private String companyCode;
+    // 组织类型id
+    private Integer orgType;
+    // 组织类型名称
+    private String orgName;
+    // 匿名
+    private String nickName;
+    // 状态: 1.正常 9.删除
+    private Integer status;
+    // 创建时间
+    private Date createTime;
+    // 父
+    private Integer parent;
+}

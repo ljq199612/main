@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoScheduleMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoSchedule" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="from_class_id" property="fromClassId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="people_number" property="peopleNumber" jdbcType="INTEGER" />
+    <result column="is_special" property="isSpecial" jdbcType="INTEGER" />
+    <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR" />
+    <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR" />
+    <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR" />
+    <result column="unit_price" property="unitPrice" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, from_class_id, user_id, people_number, is_special, special_allowance, 
+    meal_allowance, night_allowance, unit_price, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_schedule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_schedule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoSchedule" >
+    insert into bpo_schedule (id, project_id, from_class_id, 
+      user_id, people_number, is_special, 
+      special_allowance, meal_allowance, night_allowance, 
+      unit_price, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, #{fromClassId,jdbcType=INTEGER}, 
+      #{userId,jdbcType=INTEGER}, #{peopleNumber,jdbcType=INTEGER}, #{isSpecial,jdbcType=INTEGER}, 
+      #{specialAllowance,jdbcType=VARCHAR}, #{mealAllowance,jdbcType=VARCHAR}, #{nightAllowance,jdbcType=VARCHAR}, 
+      #{unitPrice,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoSchedule" >
+    insert into bpo_schedule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="fromClassId != null" >
+        from_class_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="peopleNumber != null" >
+        people_number,
+      </if>
+      <if test="isSpecial != null" >
+        is_special,
+      </if>
+      <if test="specialAllowance != null" >
+        special_allowance,
+      </if>
+      <if test="mealAllowance != null" >
+        meal_allowance,
+      </if>
+      <if test="nightAllowance != null" >
+        night_allowance,
+      </if>
+      <if test="unitPrice != null" >
+        unit_price,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="fromClassId != null" >
+        #{fromClassId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="peopleNumber != null" >
+        #{peopleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="isSpecial != null" >
+        #{isSpecial,jdbcType=INTEGER},
+      </if>
+      <if test="specialAllowance != null" >
+        #{specialAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="mealAllowance != null" >
+        #{mealAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="nightAllowance != null" >
+        #{nightAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null" >
+        #{unitPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoSchedule" >
+    update bpo_schedule
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="fromClassId != null" >
+        from_class_id = #{fromClassId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="peopleNumber != null" >
+        people_number = #{peopleNumber,jdbcType=INTEGER},
+      </if>
+      <if test="isSpecial != null" >
+        is_special = #{isSpecial,jdbcType=INTEGER},
+      </if>
+      <if test="specialAllowance != null" >
+        special_allowance = #{specialAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="mealAllowance != null" >
+        meal_allowance = #{mealAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="nightAllowance != null" >
+        night_allowance = #{nightAllowance,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null" >
+        unit_price = #{unitPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoSchedule" >
+    update bpo_schedule
+    set project_id = #{projectId,jdbcType=INTEGER},
+      from_class_id = #{fromClassId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      people_number = #{peopleNumber,jdbcType=INTEGER},
+      is_special = #{isSpecial,jdbcType=INTEGER},
+      special_allowance = #{specialAllowance,jdbcType=VARCHAR},
+      meal_allowance = #{mealAllowance,jdbcType=VARCHAR},
+      night_allowance = #{nightAllowance,jdbcType=VARCHAR},
+      unit_price = #{unitPrice,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

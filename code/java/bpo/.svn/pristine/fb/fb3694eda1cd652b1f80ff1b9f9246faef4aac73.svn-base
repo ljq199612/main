@@ -1,0 +1,102 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.web.controller.BaseController;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.SysRole;
+import com.rz.iot.bpo.model.param.SysRoleParam;
+import com.rz.iot.bpo.service.SysRoleService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * 描述 : 系统角色Controller
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/21 14:23
+ * <p>
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@RestController
+@RequestMapping("/sysRole")
+public class SysRoleController extends BaseController {
+    @Resource
+    private SysRoleService sysRoleService;
+
+    /**
+     * 查询所有角色-分页
+     * @param sysRole 查询参数
+     * @return
+     */
+    @RequestMapping("/findAll")
+    @PreAuthorize("@ss.hasPermi('sysRole:findAll')")
+    public Result findAll(SysRole sysRole){
+        startPage();
+        List<SysRole> list = sysRoleService.findAll(sysRole);
+        return getDataTable(list);
+    }
+
+    /**
+     * 新增系统角色
+     * @param sysRole 角色
+     * @return
+     */
+    @RequestMapping("/insert")
+    @Log(title = "系统新增角色",businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('sysRole:insert')")
+    public Result insert(SysRole sysRole){
+        return sysRoleService.insert(sysRole);
+    }
+
+    /**
+     * 修改系统角色
+     * @param sysRoleParam 角色参数
+     * @return
+     */
+    @RequestMapping("/update")
+    @Log(title = "系统修改角色",businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('sysRole:update')")
+    public Result update(SysRoleParam sysRoleParam){
+        return sysRoleService.update(sysRoleParam);
+    }
+
+    /**
+     * 删除系统角色
+     * @param sysRole 角色参数
+     * @return
+     */
+    @RequestMapping("/delete")
+    @Log(title = "删除系统设置",businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermi('sysRole:delete')")
+    public Result delete(SysRole sysRole){
+        return sysRoleService.delete(sysRole);
+    }
+
+
+    /**
+     * 查询所有角色-不分页
+     * @return
+     */
+    @RequestMapping("/findAllNoPage")
+    @PreAuthorize("@ss.hasPermi('sysRole:findAllNoPage')")
+    public Result findAllNoPage(){
+        return sysRoleService.findAllNoPage();
+    }
+
+    /**
+     * 角色详情
+     * @param sysRole
+     * @return
+     */
+    @RequestMapping("/detail")
+    @PreAuthorize("@ss.hasPermi('sysRole:detail')")
+    public Result detail(SysRole sysRole){
+        return sysRoleService.detail(sysRole);
+    }
+}

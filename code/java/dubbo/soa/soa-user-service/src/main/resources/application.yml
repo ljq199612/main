@@ -1,0 +1,26 @@
+server:
+  port: 8083
+
+spring:
+  # 定义服务名
+  application:
+    name: user-service
+  # 定义数据库的连接信息
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/springboot?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+    #6.0以上的驱动连接字符串为 com.mysql.cj.jdbc.Driver  比之前多了一个cj
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 199612
+    jackson:
+      # json 日期格式化问题
+      data-format: yyyy-MM-dd HH:mm:ss
+      # 解决 json 返回时中国北京时间少 8 小时的问题
+      time-zone: GMT+8
+
+  cloud:
+    # nacos 客户端配置
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848

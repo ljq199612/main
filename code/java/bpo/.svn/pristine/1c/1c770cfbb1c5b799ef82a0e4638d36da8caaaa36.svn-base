@@ -1,0 +1,17 @@
+import Layout from '@/views/layout/Layout'
+
+const financialManageRouter = {
+  path: '/financial',
+  component: Layout,
+  // redirect: '/financial/xxx',
+  name: 'financialManage',
+  meta: {
+    title: '财务管理',
+    icon: 'financial',
+    childrenFilter: false
+  },
+  children: [
+
+  ]
+}
+export default financialManageRouter

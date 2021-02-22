@@ -1,0 +1,55 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.model.BpoSupplierInfo;
+import com.rz.iot.bpo.model.SysCompany;
+import com.rz.iot.bpo.model.param.BpoFeeRuleParam;
+import com.rz.iot.bpo.model.param.SupplierAddParam;
+import com.rz.iot.bpo.model.show.*;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
+
+import java.util.List;
+
+public interface BpoSupplierInfoMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoSupplierInfo record);
+
+    int insertSelective(BpoSupplierInfo record);
+
+    BpoSupplierInfo selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoSupplierInfo record);
+
+    int updateByPrimaryKey(BpoSupplierInfo record);
+
+    int updateStatusByCompanyId(BpoSupplierInfo record);
+
+    List<SupplierListShow> list(@Param("info")SupplierListShow info,@Param("param")BaseEntity param);
+
+    SupplierDetailShow detail(@Param("id")Integer id);
+
+    List<BpoSupplierRuleListShow> ruleList(@Param("info")BpoSupplierRuleListShow info);
+
+    //计件计价规则详情
+    BpoSupplierRuleDetailShow ruleDetail(@Param("info")BpoSupplierRuleDetailShow info);
+
+    //计时计件规则详情
+    BpoSupplierRuleDetailShow ruleDetailTime(@Param("info")BpoSupplierRuleDetailShow info);
+
+    //根据项目Id获取新增供应商计价规则前置信息
+    List<BpoFeeRuleModelShow> getInfoForAddFeeRule(@Param("id")Integer id);
+
+    BpoSupplierListRelatedShow findSupplierByProjectId(@Param("projectId") Integer projectId, @Param("orgId")Integer orgId);
+
+    List<BpoSupplierInfo> findByParentId(int id);
+
+    List<SysCompany> findAllByLoginUserId(@Param("param")BaseEntity param);
+
+    List<BpoProjectSupplierListShow> selectByProjectId(@Param("projectId") Integer projectId);
+
+    BpoProjectSupplierListShow selectByPersonId(@Param("personId") Integer personId);
+
+    List<BpoSupplierSimpleList> getSupplierListByPorjectId(@Param("projectId")Integer projectId);
+}

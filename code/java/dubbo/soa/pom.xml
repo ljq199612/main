@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <packaging>pom</packaging>
+    <modules>
+        <module>soa-order-service</module>
+        <module>soa-user-service</module>
+        <module>soa-service-model</module>
+    </modules>
+    <parent>
+        <artifactId>module-demo</artifactId>
+        <groupId>com.xxx.module</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>soa</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.xxx.module</groupId>
+            <artifactId>module-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- 这里把所 soa 模块的所有 pojo 都拿出来单独放置以便各模块都能调用-->
+        <dependency>
+            <groupId>com.xxx.module</groupId>
+            <artifactId>soa-service-model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+
+</project>

@@ -1,0 +1,339 @@
+<template>
+  <div>
+    <div>
+      <CfPanel title="考勤管理" class="attendanceManage">
+        <el-form :inline="true" class="bpoFormInline">
+          <el-row>
+            <el-form-item label="项目名称：">
+              <el-select v-model="searchParam.projectId" filterable placeholder="请选择项目名称" class="cover">
+                <el-option v-for="(item,index) in projectOptions" :key="index" :label="item.projectName" :value="item.projectId" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="班次编号：">
+              <el-select v-model="searchParam.classSn" filterable placeholder="请选择班次编号" class="cover">
+                <el-option v-for="(item,index) in classSnOptions" :key="index" :label="item.classSn" :value="item.classSn" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="员工信息：">
+              <el-input v-model="searchParam.personInfo" placeholder="请输入员工信息" />
+            </el-form-item>
+            <el-form-item label="日期：">
+              <el-date-picker v-model="searchParam.date" format="yyyy-MM-dd" value-format="yyyy-MM-dd HH:mm:ss" />
+            </el-form-item>
+            <el-form-item label="状态：">
+              <el-select v-model="searchParam.approvalStatus" filterable placeholder="请选择状态" class="cover">
+                <el-option v-for="(item,index) in approvalStatusOptions" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button class="bpoBtn" @click="submit">搜索</el-button>
+              <el-button @click="reset">重置</el-button>
+            </el-form-item>
+          </el-row>
+        </el-form>
+
+        <el-button type="primary" icon="el-icon-export" @click="exportAttendance">
+          导出
+        </el-button>
+        <div style="padding-top:10px">
+          <el-row>
+            <div v-if="showcheckboxVal">
+              <el-checkbox-group v-model="checkboxVal">
+                <el-checkbox v-for="(item) in formTheadOptions" :key="item.key" :label="item.label" />
+              </el-checkbox-group>
+            </div>
+          </el-row>
+          <el-table
+            :key="key"
+            v-loading="listLoading"
+            :data="attendanceList"
+            class="bpoTable"
+            fit
+            @sort-change="sortChange"
+            @cell-mouse-enter="currentRowChange"
+          >
+            <el-table-column
+              align="center"
+              label="编号"
+              type="index"
+              width="80"
+            />
+            <el-table-column
+              v-for="item in formThead"
+              :key="item.key"
+              :prop="item.key"
+              :label="item.label"
+              align="center"
+              min-width="150"
+              :formatter="item.formatter"
+            />
+            <el-table-column align="center" label="操作" width="150" fixed="right">
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  style="color:#4794F7"
+                  size="mini"
+                  @click="handlDetailList(scope.row)"
+                >打开明细</el-button>
+                <el-button
+                  type="text"
+                  style="color:#19D185"
+                  size="mini"
+                  @click="handleAuditList(scope.row)"
+                >审核记录</el-button>
+              </template>
+
+            </el-table-column>
+          </el-table>
+          <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+        </div>
+        <el-dialog
+          class="bpoDialog"
+          :title="dialogTitle"
+          :visible.sync="detailDialogVisible"
+          width="600px"
+          @close="closeDetailDialog"
+        >
+          <el-table
+            v-if="showdetail"
+            v-loading="listLoading"
+            :data="detailList"
+            class="bpoTable"
+            fit
+          >
+            <el-table-column align="center" label="编号" type="index" width="80" />
+            <el-table-column align="left" label="打卡时间" min-width="120">
+              <template slot-scope="scope">{{ scope.row.companyName }}</template>
+            </el-table-column>
+            <el-table-column align="left" label="打卡机名称" min-width="80">
+              <template slot-scope="scope">{{ scope.row.companyName }}</template>
+            </el-table-column>
+          </el-table>
+          <el-table
+            v-else
+            v-loading="listLoading"
+            :data="detailList"
+            class="bpoTable"
+            fit
+          >
+            <el-table-column align="center" label="编号" type="index" width="80" />
+            <el-table-column align="left" label="审核人/工号" min-width="80">
+              <template slot-scope="scope">{{ scope.row.companyName }}</template>
+            </el-table-column>
+            <el-table-column align="left" label="审核时间" min-width="120">
+              <template slot-scope="scope">{{ scope.row.companyName }}</template>
+            </el-table-column>
+            <el-table-column align="left" label="说明" min-width="120">
+              <template slot-scope="scope">{{ scope.row.companyName }}</template>
+            </el-table-column>
+          </el-table>
+        </el-dialog>
+      </CfPanel>
+
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination'
+import { getAllAttendance, getClassGenerate, clockDetail, auditDetail, exportAttendance } from '@/api/attendance/attendanceManage'
+import { getProjectDetailList } from '@/api/projectManage/projectManage'
+import { deepClone } from '@/utils'
+
+export default {
+  name: 'AttendanceManage',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      entity: { },
+      total: 0,
+      searchParam: {},
+      attendanceList: [],
+      currentRow: {},
+      approvalStatusOptions: [{ value: '0', label: '正常' }, { value: '1', label: '迟到' }, { value: '2', label: '早退' }, { value: '3', label: '未打卡' }],
+      classSnOptions: [],
+      projectOptions: [],
+      detailDialogVisible: false,
+      dialogTitle: '打卡明细',
+      rules: {
+        attendanceName: [{ required: true, message: '请填写考勤类型' }],
+        attendanceKey: [{ required: true, message: '请填写考勤编码' }]
+      },
+
+      showcheckboxVal: true,
+      detailList: [],
+      showdetail: true,
+      // 工号 workNo
+      formTheadOptions: [
+        { key: 'personName', label: '姓名/工号' },
+        { key: 'attendanceDate', label: '考勤日期' },
+        { key: 'station', label: '岗位' },
+        { key: 'arrivalTime', label: '到场时间' },
+        { key: 'startTime', label: '上班时间' },
+        { key: 'endTime', label: '下班时间' },
+        { key: 'excludeHour', label: '扣除时长' },
+        { key: 'clockInTime', label: '上班打卡时间' },
+        { key: 'clockOutTime', label: '下班打卡时间' },
+        { key: 'attendanceHours', label: '考勤时长' },
+        { key: 'overtimeHours', label: '加班时长' },
+        { key: 'recordStatus', label: '系统判定状态', formatter: function(row, column, cellValue, index) {
+          var options = { 1: '正常', 2: '迟到', 3: '早退', 4: '缺上班卡', 5: '缺下班卡', 6: '工时过长', 7: '旷工', 8: '加班', 9: '临时请假', 10: '休假' }
+          return options[cellValue]
+        } },
+        { key: 'approvalWageHours', label: '审核计薪工时' },
+        { key: 'recordApprovalStatus', label: '是否审核' },
+        { key: 'approvalStatus', label: '审核状态', formatter: function(row, column, cellValue, index) {
+          var options = { 1: '待审核', 2: '待确认', 3: '已确认' }
+          return options[cellValue]
+        } },
+        { key: 'remark', label: '说明' }],
+      checkboxVal: [], // checkboxVal
+      formThead: [] // 默认表头 Default header
+    }
+  },
+  computed: {
+
+  },
+  watch: {
+    checkboxVal(valArr) {
+      const formThead = this.formTheadOptions.filter(item => valArr.includes(item.label))
+      this.formThead = formThead
+      this.key = this.key + 1 // 为了保证table 每次都会重渲 In order to ensure the table will be re-rendered each time
+    }
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+    this.checkboxVal = ['姓名/工号', '考勤日期', '岗位', '到场时间', '系统判定状态']
+  },
+  methods: {
+    handlDetailList() {
+      clockDetail().then(res => {
+        this.showdetail = true
+        this.dialogTitle = '打卡明细'
+        this.detailList = res.data.data
+      })
+      this.detailDialogVisible = 1
+    },
+    handleAuditList() {
+      auditDetail().then(res => {
+        this.showdetail = false
+        this.dialogTitle = '审核记录'
+        this.detailList = res.data.data
+      })
+      this.detailDialogVisible = 2
+    },
+    exportAttendance() {
+      exportAttendance(this.searchParam).then(res => {})
+    },
+    submit() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    statusChange(status) {
+      this.currentRow.status = status
+    },
+    submitDialog() {
+      this.$refs['entity'].validate(valid => {
+      })
+    },
+    error(message) {
+      this.$notify({
+        title: '失败',
+        duration: '2000',
+        message: message + '！',
+        type: 'error'
+      })
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getAllAttendance(this.searchParam).then(res => {
+        this.attendanceList = res.data.data.list
+        this.total = res.data.data.total
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.listLoading = false
+      })
+    },
+    addattendance() {
+      this.dialogTitle = '新增考勤'
+      this.entity = { status: 1 }
+      this.detailDialogVisible = true
+    },
+    getRemoteOptions() {
+      getProjectDetailList().then(res => {
+        this.projectOptions = res.data.data
+      })
+      getClassGenerate().then(res => {
+        this.classSnOptions = res.data.data.bpoClassesGenerateList
+      })
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleUpdate(row) {
+      this.dialogTitle = '修改考勤'
+      this.entity = deepClone(row)
+      this.detailDialogVisible = true
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该用户？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        /* deleteattendance({ id: row.id }).then(res => {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '删除用户成功！',
+            type: 'success'
+          })
+          this.getList()
+        })*/
+      }).catch(() => {
+      })
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .attendanceManage {
+    /deep/ .el-dialog .el-dialog__body{
+      padding: 10px;
+    }
+  }
+</style>

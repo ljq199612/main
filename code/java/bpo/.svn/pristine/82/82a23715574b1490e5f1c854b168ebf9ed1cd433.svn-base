@@ -1,0 +1,72 @@
+package com.rz.iot.bpo.mina.model.param;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rz.iot.bpo.mina.model.MinaClassesGenerate;
+import com.rz.iot.bpo.mina.model.MinaScheduleToEmployee;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Description: 排班到个人 参数
+ * @Author: Liu Jiaqi
+ * @Create: 2020-07-29
+ */
+
+@Data
+public class MinaScheduleToEmployeeParam extends MinaClassGenerateShow {
+    // 项目 Id
+    private Integer projectId;
+
+    // 项目名称
+    private String projectName;
+
+    // 场地名称
+    private String transferStationName;
+
+    // 场地 id
+    private String transferStationId;
+
+    // 工作小组 ID (可多个)
+    private List<Integer> groupIds;
+
+    // 工作小组名称 (多个)
+    private List<String> groupNames;
+
+    // 班次的开始日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date startDate;
+
+    // 班次的结束日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date endDate;
+
+    // 选择班次的某个日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date someDay;
+
+
+
+    // 是否属于小组
+    private Integer hasGroup;
+
+    // 规划人数
+    private Integer rulePersonNum;
+
+    // 已排班人数
+    private Integer scheduledPersonNum;
+
+
+
+
+    //排班信息
+    private MinaClassesGenerate minaClassesGenerate;
+
+  }

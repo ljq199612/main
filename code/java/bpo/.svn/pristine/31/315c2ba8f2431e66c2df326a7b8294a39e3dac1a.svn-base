@@ -1,0 +1,26 @@
+package com.rz.iot.bpo.mina.model.show;
+
+import com.rz.iot.bpo.mina.model.MinaPerson;
+import lombok.Data;
+
+import java.util.Date;
+import java.util.List;
+
+@Data
+public class MinaEmployeeParam {
+    // 班次 ID
+    private Integer ClassesId;
+
+    // 小组 id
+    Integer groupId;
+
+    // 小组 id 列表
+    List<Integer> groupIdList;
+
+    // 人员信息
+    private List<MinaPerson> employeeList;
+
+    // 班次小组相关信息
+    private MinaScheduleToEmployeeShow  minaScheduleToEmployeeShow;
+
+}

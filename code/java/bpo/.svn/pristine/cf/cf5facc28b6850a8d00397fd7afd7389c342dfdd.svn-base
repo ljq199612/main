@@ -1,0 +1,196 @@
+package com.rz.iot.bpo.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class BpoBillTime {
+    private Integer id;
+
+    private Integer projectId;
+
+    private Integer supplierInfoId;
+
+    private String billingCycle;
+
+    private Integer personId;
+
+    private Integer feeRuleType;
+
+    private Date attendanceStartTime;
+
+    private Date attendanceEndTime;
+
+    private Float wageHours;
+
+    private BigDecimal timePrice;
+
+    private BigDecimal salaryStandard;
+
+    private BigDecimal foodSubsidy;
+
+    private BigDecimal nightSubsidy;
+
+    private BigDecimal otherSubsidy;
+
+    private BigDecimal deduction;
+
+    private BigDecimal realIncome;
+
+    private Integer status;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public Integer getSupplierInfoId() {
+        return supplierInfoId;
+    }
+
+    public void setSupplierInfoId(Integer supplierInfoId) {
+        this.supplierInfoId = supplierInfoId;
+    }
+
+    public String getBillingCycle() {
+        return billingCycle;
+    }
+
+    public void setBillingCycle(String billingCycle) {
+        this.billingCycle = billingCycle == null ? null : billingCycle.trim();
+    }
+
+    public Integer getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(Integer personId) {
+        this.personId = personId;
+    }
+
+    public Integer getFeeRuleType() {
+        return feeRuleType;
+    }
+
+    public void setFeeRuleType(Integer feeRuleType) {
+        this.feeRuleType = feeRuleType;
+    }
+
+    public Date getAttendanceStartTime() {
+        return attendanceStartTime;
+    }
+
+    public void setAttendanceStartTime(Date attendanceStartTime) {
+        this.attendanceStartTime = attendanceStartTime;
+    }
+
+    public Date getAttendanceEndTime() {
+        return attendanceEndTime;
+    }
+
+    public void setAttendanceEndTime(Date attendanceEndTime) {
+        this.attendanceEndTime = attendanceEndTime;
+    }
+
+    public Float getWageHours() {
+        return wageHours;
+    }
+
+    public void setWageHours(Float wageHours) {
+        this.wageHours = wageHours;
+    }
+
+    public BigDecimal getTimePrice() {
+        return timePrice;
+    }
+
+    public void setTimePrice(BigDecimal timePrice) {
+        this.timePrice = timePrice;
+    }
+
+    public BigDecimal getSalaryStandard() {
+        return salaryStandard;
+    }
+
+    public void setSalaryStandard(BigDecimal salaryStandard) {
+        this.salaryStandard = salaryStandard;
+    }
+
+    public BigDecimal getFoodSubsidy() {
+        return foodSubsidy;
+    }
+
+    public void setFoodSubsidy(BigDecimal foodSubsidy) {
+        this.foodSubsidy = foodSubsidy;
+    }
+
+    public BigDecimal getNightSubsidy() {
+        return nightSubsidy;
+    }
+
+    public void setNightSubsidy(BigDecimal nightSubsidy) {
+        this.nightSubsidy = nightSubsidy;
+    }
+
+    public BigDecimal getOtherSubsidy() {
+        return otherSubsidy;
+    }
+
+    public void setOtherSubsidy(BigDecimal otherSubsidy) {
+        this.otherSubsidy = otherSubsidy;
+    }
+
+    public BigDecimal getDeduction() {
+        return deduction;
+    }
+
+    public void setDeduction(BigDecimal deduction) {
+        this.deduction = deduction;
+    }
+
+    public BigDecimal getRealIncome() {
+        return realIncome;
+    }
+
+    public void setRealIncome(BigDecimal realIncome) {
+        this.realIncome = realIncome;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+}

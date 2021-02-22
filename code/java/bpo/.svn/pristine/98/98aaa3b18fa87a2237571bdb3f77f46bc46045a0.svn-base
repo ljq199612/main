@@ -1,0 +1,529 @@
+<template>
+  <div class="form main">
+    <CfPanel title="人员管理">
+      <el-form ref="search_from" :inline="true" :model="search_from" class="bpoFormInline">
+        <el-row>
+          <el-form-item label="员工归属：" prop="personName">
+            <el-cascader v-model="search_content.deptId" placeholder="请选择所属部门" :props="provincialCityFormat" :options="deptList" />
+          </el-form-item>
+          <el-form-item label="姓名：" prop="personName">
+            <el-input v-model="search_content.personName" placeholder="请输入姓名" />
+          </el-form-item>
+          <el-form-item label="工号：" prop="workNo">
+            <el-input v-model="search_content.workNo" placeholder="请输入工号" />
+          </el-form-item>
+          <el-form-item label="岗位：" prop="sex">
+            <el-select v-model="search_content.station" placeholder="请选择岗位">
+              <el-option
+                v-for="(item,index) in dictLabel"
+                :key="index"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="民族：" prop="nation">
+            <el-select v-model="search_content.nation" filterable placeholder="请选择民族（可搜索）">
+              <el-option
+                v-for="(item,index) in search_from.nationList"
+                :key="index"
+                :label="item.nation"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="状态：" prop="sex">
+            <el-select v-model="search_content.status" placeholder="请选择类型">
+              <el-option
+                v-for="(item,index) in search_from.state_data"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="类型：" prop="sex">
+            <el-select v-model="search_content.personType" placeholder="请选择类型">
+              <el-option
+                v-for="(item,index) in search_from.personType"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="户籍：" prop="idCardAddress">
+            <el-input v-model="search_content.idCardAddress" placeholder="请输入户籍" />
+          </el-form-item>
+          <el-form-item label="供应商员工：" prop="sex">
+            <el-select v-model="search_content.haveSupplier" placeholder="请选择状态">
+              <el-option
+                v-for="(item,index) in search_from.haveSupplier"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="开始时间：" prop="dimissionTime">
+            <el-date-picker
+              v-model="search_content.startTime"
+              type="date"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd"
+            />
+          </el-form-item>
+          <el-form-item label="结束时间：" prop="dimissionTime">
+            <el-date-picker
+              v-model="search_content.endTime"
+              type="date"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd"
+            />
+          </el-form-item>
+          <el-form-item label="">
+            <el-button class="bpoBtn" @click="search_button">搜索</el-button>
+            <el-button @click="reset_button">重置</el-button>
+          </el-form-item>
+        </el-row>
+      </el-form>
+      <el-button type="primary" class="el-icon-plus" @click="add_field">新增</el-button>
+      <el-upload
+        class="inline-block"
+        :action="importPersonUrl"
+        multiple
+        :show-file-list="false"
+        :on-success="onSuccess"
+        :file-list="fileExex"
+      >
+        <el-button type="warning" plain @click="importFun">导入</el-button>
+      </el-upload>
+      <el-button type="warning" plain @click="exportPerson">导出</el-button>
+      <el-button style="margin-left:0;" type="warning" plain @click="exportPersonModel">模版下载</el-button>
+      <div style="padding-top:10px" />
+      <el-checkbox-group v-model="cities" @change="handleCheckedCitiesChange">
+        <el-checkbox v-for="city in checkedCitiesList" :key="city" :label="city" style="padding-top:10px"> {{ city }} </el-checkbox>
+      </el-checkbox-group>
+      <el-table
+        v-loading="listLoading"
+        :data="fieldList"
+        style="width: 100%;margin-top:10px;"
+        border
+        fit
+      >
+        <el-table-column align="center" label="编号" width="80" fixed>
+          <template slot-scope="scope">{{ scope.row.num }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="姓名" min-width="80">
+          <template slot-scope="scope">{{ scope.row.personName }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="工号" min-width="80">
+          <template slot-scope="scope">{{ scope.row.workNo }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="岗位" min-width="80">
+          <template slot-scope="scope">{{ scope.row.station }}</template>
+        </el-table-column>
+        <el-table-column align="center" class="idCard" label="身份证号码" min-width="150">
+          <template slot-scope="scope">
+            <el-button type="text" style="color:#4794F7" size="mini" @click="idCard_button(scope.row)">{{ scope.row.idCard }}</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="民族" min-width="80">
+          <template slot-scope="scope">{{ scope.row.nation }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="户籍地址" min-width="200">
+          <template slot-scope="scope">{{ scope.row.idCardAddress }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="员工归属   " min-width="80">
+          <template slot-scope="scope">{{ scope.row.companyName }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="员工类型" min-width="80">
+          <template slot-scope="scope">{{ scope.row.personType }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="状态" min-width="80">
+          <template slot-scope="scope">{{ scope.row.status === 1? '在职': '离职' }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.createTime" align="center" label="入职时间" min-width="150">
+          <template slot-scope="scope">{{ scope.row.createTime }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.projectName" align="center" label="所属项目" min-width="80">
+          <template slot-scope="scope">{{ scope.row.projectName }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.wageType" align="center" label="薪资类型" min-width="80">
+          <template slot-scope="scope">{{ scope.row.wageType }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.phone" align="center" label="联系方式" min-width="120">
+          <template slot-scope="scope">{{ scope.row.phone }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.sfWorkNo" align="center" label="甲方工号" min-width="120">
+          <template slot-scope="scope">{{ scope.row.sfWorkNo }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.dimissionTime" align="center" label="离职时间" min-width="150">
+          <template slot-scope="scope">{{ scope.row.dimissionTime }}</template>
+        </el-table-column>
+        <el-table-column v-if="uncheckList.transactStationName" align="center" label="所属场地" min-width="150">
+          <template slot-scope="scope">{{ scope.row.transactStationName }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="100" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" style="color:#4794F7" size="mini" @click="details_button(scope.row)">详情</el-button>
+            <el-button type="text" style="color:#19D185" size="mini" @click="modify_button(scope.row)">修改</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 新增弹框 -->
+      <el-dialog
+        title="查看身份证号码"
+        custom-class="dialog-small"
+        :close-on-click-modal="false"
+        :visible.sync="dialogFormVisible"
+        @close="cancelAddForm"
+      >
+        <div>{{ idCard }}</div>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="cancelAddForm">确定</el-button>
+        </div>
+      </el-dialog>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        lang-type="zh"
+        :page.sync="page.pageNum"
+        :limit.sync="page.pageSize"
+        @pagination="findAllPerson"
+      />
+    </CfPanel>
+  </div>
+</template>
+
+<script type="text/javascript">
+// 请求方法加载
+import { findAllPerson, findAllNation, lookIdCard, exportPersonModel, currentUserCom, findAllStation, importPerson, exportPerson } from '@/api/personnelManagement/personnelManagement'
+// 整体页面加载
+import CfPanel from '@/components/Panel'
+// 分页加载
+import Pagination from '@/components/Pagination'
+
+export default {
+  name: 'SiteManage',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      listLoading: true,
+      // 分页初始数据
+      page: {
+        pageNum: 1,
+        pageSize: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      importPersonUrl: process.env.BASE_API + '/bpoPerson/importPerson', // 人员审核(管理)-上传合同附件
+      checkedCities: [
+        { label: 'createTime', name: '入职时间' },
+        { label: 'projectName', name: '所属项目' },
+        { label: 'wageType', name: '薪资类型' },
+        { label: 'phone', name: '联系方式' },
+        { label: 'sfWorkNo', name: '甲方工号' },
+        { label: 'dimissionTime', name: '离职时间' },
+        { label: 'transactStationName', name: '所属场地' }
+      ],
+      checkedCitiesList: ['入职时间', '所属项目', '薪资类型', '联系方式', '甲方工号', '离职时间', '所属场地'],
+      cities: [],
+      // 初始化页数
+      total: 0,
+      // 搜索的value值
+      search_from: {
+        // 当前场地是否启用
+        state_data: [{ value: '1', label: '在职' }, { value: '9', label: '离职' }],
+        haveSupplier: [{ value: '1', label: '包含' }, { value: '2', label: '不包含' }],
+        personType: [{ value: '1', label: '自有员工' }, { value: '2', label: '外包员工' }, { value: '3', label: '临时工' }]
+      },
+      wageType: ['时薪', '日薪', '月薪'],
+      // 搜索的内容
+      search_content: {
+        sex: '男'
+      },
+      idCard: '', // 初始化完整身份证号
+      dialogFormVisible: false,
+      fieldList: [],
+      checkList: [], // 筛选列选中的数据列表
+      uncheckList: {}, // 控制筛选列显示隐藏
+      deptList: [],
+      provincialCityFormat: {
+        label: 'deptName',
+        value: 'deptId',
+        children: 'deptShowList'
+      },
+      dictLabel: [],
+      fileExex: []
+    }
+  },
+  created() {
+    // 人员审核-查询所有未审核人员
+    this.findAllPerson()
+    // 查询所有民族
+    this.findAllNation()
+    // 查询所有民族
+    this.currentUserCom()
+    // 查询所有民族
+    this.findAllStation()
+  },
+  methods: {
+    importFun() {
+      // this.importPerson()
+    },
+    importPerson() {
+      importPerson({ }).then((res) => {
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    onSuccess() {
+      this.$notify({
+        title: '成功',
+        duration: '2000',
+        message: '导入成功！',
+        type: 'success'
+      })
+      this.findAllPerson()
+    },
+    handleCheckedCitiesChange(e) {
+      if (e === undefined) {
+        this.checkedCities.map((item, i) => {
+          if (this.cities[i]) {
+            if (this.cities[i] === this.checkedCities[i].name) {
+              this.uncheckList[item.label] = true
+            } else {
+              this.uncheckList[item.label] = false
+            }
+          }
+        })
+      } else {
+        this.checkedCities.map((item, i) => {
+          this.uncheckList[item.label] = false
+        })
+        const list = []
+        for (var i = 0; i < this.checkedCities.length; i++) {
+          for (var k = 0; k < this.cities.length; k++) {
+            if (this.cities[k] !== this.checkedCities[i].name) {
+              console.log(i)
+            } else {
+              list.push(this.checkedCities[i].label)
+            }
+          }
+        }
+        for (var j = 0; j < this.checkedCities.length; j++) {
+          for (var l = 0; l < this.cities.length; l++) {
+            if (this.cities[l] === this.checkedCities[j].name) {
+              this.uncheckList[list[l]] = true
+            }
+          }
+        }
+      }
+      this.$forceUpdate()
+    },
+    findAllStation() {
+      findAllStation({ }).then((res) => {
+        console.log(res)
+        this.dictLabel = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 人员审核(管理)-新增/修改获取员工属性(公司、部门)
+    currentUserCom() {
+      currentUserCom({ }).then((res) => {
+        console.log(res)
+        this.deptList = res.data.data.dept
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 人员审核-查询所有未审核人员
+    findAllPerson(search_content) {
+      findAllPerson({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...search_content
+      }).then((res) => {
+        console.log(res)
+        const findAll_list = res.data.data.list
+        findAll_list.map((item, i) => {
+          this.$set(item, 'num', i + 1)
+          if (item.wageType === '1') {
+            this.$set(item, 'wageType', '时薪')
+          } else if (item.wageType === '2') {
+            this.$set(item, 'wageType', '日薪')
+          } else if (item.wageType === '3') {
+            this.$set(item, 'wageType', '月薪')
+          }
+          if (parseInt(item.personType) === 1) {
+            this.$set(item, 'personType', '自有员工')
+          } else if (item.personType === 2) {
+            this.$set(item, 'personType', '外包员工')
+          } else if (item.personType === 3) {
+            this.$set(item, 'personType', '临时工')
+          }
+        })
+        this.fieldList = findAll_list
+        this.total = 1
+        this.listLoading = false
+        this.handleCheckedCitiesChange()
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    exportPerson() {
+      const dictLabel = []
+      this.dictLabel.map((item, i) => {
+        const obj = []
+        obj[i] = item.dictLabel
+        dictLabel.push(obj)
+        console.log(item.dictLabel)
+      })
+      const search_content = {
+        haveSupplier: this.search_content.haveSupplier,
+        personName: this.search_content.personName,
+        workNo: this.search_content.workNo,
+        station: dictLabel[this.search_content.station],
+        deptId: this.search_content.deptId,
+        status: this.search_content.status,
+        nation: this.search_content.nation,
+        personType: this.search_content.personType,
+        idCardAddress: this.search_content.idCardAddress,
+        startTime: this.search_content.startTime,
+        endTime: this.search_content.endTime
+      }
+      this.exportPersonList(search_content)
+    },
+    exportPersonList(search_content) {
+      exportPerson({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...search_content
+      }).then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    exportPersonModel() {
+      window.open(exportPersonModel)
+    },
+    // 查询所有民族
+    findAllNation() {
+      findAllNation({}).then((res) => {
+        this.$set(this.search_from, 'nationList', res.data.data)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 搜索按钮
+    search_button(e) {
+      const dictLabel = []
+      this.dictLabel.map((item, i) => {
+        const obj = []
+        obj[i] = item.dictLabel
+        dictLabel.push(obj)
+        console.log(item.dictLabel)
+      })
+      const search_content = {
+        haveSupplier: this.search_content.haveSupplier,
+        personName: this.search_content.personName,
+        workNo: this.search_content.workNo,
+        station: dictLabel[this.search_content.station],
+        deptId: this.search_content.deptId,
+        status: this.search_content.status,
+        nation: this.search_content.nation,
+        personType: this.search_content.personType,
+        idCardAddress: this.search_content.idCardAddress,
+        startTime: this.search_content.startTime,
+        endTime: this.search_content.endTime
+      }
+      this.findAllPerson(search_content)
+    },
+    // 重置按钮
+    reset_button() {
+      // 重置搜索数据
+      this.search_content = {
+        sex: '男'
+      }
+    },
+    // 查询完整身份证号
+    // 查询完整身份证号
+    idCard_button(e) {
+      lookIdCard({ personId: e.id }).then((res) => {
+        this.$alert(res.data.data.idCard, '查看身份证号码', {
+          confirmButtonText: '确定',
+          callback: action => {
+          }
+        })
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 隐藏弹窗
+    cancelAddForm() {
+      this.dialogFormVisible = false
+    },
+    // 跳转人员管理详情界面
+    details_button(row) {
+      this.$router.push({ name: 'PersonnelManagementDetails', query: { id: row.personId }})
+    },
+    // 跳转人员管理新增界面
+    add_field() {
+      this.$router.push({ name: 'NewPersonnelManagement' })
+    },
+    modify_button(row) {
+      this.$router.push({ name: 'PersonnelManagementModification', query: { id: row.personId }})
+    }
+  }
+}
+</script>
+<style lang="scss">
+.app-container-cc {
+  .el-table th {
+    background-color: #eee;
+  }
+  .el-select {
+    width: 100%;
+  }
+  .searchForm {
+    .el-form-item__label {
+      padding: 0px;
+      font-size: 12px;
+      color: #000;
+    }
+  }
+  .idCard .cell{
+    color: #4794F7;
+  }
+}
+.inline-block {
+  display: inline-block;
+}
+</style>

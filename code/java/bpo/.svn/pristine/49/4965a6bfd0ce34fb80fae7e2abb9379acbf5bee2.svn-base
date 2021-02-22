@@ -1,0 +1,260 @@
+<template>
+  <div>
+    <div class="supplierManage">
+      <!-- <CfPanel title="供应商管理">-->
+      <el-form :inline="true" class="bpoFormInline" label-width="100px">
+        <el-form-item label="供应商名称：">
+          <el-input v-model="searchParam.companyName" placeholder="请输入供应商名称" />
+        </el-form-item>
+        <el-form-item label-width="70px" label="编码：">
+          <el-input v-model="searchParam.companyCode" placeholder="请输入编码" />
+        </el-form-item>
+        <el-form-item label="项目名称：">
+          <el-input v-model="searchParam.projectName" placeholder="请输入项目名称" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bpoBtn" @click="getList">搜索</el-button>
+          <el-button @click="reset">重置</el-button>
+        </el-form-item>
+      </el-form>
+
+      <el-button type="primary" icon="el-icon-plus" @click="addsuppiler">
+        新增
+      </el-button>
+      <el-button type="primary" plain @click="setFeeRule">
+        配置计费规则
+      </el-button>
+      <el-button type="primary" plain @click="backTo">配置考核规则</el-button>
+      <el-table
+        v-loading="listLoading"
+        :data="tableData"
+        class="bpoTable"
+        fit
+        @sort-change="sortChange"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          align="center"
+          width="50"
+        />
+        <el-table-column align="center" label="编号" type="index" width="80" />
+        <el-table-column align="center" label="供应商名称" min-width="80">
+          <template slot-scope="scope">{{ scope.row.companyName }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="编码" min-width="80">
+          <template slot-scope="scope">{{ scope.row.companyCode }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="供应商简称" min-width="80">
+          <template slot-scope="scope">{{ scope.row.companyCode1 }}</template>
+        </el-table-column>
+
+        <el-table-column align="center" label="社会统一信用代码" min-width="80">
+          <template slot-scope="scope">{{ scope.row.creditCode }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="公司联系人" min-width="80">
+          <template slot-scope="scope">{{ scope.row.contacts }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="联系方式" min-width="80">
+          <template slot-scope="scope">{{ scope.row.phone }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="上级供应商" min-width="80">
+          <template slot-scope="scope">{{ scope.row.parentName }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="项目名称" min-width="80">
+          <template slot-scope="scope">{{ scope.row.projectName }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="计费规则" min-width="80">
+          <template slot-scope="scope">{{ scope.row.rule }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="200">
+          <template slot-scope="scope">
+            <el-button size="mini" style="color:#FF6B00;" type="text" @click="handleDispose(scope.row,'deleted')">
+              分配账户
+            </el-button>
+            <el-button type="text" style="color:#4794F7" size="mini" @click="handleView(scope.row)">详情</el-button>
+            <el-button type="text" style="color:#19D185" size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+            <el-button v-if="scope.row.status!='deleted'" size="mini" type="text" style="color:#F52222" @click="handleDelete(scope.row,'deleted')">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+      <!--</CfPanel>-->
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+// import path from 'path'
+// import { deepClone } from '@/utils'
+// import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import { getSupplierList, deletesuppiler } from '@/api/supplierManage'
+// import { deepClone } from '@/utils'
+
+export default {
+  name: 'SupplierManage',
+  components: { Pagination },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      entity: { },
+      total: 0,
+      searchParam: {},
+      tableData: [],
+      multipleSelection: [],
+      orgOptions: [],
+      stateOptions: [{ value: '1', label: '启用' }, { value: '2', label: '禁用' }],
+      detailDialogVisible: false,
+      dialogTitle: '新增供应商'
+    }
+  },
+  computed: {
+
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+
+  },
+  methods: {
+    addsuppiler() {
+      this.$router.push({ name: 'supplierInfo' })
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    handleBillingRules(row) {
+      this.$router.push({
+        name: 'SalaryRules',
+        query: {
+          id: row.id
+        }
+      })
+    },
+    error() {
+      this.$notify({
+        title: '失败',
+        duration: '2000',
+        message: '操作失败！',
+        type: 'fail'
+      })
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getSupplierList(this.searchParam).then(res => {
+        this.tableData = res.data.data.list
+        this.total = res.data.data.total
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.listLoading = false
+      })
+    },
+    getRemoteOptions() {
+      this.orgOptions = [{ value: '0', label: '超级管理员' }, { value: '1', label: '甲方' }, { value: '2', label: '乙方' }, { value: '3', label: '供应商' }]
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleView(row) {
+      this.$router.push({
+        name: 'supplierDetail',
+        params: { primaryKey: row.id, entity: JSON.stringify(row), readonly: true }
+      })
+    },
+    handleUpdate(row) {
+      this.$router.push({ name: 'supplierInfo', params: {
+        primaryKey: row.id
+      }})
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该合同？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        deletesuppiler({ suppilerId: row.id }).then(() => {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '删除用户成功！',
+            type: 'success'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+      })
+    },
+    handleDispose(row) {},
+    setFeeRule() {
+      this.$router.push({
+        name: 'AddRules'
+      })
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .supplierManage {
+    .el-table th{
+      background-color: #E8E9F3;
+    }
+    .el-select{
+      width: 100%;
+    }
+    .searchForm{
+      .el-form-item__label{
+        padding: 0px;
+      }
+    }
+    .el-dialog__header{
+      background: #F6F7FB;
+    }
+    .cover{
+      width: 100%;
+    }
+    .half{
+      width: 50%;
+    }
+    .cf-button-group {
+      margin-bottom: 0;
+      text-align: right;
+    }
+    .dialog-cover{
+      width: 300px;
+    }
+    /deep/.el-textarea__inner{
+      min-height: 54px !important;
+    }
+  }
+</style>

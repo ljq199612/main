@@ -1,0 +1,24 @@
+package com.rz.iot.bpo.mina.mapper;
+
+import com.rz.iot.bpo.mina.model.MinaClassesFromExternal;
+import com.rz.iot.bpo.mina.model.MinaClassesGenerate;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface MinaClassesGenerateMapper {
+
+    int insert(MinaClassesGenerate record);
+
+    int insertBatch(List<MinaClassesFromExternal> recordList);
+
+    MinaClassesGenerate selectByPrimaryKey(Integer id);
+
+    int deleteByPrimaryKey(Integer id);
+
+    int updateByPrimaryKey(MinaClassesGenerate record);
+
+    MinaClassGenerateShow selectByProjectId(Integer projectId);
+}

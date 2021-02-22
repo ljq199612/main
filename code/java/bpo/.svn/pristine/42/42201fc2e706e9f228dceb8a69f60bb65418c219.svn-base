@@ -1,0 +1,207 @@
+<template>
+  <CfPanel title="供应商考核" class="main">
+    <el-form :inline="true" :model="queryForm" class="bpoFormInline">
+      <el-form-item label="场地：">
+        <el-select v-model="queryForm.transferStationId" placeholder="请选择场地" @change="submit">
+          <el-option v-for="(item,index) in siteOptions" :key="index" :label="item.name" :value="item.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="项目名称：">
+        <el-input v-model.trim="queryForm.projectName" placeholder="请输入项目名称" class="half" @keyup.13.native="submit" />
+      </el-form-item>
+      <el-form-item label="供应商名称：">
+        <el-input v-model.trim="queryForm.supplierName" placeholder="请输入供应商名称" class="half" @keyup.13.native="submit" />
+      </el-form-item>
+      <el-form-item label="考核周期：">
+        <el-date-picker
+          v-model="queryForm.evaluationTime"
+          type="month"
+          value-format="yyyy-MM"
+          placeholder="请选择月"
+          @change="submit"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <el-button type="primary" icon="el-icon-plus" @click="addFn">
+      新增
+    </el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="tableList"
+      class="bpoTable"
+      fit
+    >
+      <el-table-column align="center" type="index" label="序号" width="80" />
+      <el-table-column show-overflow-tooltip align="left" label="项目名称" min-width="80" prop="projectName" />
+      <el-table-column show-overflow-tooltip align="center" label="项目编号" min-width="80" prop="projectSn" />
+      <el-table-column show-overflow-tooltip align="left" label="场地" min-width="80" prop="transferStationName" />
+      <el-table-column show-overflow-tooltip align="left" label="供应商名称" min-width="80" prop="supplierName" />
+      <el-table-column show-overflow-tooltip align="center" label="考核周期" min-width="80" prop="evaluationTime" />
+      <el-table-column show-overflow-tooltip align="right" label="考核结果（分）" min-width="80" prop="grade" />
+      <el-table-column align="center" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button type="text" @click="viewDetail(scope.row)">详情</el-button>
+          <el-button type="text" style="color:#19D185" @click="updateAddForm(scope.row)">修改</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 查看评分配置 -->
+    <el-dialog
+      title="评分等级表"
+      custom-class="dialog-large"
+      :close-on-click-modal="false"
+      :visible.sync="dialogVisible"
+      @close="cancelDialog"
+    >
+      <el-table
+        v-loading="dialogLoading"
+        :data="dialogTable"
+        class="bpoTable"
+        fit
+      >
+        <el-table-column align="center" label="序号" width="80">
+          <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+        </el-table-column>
+        <el-table-column show-overflow-tooltip align="left" label="评分氛围（最低分）" min-width="80" prop="name" />
+        <el-table-column show-overflow-tooltip align="left" label="评分氛围（最高分）" min-width="80" prop="creditCode" />
+        <el-table-column show-overflow-tooltip align="left" label="支付比例" min-width="80" prop="belogGroupName" />
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancelDialog">关闭</el-button>
+      </div>
+    </el-dialog>
+    <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="page.pageNum" :limit.sync="page.pageSize" @pagination="getList" />
+  </CfPanel>
+</template>
+<script>
+import { queryList, findAllInDepByLoginUserId } from '@/api/supplierManage'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination'
+
+export default {
+  name: 'SupplierAssessment',
+  components: {
+    CfPanel,
+    Pagination
+  },
+  data() {
+    return {
+      listLoading: false,
+      page: {
+        pageNum: 1,
+        pageSize: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      total: 0,
+      queryForm: {
+        transferStationId: '',
+        projectName: '',
+        supplierName: '',
+        evaluationTime: ''
+      },
+      siteOptions: [], // 场地列表
+      tableList: [],
+      dialogVisible: false,
+      dialogLoading: false,
+      dialogTable: []
+    }
+  },
+  created() {
+    this.getAllTransferStation()
+    this.getList()
+  },
+  methods: {
+    // 场地列表
+    getAllTransferStation() {
+      findAllInDepByLoginUserId().then((res) => {
+        const data = res.data.data || []
+        this.siteOptions = data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    addFn() {
+      this.$router.push({
+        name: 'AddAssessment'
+      })
+    },
+    getList() {
+      this.listLoading = true
+      queryList({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...this.queryForm
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.tableList = data.list || []
+        this.total = data.total || 0
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    reset() {
+      this.page.pageNum = 1
+      this.queryForm.customerName = ''
+      this.queryForm.name = ''
+      this.queryForm.belogGroupName = ''
+      this.getList()
+    },
+    submit() {
+      this.page.pageNum = 1
+      this.getList()
+    },
+    updateAddForm(row) {
+      this.$router.push({
+        name: 'AddAssessment',
+        query: {
+          supplierInfoId: row.supplierInfoId
+        }
+      })
+    },
+    viewDetail(row) {
+      this.$router.push({
+        name: 'AssessmentDetail'
+      })
+      // this.getDialogTable(row.id)
+      // this.dialogVisible = true
+    },
+    getDialogTable(id) {
+      this.dialogLoading = true
+      queryList({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...this.queryForm
+      }).then((res) => {
+        this.dialogLoading = false
+        const data = res.data.data
+        this.dialogTable = data || []
+      }).catch((err) => {
+        this.dialogLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    cancelDialog() {
+      this.dialogVisible = false
+    }
+  }
+}
+</script>

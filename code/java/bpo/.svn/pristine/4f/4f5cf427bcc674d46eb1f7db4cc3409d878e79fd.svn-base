@@ -1,0 +1,39 @@
+package com.rz.iot.bpo.mina.model.show;
+
+import com.rz.iot.bpo.mina.model.MinaClassesGenerate;
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+import io.swagger.models.auth.In;
+import lombok.Data;
+
+import javax.xml.soap.SAAJResult;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * @description: 展示排班信息列表
+ * @author: LiuJiaqi
+ * @create: 2020-07-22 19:12
+ **/
+@Data
+public class MinaClassGenerateShow extends MinaClassesGenerate {
+    //项目名
+    private String projectName;
+
+    // 工作小组 id, (单行分开)
+    private Integer workGroupId;
+
+    // 工作小组名称 (单行分开)
+    private String workGroupName;
+
+    // 工作小组 id, (根据排班id, 获取小组ID列表)
+    //private Map<Integer, List<Integer>> workGroupIds;
+
+    // 工作小组名称 (根据排班 Id, 获取小组名称列表)
+    //private Map<Integer, List<String>> workGroupNames;
+
+    //排班和工作小组关联信息(包含工作小组 id 和 工作小组名称等, 非单行显示)
+    List<MinaClassesGroupRelShow> minaClassesGroupRelShows;
+
+}

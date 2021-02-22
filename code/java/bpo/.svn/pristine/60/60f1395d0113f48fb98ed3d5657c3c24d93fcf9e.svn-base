@@ -1,0 +1,155 @@
+<template>
+  <el-table
+    v-loading="listLoading"
+    :data="tableData"
+    border
+    fit
+    :span-method="mergeFeeRuleTable"
+  >
+    <el-table-column align="center" label="编号">
+      <template slot-scope="scope">{{ scope.row.modelId }}</template>
+    </el-table-column>
+    <el-table-column align="center" label="工作模块">
+      <template slot-scope="scope">{{ scope.row.modelName }}</template>
+    </el-table-column>
+    <el-table-column align="center" label="工序">
+      <template slot-scope="scope">{{ scope.row.processName }}</template>
+    </el-table-column>
+    <el-table-column align="center" label="产品名称">
+      <template slot-scope="scope">{{ scope.row.productName }}</template>
+    </el-table-column>
+    <el-table-column align="center" label="计件模式（件/票）">
+      <template slot-scope="scope">{{ scope.row.lowerLimit }} - {{ scope.row.upperLimit }}</template>
+    </el-table-column>
+    <el-table-column align="center" label="价格（元/包裹）">
+      <template slot-scope="scope">{{ scope.row.price }}</template>
+    </el-table-column>
+  </el-table>
+</template>
+
+<script>
+import mergeData from './../utils/mergeData'
+import { caculateObjectLength } from './../utils/utils'
+export default {
+  props: {
+    tableData: {
+      type: Array,
+      default: function() {
+        return []
+      }
+    }
+  },
+  data() {
+    return {
+      listLoading: false
+    }
+  },
+  computed: {
+    /**
+     * 计算模块合并数据
+     */
+    mergeDataMapByModelId() {
+      return mergeData({
+        tableData: this.tableData,
+        key: 'modelId',
+        mergeDataFunction: (item1, item2) => {
+          return item1['modelId'] === item2['modelId']
+        }
+      })
+    },
+    /**
+     * 计算工序合并数据
+     */
+    mergeDataMapByProcessId() {
+      return mergeData({
+        tableData: this.tableData,
+        key: 'processId',
+        mergeDataFunction: (item1, item2) => {
+          return (
+            item1['modelId'] === item2['modelId'] &&
+            item1['processId'] === item2['processId']
+          )
+        }
+      })
+    },
+    /**
+     * 计算产品名合并数据
+     */
+    mergeDataMapByProductId() {
+      return mergeData({
+        tableData: this.tableData,
+        key: 'productId',
+        mergeDataFunction: (item1, item2) => {
+          return (
+            item1['modelId'] === item2['modelId'] &&
+            item1['processId'] === item2['processId'] &&
+            item1['productId'] === item2['productId']
+          )
+        }
+      })
+    }
+  },
+  mounted() {},
+  methods: {
+    /**
+     * 合并计费单元格算法
+     */
+    mergeFeeRuleTable({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0 || columnIndex === 1) {
+        // 合并模块
+        if (!caculateObjectLength(this.mergeDataMapByModelId)) {
+          return
+        }
+        // 模块单元格
+        if (this.mergeDataMapByModelId[rowIndex]) {
+          return {
+            rowspan: this.mergeDataMapByModelId[rowIndex]['rowspan'],
+            colspan: 1
+          }
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          }
+        }
+      } else if (columnIndex === 2) {
+        // 合并工序
+        if (!caculateObjectLength(this.mergeDataMapByProcessId)) {
+          return
+        }
+        // 工序单元格
+        if (this.mergeDataMapByProcessId[rowIndex]) {
+          return {
+            rowspan: this.mergeDataMapByProcessId[rowIndex]['rowspan'],
+            colspan: 1
+          }
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          }
+        }
+      } else if (columnIndex === 3) {
+        // 合并产品
+        if (!caculateObjectLength(this.mergeDataMapByProductId)) {
+          return
+        }
+        // 合并单元格
+        if (this.mergeDataMapByProductId[rowIndex]) {
+          return {
+            rowspan: this.mergeDataMapByProductId[rowIndex]['rowspan'],
+            colspan: 1
+          }
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          }
+        }
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped></style>

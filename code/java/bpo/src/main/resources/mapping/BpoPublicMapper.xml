@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoPublicMapper">
+
+    <select id="getProject" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        SELECT project.id as id,project.project_name as name from bpo_project project
+        LEFT JOIN sys_user_module_rel module on module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        AND module.module_id = project.id
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where project.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+    <select id="getTransferStation" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        SELECT transfer.id as id,transfer.name as name from bpo_transfer_station transfer
+        LEFT JOIN bpo_project project ON transfer.id = project.transfer_station_id
+        AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_user_module_rel module on module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        AND module.module_id = project.id
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where transfer.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+    <select id="getCustomer" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        SELECT infos.id as id,company.company_name as name from sys_company company
+        LEFT JOIN bpo_project project ON company.id = project.first_party
+        AND project.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_user_module_rel module on module.module_id = project.id
+        AND module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_customer_infos infos ON infos.org_id = company.id
+        where company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_JF}
+        and company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+    <select id="getSupplier" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        select supplier.id as id,company.company_name as name from sys_company company
+        LEFT JOIN  bpo_supplier supplier on supplier.id = company.id
+        LEFT JOIN bpo_supplier_info info on info.org_id = supplier.id
+        WHERE company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_PROVIDER}
+        AND company.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="userId!=null">
+            and info.parent_id  =(
+            SELECT supplier.id from sys_company company
+            LEFT JOIN bpo_supplier supplier on supplier.company_id = company.id
+            LEFT JOIN bpo_person person on person.company_id = company.id
+            LEFT JOIN sys_user users on users.user_id = person.user_id
+            where users.user_id = #{userId})
+        </if>
+    </select>
+    <select id="getPayer" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        select company.id AS id,company.company_name as name
+        from sys_company company LEFT JOIN bpo_supplier supplier
+        ON company.id = supplier.company_id
+        where company.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="userId!=null">
+        and supplier.id in(
+            SELECT info.parent_id from bpo_supplier_info info
+            LEFT JOIN bpo_supplier supplier ON supplier.id = info.org_id
+            LEFT JOIN sys_company company ON company.id = supplier.company_id
+            LEFT JOIN bpo_person person on person.company_id = company.id
+            LEFT JOIN sys_user users on users.user_id = person.user_id
+            where users.user_id = ${userId})
+        </if>
+    </select>
+
+</mapper>

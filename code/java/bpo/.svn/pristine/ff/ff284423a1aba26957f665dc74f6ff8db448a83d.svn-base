@@ -1,0 +1,26 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+import com.rz.iot.bpo.model.show.BpoClassGenerateShow;
+import com.rz.iot.bpo.model.show.BpoClassGenerateListShow;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface BpoClassesGenerateMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoClassesGenerate record);
+
+    int insertSelective(BpoClassesGenerate record);
+
+    BpoClassesGenerate selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoClassesGenerate record);
+
+    int updateByPrimaryKey(BpoClassesGenerate record);
+
+    BpoClassGenerateShow selectByProjectId(Integer projectId);
+
+    List<BpoClassGenerateListShow> getClassGenerateList(@Param("info")BpoClassGenerateListShow info);
+}

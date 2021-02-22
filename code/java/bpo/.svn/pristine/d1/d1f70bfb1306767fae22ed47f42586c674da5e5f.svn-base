@@ -1,0 +1,181 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.OperatorType;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.BpoFeeRuleParam;
+import com.rz.iot.bpo.model.param.SupplierAddParam;
+import com.rz.iot.bpo.model.show.BpoSupplierRuleDetailShow;
+import com.rz.iot.bpo.model.show.BpoSupplierRuleListShow;
+import com.rz.iot.bpo.model.show.SupplierDetailShow;
+import com.rz.iot.bpo.model.show.SupplierListShow;
+import com.rz.iot.bpo.service.SupplierService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 描述 : 供应商管理Controller
+ * 作者 : qin xian
+ * 创建时间 : 2020/6/18 0018 10:10
+ *
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Api(tags = "供应商管理")
+@RequestMapping("/supplier")
+@RestController
+public class SupplierController {
+
+    @Resource
+    private SupplierService supplierService;
+
+    @ApiOperation("获取供应商列表")
+    @GetMapping("/list")
+    public Result<List<SupplierListShow>> list(Page<SupplierListShow> page,SupplierListShow info) {
+        BaseEntity param = new BaseEntity();
+        return supplierService.list(param, info, page);
+    }
+
+    @ApiOperation("获取供应商详情")
+    @GetMapping("/detail")
+    public Result<SupplierDetailShow> detail(Integer id) {
+        return supplierService.detail(id);
+    }
+
+    /**
+     * 供应商新增
+     * @param
+     * @return
+     */
+    @ApiOperation("新增供应商")
+    @PostMapping("/add")
+    @Log(title = "供应商管理", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<Map> add(@RequestBody SupplierAddParam info) {
+
+        return supplierService.add(info);
+    }
+
+    /**
+     * 供应商修改
+     * @param
+     * @return
+     */
+    @ApiOperation("修改供应商")
+    @PostMapping("/update")
+    @Log(title = "供应商管理", businessType = BusinessType.UPDATE, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<Map> update(@RequestBody SupplierAddParam info) {
+
+        return supplierService.update(info);
+    }
+
+    /**
+     * 供应商修改
+     * @param
+     * @return
+     */
+    @ApiOperation("删除供应商")
+    @GetMapping("/delete")
+    @Log(title = "供应商管理", businessType = BusinessType.DELETE, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<Map> delete(Integer companyId) {
+
+        return supplierService.delete(companyId);
+    }
+
+    /**
+     * 通过供应商Id 获取该供应商计薪规则list
+     * @param info
+     * @return*/
+    @ApiOperation("获取供应商计费列表")
+    @PostMapping("/ruleList")
+    public Result ruleList(@RequestBody BpoSupplierRuleListShow info){
+
+        return supplierService.ruleList(info);
+    }
+
+    /**
+     * 通过供应商Id,计薪规则类型,规则Id 获取该供应商计薪规则详情
+     * @param info
+     * @return*/
+    @ApiOperation("获取供应商计费详情")
+    @PostMapping("/ruleDetail")
+    public Result ruleDetail(@RequestBody BpoSupplierRuleDetailShow info){
+
+        return supplierService.ruleDetail(info);
+    }
+
+    /**
+     * 通过供应商Id,计薪规则类型,规则Id 获取该供应商计薪规则(计时)详情
+     * @param info
+     * @return*/
+    @ApiOperation("获取供应商计费(计时)详情")
+    @PostMapping("/ruleDetailTime")
+    public Result ruleDetailTime(@RequestBody BpoSupplierRuleDetailShow info){
+
+        return supplierService.ruleDetailTime(info);
+    }
+
+    /**
+     * 获取 新增供应商计费规则前置数据
+     * 通过项目Id,获取当前项目关联的工作模块-工序-产品等
+     * @param
+     * @return*/
+    @ApiOperation("获取新增供应商计费规则前置数据")
+    @GetMapping("/getInfoForAddFeeRule")
+    public Result getInfoForAddFeeRule(Integer id) {
+        return supplierService.getInfoForAddFeeRule(id);
+    }
+
+
+    /**
+     * 新增供应商计费规则
+     * @param list
+     * @return*/
+    @ApiOperation("新增供应商计费信息")
+    @PostMapping("/addFeeRule")
+    @Log(title = "新增供应商计费信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addFeeRule(@RequestBody List<BpoFeeRuleParam> list) {
+        return supplierService.addFeeRule(list);
+    }
+
+    @GetMapping("/deleteProductPrice")
+    public Result deleteProductPrice(int[] id){
+        return supplierService.deleteProductPrice(id);
+    }
+
+    /**
+     * 获取当前登录用户所属部门 的供应商信息
+     * @param param
+     * @return
+     */
+    @GetMapping("/findAllInDepByLoginUserId")
+    public Result findAllInDepByLoginUserId(BaseEntity param){
+        return supplierService.findAllInDepByLoginUserId(param);
+    }
+
+    /**
+     * 获取当前登录用户所属部门及以下 的供应商信息
+     * @param param
+     * @return
+     */
+    @GetMapping("/findAllByLoginUserId")
+    public Result findAllByLoginUserId(BaseEntity param){
+        return supplierService.findAllByLoginUserId(param);
+    }
+
+    /**
+     * 获取与当前项目关联的供应商列表
+     */
+    @GetMapping("/getSupplierListByPorjectId")
+    public Result getSupplierListByPorjectId(Integer projectId){
+        return supplierService.getSupplierListByPorjectId(projectId);
+    }
+}

@@ -1,0 +1,295 @@
+<template>
+  <div>
+    <div>
+      <CfPanel title="角色管理" class="roleManage">
+        <el-form :inline="true" class="bpoFormInline">
+          <el-row>
+            <el-form-item label="角色类型：">
+              <el-input v-model="searchParam.roleName" placeholder="请输入角色类型" />
+            </el-form-item>
+            <el-form-item label="状态：">
+              <el-select v-model="searchParam.status" filterable placeholder="请选择状态" class="cover">
+                <el-option v-for="(item,index) in stateOptions" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button class="bpoBtn" @click="submit">搜索</el-button>
+              <el-button @click="reset">重置</el-button>
+            </el-form-item>
+          </el-row>
+        </el-form>
+
+        <el-button type="primary" icon="el-icon-plus" @click="addUser">
+          新增
+        </el-button>
+        <el-table
+          v-loading="listLoading"
+          :data="userList"
+          class="bpoTable"
+          fit
+          @sort-change="sortChange"
+          @cell-mouse-enter="currentRowChange"
+        >
+          <el-table-column align="center" label="编号" type="index" width="80" />
+          <el-table-column align="left" label="角色类型" min-width="80">
+            <template slot-scope="scope">{{ scope.row.roleName }}</template>
+          </el-table-column>
+          <el-table-column align="left" label="角色编码" min-width="80">
+            <template slot-scope="scope">{{ scope.row.roleKey }}</template>
+          </el-table-column>
+
+          <el-table-column align="center" label="创建时间" min-width="80">
+            <template slot-scope="scope">{{ scope.row.createTime }}</template>
+          </el-table-column>
+
+          <el-table-column align="left" label="备注" min-width="80"><!-- 1.启用 2.禁用 -->
+            <template slot-scope="scope">{{ scope.row.remark }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="状态" width="100">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.status"
+                :active-value="1"
+                :inactive-value="2"
+                @change="statusChange"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="操作" width="150">
+            <template slot-scope="scope">
+              <el-button type="text" style="color:#19D185;" size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+              <el-button v-if="scope.row.status!='deleted'" style="color:#F52222;" type="text" size="mini" @click="handleDelete(scope.row,'deleted')">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+      </CfPanel>
+      <el-dialog
+        class="bpoDialog"
+        :title="dialogTitle"
+        :visible.sync="detailDialogVisible"
+        @close="closeDetailDialog"
+      >
+        <el-form ref="entity" label-width="90px" :model="entity" :rules="rules">
+          <el-form-item label="角色类型：" prop="roleName">
+            <el-input v-model="entity.roleName" />
+          </el-form-item>
+          <el-form-item label="角色编码：" prop="roleKey">
+            <el-input v-model="entity.roleKey" />
+          </el-form-item>
+
+          <el-form-item label="状态：">
+            <el-radio-group v-model="entity.status">
+              <el-radio :label="1">启用</el-radio>
+              <el-radio :label="2">禁用</el-radio>
+            </el-radio-group>
+
+          </el-form-item>
+          <el-form-item label="备注：">
+            <el-input v-model="entity.remark" type="textarea" :rows="5" />
+          </el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="24" class="bpoButtonGroup pull-right">
+              <el-button type="primary" @click="submitDialog('entity')">提交</el-button>
+              <el-button @click="closeDetailDialog">关闭</el-button>
+            </el-col>
+          </el-row>
+        </el-form>
+      </el-dialog>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination'
+import { updateRole, getRoles, addRole, deleteRole } from '@/api/role'
+import { deepClone } from '@/utils'
+
+export default {
+  name: 'RoleManage',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      entity: { },
+      total: 0,
+      searchParam: {},
+      userList: [],
+      currentRow: {},
+      orgOptions: [{ value: '0', label: '超级管理员' }, { value: '1', label: '甲方' }, { value: '2', label: '乙方' }, { value: '3', label: '供应商' }],
+      stateOptions: [{ value: '1', label: '启用' }, { value: '2', label: '禁用' }],
+      detailDialogVisible: false,
+      dialogTitle: '新增角色',
+      rules: {
+        roleName: [{ required: true, message: '请填写角色类型' }],
+        roleKey: [{ required: true, message: '请填写角色编码' }]
+      }
+    }
+  },
+  computed: {
+
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+
+  },
+  methods: {
+    submit() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    statusChange(status) {
+      this.currentRow.status = status
+      updateRole(this.currentRow).then(res => {
+        this.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '修改成功！',
+          type: 'success'
+        })
+      })
+    },
+    submitDialog() {
+      this.$refs['entity'].validate(valid => {
+        if (valid) {
+          var opration = addRole
+          if (this.entity.id) {
+            opration = updateRole
+          }
+          opration(this.entity).then(res => {
+            if (String(res.data.code) === '20001') {
+              this.$notify({
+                title: '成功',
+                duration: '2000',
+                message: '修改成功！',
+                type: 'success'
+              })
+              this.detailDialogVisible = false
+              this.getList()
+            } else {
+              this.error(res.data.message || '操作失败')
+            }
+
+            // eslint-disable-next-line handle-callback-err
+          }).catch(err => {
+            this.error('操作失败')
+          })
+        }
+      })
+    },
+    error(message) {
+      this.$notify({
+        title: '失败',
+        duration: '2000',
+        message: message + '！',
+        type: 'error'
+      })
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getRoles(this.searchParam).then(res => {
+        this.userList = res.data.data.list
+        this.total = res.data.data.total
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.listLoading = false
+      })
+    },
+    addUser() {
+      this.dialogTitle = '新增角色'
+      this.entity = { status: 1 }
+      this.detailDialogVisible = true
+    },
+    getRemoteOptions() {
+      this.orgOptions = [{ value: '0', label: '超级管理员' }, { value: '1', label: '甲方' }, { value: '2', label: '乙方' }, { value: '3', label: '供应商' }]
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleUpdate(row) {
+      this.dialogTitle = '修改角色'
+      this.entity = deepClone(row)
+      this.detailDialogVisible = true
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该用户？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        deleteRole({ id: row.id }).then(res => {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '删除用户成功！',
+            type: 'success'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+      })
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .roleManage {
+    .el-table th{
+      background-color: #E8E9F3;
+    }
+    .el-select{
+      width: 100%;
+    }
+    .el-dialog__header{
+      background: #F6F7FB;
+    }
+    .cover{
+      width: 100%;
+    }
+    .half{
+      width: 50%;
+    }
+    .cf-button-group {
+      margin-bottom: 0;
+      text-align: right;
+    }
+    .dialog-cover{
+      width: 300px;
+    }
+  }
+</style>

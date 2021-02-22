@@ -1,0 +1,348 @@
+<template>
+  <div>
+    <CfPanel title="合同管理" class="contractManage">
+      <el-form
+        class="bpoFormInline"
+        :inline="true"
+      >
+        <el-form-item label="合同归属：">
+          <SelectTree
+            v-model="searchParam.deptId"
+            :props="props"
+            :options="options"
+            :value="valueId"
+            :clearable="isClearable"
+            :accordion="isAccordion"
+            placeholder="请选择合同归属"
+            @getValue="getValue($event)"
+          />
+        </el-form-item>
+        <el-form-item label="合同名称：">
+          <el-input v-model="searchParam.name" placeholder="请输入合同名称" />
+        </el-form-item>
+        <el-form-item label="合同类型：">
+          <el-select v-model="searchParam.type" placeholder="请选择合同类型">
+            <el-option
+              v-for="(item,index) in searchParam.site_type"
+              :key="index"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="项目名称：">
+          <el-input v-model="searchParam.projectName" placeholder="请输入项目名称" />
+        </el-form-item>
+        <el-form-item label="开始日期：">
+          <el-date-picker
+            v-model="searchParam.startTime"
+            type="date"
+            placeholder="请选择开始日期"
+          />
+        </el-form-item>
+        <el-form-item label="结束日期：">
+          <el-date-picker
+            v-model="searchParam.endTime"
+            type="date"
+            placeholder="请选择结束日期"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bpoBtn" @click="getList">搜索</el-button>
+          <el-button @click="reset">重置</el-button>
+        </el-form-item>
+
+      </el-form>
+
+      <el-button type="primary" icon="el-icon-plus" @click="addcontract">
+        新增
+      </el-button>
+      <el-table
+        v-loading="listLoading"
+        :data="contractList"
+        class="bpoTable"
+        fit
+        @sort-change="sortChange"
+        @cell-mouse-enter="currentRowChange"
+      >
+        <el-table-column
+          align="center"
+          label="编号"
+          type="index"
+          :index="indexMethod"
+          width="80"
+        />
+        <el-table-column align="center" label="合同名称" min-width="80">
+          <template slot-scope="scope">{{ scope.row.name }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="合同编号" min-width="80">
+          <template slot-scope="scope">
+            <el-button type="text" style="color:#4794F7;" title="下载附件" @click="downloadContracts(scope.row.id)">{{ scope.row.contractCode }}</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="合同归属" min-width="80">
+          <template slot-scope="scope">{{ transferPath(scope.row.deptList) }}</template>
+        </EL-TABLE-COLUMN>
+        <el-table-column align="center" label="项目名称" min-width="80">
+          <template slot-scope="scope">{{ scope.row.projectName }}</template>
+        </EL-TABLE-COLUMN>
+        <el-table-column align="center" label="合同类型" min-width="80">
+          <template slot-scope="scope">{{ typeMap[scope.row.type] }}</template>
+        </EL-TABLE-COLUMN>
+        <el-table-column align="center" label="结算类型" min-width="80">
+          <template slot-scope="scope">{{ setypeMap[scope.row.settlementType] }}</template>
+        </EL-TABLE-COLUMN>
+        <el-table-column align="center" label="开始日期" min-width="80">
+          <template slot-scope="scope">{{ scope.row.startTime }}</template>
+        </EL-TABLE-COLUMN>
+        <el-table-column align="center" label="结束日期" min-width="80">
+          <template slot-scope="scope">{{ scope.row.endTime }}</template>
+        </EL-TABLE-COLUMN>
+        <el-table-column align="center" label="操作" width="150">
+          <template slot-scope="scope">
+            <el-button type="text" style="color:#4794F7" size="mini" @click="handleView(scope.row)">详情</el-button>
+            <el-button type="text" style="color:#19D185" size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+            <el-button v-if="scope.row.status!='deleted'" size="mini" type="text" style="color:#F52222" @click="handleDelete(scope.row,'deleted')">
+              删除
+            </el-button>
+
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    </CfPanel>
+  </div>
+</template>
+
+<script type="text/javascript">
+// import path from 'path'
+// import { deepClone } from '@/utils'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import { findAllContract, deleteContract, Updatecontract, resetPassword, downloadFile, findCanControl } from '@/api/contract'
+import { getRolesNoPage } from '../../api/role'
+import { findOrgType } from '../../api/orgnization'
+import { validatePassword } from '@/utils/validate'
+import { deepClone } from '../../utils'
+import SelectTree from '@/components/treeSelect'
+
+export default {
+  name: 'ContractManage',
+  components: { CfPanel, Pagination, SelectTree },
+  data() {
+    // 重复密码验证
+    const pwdAgainCheck = async(rule, value, callback) => {
+      if (this.restPasswordForm.password !== this.restPasswordForm.confirmPassword) {
+        return callback(new Error('两次输入密码不一致！'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      total: 0,
+      searchParam: {},
+      contractList: [],
+      orgOptions: [],
+      roleOptions: [],
+      stateOptions: [{ value: '0', label: '启用' }, { value: '1', label: '停用' }],
+      settlementTypeOptions: [{ value: '0', label: '按工序计费' }, { value: '1', label: '按小时计费' }],
+      setypeMap: { 1: '按工序计费', 2: '按小时计费' },
+      typeMap: { 1: '客户', 2: '供应商' },
+      restPasswordForm: {},
+
+      restPasswordRules: {
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        confirmPassword: [{ required: true, trigger: 'blur', validator: validatePassword },
+          { required: true, trigger: 'blur', validator: pwdAgainCheck }]
+      },
+      restPasswordDialog: false,
+
+      isClearable: true, // 可清空（可选）
+      isAccordion: false, // 可收起（可选）
+      valueId: '0', // 初始ID（可选）
+      props: { // 配置项（必选）
+        value: 'deptId',
+        label: 'deptName',
+        children: 'depts'
+      },
+      options: []
+    }
+  },
+  computed: {
+
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+
+  },
+  methods: {
+    getValue(value) {
+      // 合同归属取值
+      this.valueId = value
+      this.searchParam.deptId = value
+      // console.log(value);
+    },
+    downloadContracts(id) {
+      downloadFile({ 'id': id }).then((res) => {
+      })
+    },
+    transferPath(deptList) {
+      var tempList = deepClone(deptList)
+      var path = ''
+      tempList.sort(function(a, b) {
+        return a.deptId - b.deptId
+      })
+      tempList.forEach(item => {
+        path += item.deptName + '/'
+      })
+
+      if (path.length > 0) {
+        path = path.substr(0, path.length - 1)
+      }
+      return path
+    },
+    indexMethod(index) {
+      return index + 1
+    },
+    confirmRestPassword() {
+      this.$refs['restPasswordForm'].validate((valid) => {
+        if (valid) {
+          resetPassword(this.restPasswordForm).then((res) => {
+            this.restPasswordDialog = false
+            this.$notify({
+              title: '成功',
+              duration: '2000',
+              message: '重置密码成功！',
+              type: 'success'
+            })
+          })
+        }
+      })
+    },
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    statusChange(status) {
+      this.currentRow.status = status
+      Updatecontract(this.currentRow).then(res => {
+        this.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '修改成功！',
+          type: 'success'
+        })
+      })
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      findAllContract(this.searchParam).then((res) => {
+        this.contractList = res.data.data.list
+        this.total = res.data.data.total
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch((err) => {
+        this.listLoading = false
+      })
+    },
+    addcontract() {
+      this.$router.push({ name: 'contractInfo' })
+    },
+    getRemoteOptions() {
+      getRolesNoPage().then(res => {
+        this.roleOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+
+      findCanControl().then(res => {
+        this.options = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    restPassword(row) {
+      this.restPasswordForm = { contractId: row.id }
+      this.restPasswordDialog = true
+    },
+    handleUpdate(row) {
+      this.$router.push({ name: 'contractInfo', query: {
+        id: 1
+      }})
+    },
+    handleView() {
+      this.$router.push({ name: 'contractDetail', query: {
+        id: 1,
+        readonly: true
+      }})
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该合同？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        deleteContract({ contractId: row.id }).then(() => {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '删除用户成功！',
+            type: 'success'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+      })
+    }
+  }
+}
+</script>
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .contractManage {
+    .el-table th{
+      background-color: red;
+    }
+    .el-select{
+      width: 100%;
+    }
+    .searchForm{
+      .el-form-item__label{
+        padding: 0px;
+      }
+    }
+  }
+
+</style>

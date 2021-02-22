@@ -1,0 +1,246 @@
+package com.rz.iot.bpo.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class BpoBillReconciliationPieceDetailed {
+    private Integer id;
+
+    private Integer billReconciliationId;
+
+    private Integer projectId;
+
+    private Integer supplierInfoId;
+
+    private String billingCycle;
+
+    private Integer personId;
+
+    private Integer feeRuleType;
+
+    private BigDecimal income;
+
+    private BigDecimal deduction;
+
+    private BigDecimal realIncome;
+
+    private Integer workModelId;
+
+    private Integer workGroupId;
+
+    private Integer processId;
+
+    private Integer productId;
+
+    private Integer pricingIntervalId;
+
+    private Integer upperLimit;
+
+    private Integer lowerLimit;
+
+    private BigDecimal price;
+
+    private Integer status;
+
+    private Integer appealStatus;
+
+    private String appealReason;
+
+    private Integer updateUserId;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getBillReconciliationId() {
+        return billReconciliationId;
+    }
+
+    public void setBillReconciliationId(Integer billReconciliationId) {
+        this.billReconciliationId = billReconciliationId;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public Integer getSupplierInfoId() {
+        return supplierInfoId;
+    }
+
+    public void setSupplierInfoId(Integer supplierInfoId) {
+        this.supplierInfoId = supplierInfoId;
+    }
+
+    public String getBillingCycle() {
+        return billingCycle;
+    }
+
+    public void setBillingCycle(String billingCycle) {
+        this.billingCycle = billingCycle == null ? null : billingCycle.trim();
+    }
+
+    public Integer getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(Integer personId) {
+        this.personId = personId;
+    }
+
+    public Integer getFeeRuleType() {
+        return feeRuleType;
+    }
+
+    public void setFeeRuleType(Integer feeRuleType) {
+        this.feeRuleType = feeRuleType;
+    }
+
+    public BigDecimal getIncome() {
+        return income;
+    }
+
+    public void setIncome(BigDecimal income) {
+        this.income = income;
+    }
+
+    public BigDecimal getDeduction() {
+        return deduction;
+    }
+
+    public void setDeduction(BigDecimal deduction) {
+        this.deduction = deduction;
+    }
+
+    public BigDecimal getRealIncome() {
+        return realIncome;
+    }
+
+    public void setRealIncome(BigDecimal realIncome) {
+        this.realIncome = realIncome;
+    }
+
+    public Integer getWorkModelId() {
+        return workModelId;
+    }
+
+    public void setWorkModelId(Integer workModelId) {
+        this.workModelId = workModelId;
+    }
+
+    public Integer getWorkGroupId() {
+        return workGroupId;
+    }
+
+    public void setWorkGroupId(Integer workGroupId) {
+        this.workGroupId = workGroupId;
+    }
+
+    public Integer getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(Integer processId) {
+        this.processId = processId;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public Integer getPricingIntervalId() {
+        return pricingIntervalId;
+    }
+
+    public void setPricingIntervalId(Integer pricingIntervalId) {
+        this.pricingIntervalId = pricingIntervalId;
+    }
+
+    public Integer getUpperLimit() {
+        return upperLimit;
+    }
+
+    public void setUpperLimit(Integer upperLimit) {
+        this.upperLimit = upperLimit;
+    }
+
+    public Integer getLowerLimit() {
+        return lowerLimit;
+    }
+
+    public void setLowerLimit(Integer lowerLimit) {
+        this.lowerLimit = lowerLimit;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getAppealStatus() {
+        return appealStatus;
+    }
+
+    public void setAppealStatus(Integer appealStatus) {
+        this.appealStatus = appealStatus;
+    }
+
+    public String getAppealReason() {
+        return appealReason;
+    }
+
+    public void setAppealReason(String appealReason) {
+        this.appealReason = appealReason == null ? null : appealReason.trim();
+    }
+
+    public Integer getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(Integer updateUserId) {
+        this.updateUserId = updateUserId;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+}

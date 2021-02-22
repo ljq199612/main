@@ -1,0 +1,530 @@
+<template>
+  <CfPanel title="项目管理" class="main porject-manage-list">
+    <el-form :inline="true" :model="formInline" class="bpoFormInline">
+      <el-form-item label="请选择场地：">
+        <el-select v-model="formInline.orgType" placeholder="请选择场地">
+          <el-option label="组织一" value="shanghai" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="项目名称：">
+        <el-input
+          v-model="formInline.companyName"
+          placeholder="请输入项目名称"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <div class="addProjectWrapper">
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        @click="createProject"
+      >新增项目</el-button>
+    </div>
+    <div class="card-wrapper">
+      <div
+        v-for="item in [{ id: '1' }, { id: '2' }]"
+        :key="item.id"
+        class="card-item"
+      >
+        <div class="info-1">
+          <div class="text">顺丰速运高新奇中转场项目-01</div>
+          <el-button type="text">修改</el-button>
+          <el-button
+            type="text"
+            @click="toProjectDetails(item.id)"
+          >详情</el-button>
+        </div>
+        <div class="info-2">
+          甲方：顺丰速运高新奇业务部
+        </div>
+        <div class="info-3">
+          <div class="info-3-item">
+            <div class="label">昨日总工时</div>
+            <div class="value">5</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">驻场人员</div>
+            <div class="value">223</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">昨日实到人数</div>
+            <div class="value">345</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">昨日考勤异常人数</div>
+            <div class="value">345</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">昨日考勤完成率</div>
+            <div class="progress">
+              <el-progress :color="'#4794F7'" :percentage="60" />
+            </div>
+          </div>
+        </div>
+        <div class="info-3">
+          <div class="info-3-item">
+            <div class="label">今日总班次</div>
+            <div class="value">5</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">今日已排班次</div>
+            <div class="value">223</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">今日总规划人数</div>
+            <div class="value">345</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">昨日考勤异常人数</div>
+            <div class="value">345</div>
+          </div>
+          <div class="info-3-item">
+            <div class="label">人员规划完成率</div>
+            <el-progress :percentage="60" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      lang-type="zh"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.limit"
+      @pagination="getList"
+    />
+    <div class="table-wrapper">
+      <div class="title">顺丰速运高新奇中转场项目昨日异常考勤统计</div>
+      <el-table
+        v-loading="listLoading"
+        :data="equipmentInfoList"
+        style="width: 100%;margin-top:10px;"
+        border
+        fit
+        @sort-change="sortChange"
+      >
+        <el-table-column align="center" label="编号">
+          <template slot-scope="scope">{{ scope.row.col1 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="工号">
+          <template slot-scope="scope">{{ scope.row.col2 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="姓名">
+          <template slot-scope="scope">{{ scope.row.col3 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="班次">
+          <template slot-scope="scope">{{ scope.row.col4 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="班次时间">
+          <template slot-scope="scope">{{ scope.row.col5 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="打卡时间">
+          <template slot-scope="scope">{{ scope.row.col6 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="考勤异常原因">
+          <template slot-scope="scope">{{ scope.row.col7 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="状态">
+          <template slot-scope="scope">{{ scope.row.col8 }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="处理人">
+          <template slot-scope="scope">
+            {{ scope.row.col8 }}
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="处理意见">
+          <template slot-scope="scope">
+            {{ scope.row.col8 }}
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="chart-wrapper">
+      <div class="chart-item">
+        <div class="title">顺丰速运高新奇中转场项目历史数据</div>
+        <div class="chart">
+          <div id="js-history" class="history" />
+        </div>
+      </div>
+      <div class="chart-item">
+        <div class="title">顺丰速运高新奇中转场项目历史数据</div>
+        <div class="chart">
+          <div id="js-pie" class="pie" />
+        </div>
+      </div>
+    </div>
+  </CfPanel>
+</template>
+
+<script type="text/javascript">
+import echarts from 'echarts'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import { getProjectDetailList } from '@/api/projectManage/projectManage'
+
+export default {
+  name: 'PorjectManageList',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      formInline: {
+        orgType: '',
+        companyName: ''
+      },
+      options: [
+        {
+          value: '选项1',
+          label: '黄金糕'
+        },
+        {
+          value: '选项2',
+          label: '双皮奶'
+        },
+        {
+          value: '选项3',
+          label: '蚵仔煎'
+        },
+        {
+          value: '选项4',
+          label: '龙须面'
+        },
+        {
+          value: '选项5',
+          label: '北京烤鸭'
+        }
+      ],
+      value: '',
+      equipmentInfoList: [],
+      total: 0,
+      listLoading: false,
+      listQuery: {
+        page: 1,
+        limit: 20
+      }
+    }
+  },
+  computed: {},
+  created() {
+    // 获取项目列表
+    // this.getProjectDetailList()
+  },
+  mounted() {
+    this.getList()
+    this.initChart()
+  },
+  methods: {
+    submit() {},
+    reset() {},
+    getList() {
+      this.equipmentInfoList = [
+        {
+          col1: '001',
+          col2: '设备序号',
+          col3: '设备名称',
+          col4: '场地名称',
+          col5: 'ip地址',
+          col6: '模式',
+          col7: '设备状态',
+          col8: '在线状态',
+          col9: '操作'
+        }
+      ]
+      this.total = 10
+      this.listLoading = false
+    },
+    sortChange() {},
+    initChart() {
+      this.initHistoryChart()
+      this.initPie()
+    },
+    initHistoryChart() {
+      const historyDOM = document.getElementById('js-history')
+      const historyChart = echarts.init(historyDOM)
+      const option = {
+        xAxis: {
+          type: 'category',
+          data: ['6月18', '6月19', '6月20', '6月21', '6月22', '6月23', '6月24'],
+          axisTick: {
+            show: false // 是否显示刻度
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#DDDDDD' // x坐标轴的轴线颜色
+            }
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#000', // x轴上的字体颜色
+              fontSize: '12', // x轴字体大小
+              fontFamily: 'Microsoft YaHei'
+            }
+          }
+        },
+        yAxis: {
+          type: 'value',
+          splitLine: {
+            show: false
+          },
+          axisTick: {
+            show: false // 是否显示刻度
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#DDDDDD' // Y坐标轴的轴线颜色
+            }
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#000', // y轴上的字体颜色
+              fontSize: '12', // y轴字体大小
+              fontFamily: 'Microsoft YaHei'
+            }
+          }
+        },
+        series: [
+          {
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            lineStyle: {
+              normal: {
+                color: '#3B9BE5'
+              }
+            },
+            symbol: 'circle', // 拐点样式,
+            symbolSize: 8, // 拐点大小
+            itemStyle: {
+              normal: {
+                color: '#3B9BE5',
+                borderColor: '#fff', // 拐点边框颜色
+                borderWidth: 2 // 拐点边框大小
+              }
+            }
+          },
+          {
+            data: [8201, 9321, 9101, 1934, 11290, 11330, 11320],
+            type: 'line'
+          }
+        ]
+      }
+      if (option && typeof option === 'object') {
+        historyChart.setOption(option, true)
+      }
+    },
+    initPie() {
+      const pieDOM = document.getElementById('js-pie')
+      const pieChart = echarts.init(pieDOM)
+      const option = {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          left: '70%', // 图例距离左的距离
+          y: 'center', // 图例上下居中
+          data: ['班次1', '班次2', '班次3', '班次4']
+        },
+        series: [
+          {
+            name: '访问来源',
+            type: 'pie',
+            radius: ['40%', '50%'],
+            center: ['35%', '50%'], // 饼图的位置
+            avoidLabelOverlap: false,
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: '30',
+                fontWeight: 'bold'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            data: [
+              { value: 335, name: '班次1' },
+              { value: 310, name: '班次2' },
+              { value: 234, name: '班次3' },
+              { value: 135, name: '班次4' }
+            ],
+            color: ['#6DD94D', '#FF6B00', '#3B9BE5', '#8B3BE5']
+          }
+        ]
+      }
+      if (option && typeof option === 'object') {
+        pieChart.setOption(option, true)
+      }
+    },
+    /**
+     * 跳转新建项目
+     */
+    createProject() {
+      this.$router.push({ path: '/project/createProject' })
+    },
+    /**
+     * 获取项目列表
+     */
+    getProjectDetailList() {
+      getProjectDetailList()
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取项目列表失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 跳转项目详情
+     */
+    toProjectDetails(id) {
+      this.$router.push({
+        path: '/project/projectManageDetail',
+        query: {
+          id
+        }
+      })
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.porject-manage-list {
+  font-family: Microsoft YaHei;
+
+  .addProjectWrapper {
+    margin-top: 12px;
+    margin-bottom: 30px;
+  }
+
+  .card-wrapper {
+    display: flex;
+    justify-content: space-between;
+    .card-item {
+      padding: 18px 25px;
+      width: 49%;
+      background: #f5f5f5;
+    }
+    .info-1 {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      .text {
+        margin-right: 13px;
+        font-size: 13px;
+        font-weight: 400;
+        color: #000;
+      }
+    }
+    .info-2 {
+      margin-bottom: 27px;
+      color: #656565;
+      font-size: 12px;
+    }
+    .info-3 {
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      display: flex;
+      .info-3-item {
+        display: flex;
+        flex-direction: column;
+      }
+      .label {
+        margin-bottom: 15px;
+        color: #656565;
+        font-size: 12px;
+      }
+      .value {
+        line-height: 20px;
+        height: 20px;
+        color: #333;
+        font-size: 20px;
+        font-weight: 400;
+      }
+    }
+  }
+
+  .table-wrapper {
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid #e7e9f3;
+    .title {
+      margin-bottom: 18px;
+      border-left: 3px solid #ff6b00;
+      padding-left: 9px;
+      color: #000;
+      font-size: 14px;
+      line-height: 16px;
+      font-weight: bold;
+    }
+  }
+
+  .chart-wrapper {
+    padding-bottom: 55px;
+    margin-top: 54px;
+    display: flex;
+    justify-content: space-between;
+    .chart-item {
+      width: 49%;
+      .title {
+        margin-bottom: 18px;
+        border-left: 3px solid #ff6b00;
+        padding-left: 9px;
+        color: #000;
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: bold;
+      }
+      .chart {
+        border: 1px solid #dddddd;
+        width: 100%;
+        height: 500px;
+      }
+    }
+    .history,
+    .pie {
+      height: 100%;
+      width: 100%;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.porject-manage-list {
+  .el-progress {
+    height: 20px;
+    width: 98px;
+    display: flex;
+    align-items: center;
+    .el-progress-bar {
+      padding-right: 0;
+      margin-right: 0;
+      flex: 1;
+    }
+    .el-progress__text {
+      margin-left: 2px;
+      font-size: 12px !important;
+    }
+  }
+  .pagination-container {
+    padding: 0;
+    .el-pagination {
+      text-align: right;
+    }
+  }
+}
+</style>

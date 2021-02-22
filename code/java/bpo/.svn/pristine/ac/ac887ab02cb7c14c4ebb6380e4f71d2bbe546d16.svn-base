@@ -1,0 +1,623 @@
+<template>
+  <el-table
+    v-loading="listLoading"
+    :data="tableData"
+    border
+    fit
+    :span-method="mergeWorkModels"
+    class="editWorkTable"
+    @cell-click="editTableCell"
+  >
+    <el-table-column align="center" label="编号">
+      <template slot-scope="scope">
+        <span>{{ scope.row.number }}</span>
+      </template>
+    </el-table-column>
+
+    <el-table-column align="center" label="工作模块编码">
+      <template slot-scope="scope"><span>{{ scope.row.sysModuleCode }}</span>
+        <div class="input-box" :data-index="scope.$index">
+          <el-form
+            :ref="`sysModuleCodeForm${scope.$index}`"
+            :model="scope.row"
+            :inline-message="true"
+            @submit.native.prevent
+          >
+            <el-form-item
+              prop="sysModuleCode"
+              :rules="[
+                {
+                  required: true,
+                  message: '请输入工作编码',
+                  trigger: 'blur'
+                },
+                { validator: validWorkCode, trigger: 'blur' }
+              ]"
+            >
+              <el-input
+                v-model.trim="scope.row.sysModuleCode"
+                name="sysModuleCode"
+                @blur="handleInputBlur"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工作模块">
+      <template slot-scope="scope">
+        <span>{{ scope.row.sysModuleName }}</span>
+        <div class="input-box" :data-index="scope.$index">
+          <el-form
+            :ref="`sysModuleNameForm${scope.$index}`"
+            :model="scope.row"
+            :inline-message="true"
+            @submit.native.prevent
+          >
+            <el-form-item
+              prop="sysModuleName"
+              :rules="[
+                {
+                  required: true,
+                  message: '请输入工作模块名',
+                  trigger: 'blur'
+                }
+              ]"
+            >
+              <el-input
+                v-model="scope.row.sysModuleName"
+                name="sysModuleName"
+                @blur="handleInputBlur"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工作小组编码">
+      <template slot-scope="scope"><span>{{ scope.row.sysGroupCode }}</span>
+        <div class="input-box" :data-index="scope.$index">
+          <el-form
+            :ref="`sysGroupCodeForm${scope.$index}`"
+            :model="scope.row"
+            :inline-message="true"
+            @submit.native.prevent
+          >
+            <el-form-item
+              prop="sysGroupCode"
+              :rules="[
+                {
+                  required: true,
+                  message: '请输入工作小组编码',
+                  trigger: 'blur'
+                },
+                {
+                  validator: validWorkGroupCode,
+                  trigger: 'blur'
+                }
+              ]"
+            >
+              <el-input
+                v-model="scope.row.sysGroupCode"
+                name="sysGroupCode"
+                @blur="handleInputBlur"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工作小组">
+      <template slot-scope="scope"><span>{{ scope.row.sysGroupName }}</span>
+        <div class="input-box" :data-index="scope.$index">
+          <el-form
+            :ref="`sysGroupNameForm${scope.$index}`"
+            :model="scope.row"
+            :inline-message="true"
+            @submit.native.prevent
+          >
+            <el-form-item
+              prop="sysGroupName"
+              :rules="[
+                {
+                  required: true,
+                  message: '请输入工作小组',
+                  trigger: 'blur'
+                }
+              ]"
+            >
+              <el-input
+                v-model="scope.row.sysGroupName"
+                name="sysGroupName"
+                @blur="handleInputBlur"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工序编码">
+      <template slot-scope="scope"><span>{{ scope.row.sysProcessCode }}</span>
+        <div class="input-box" :data-index="scope.$index">
+          <el-form
+            :ref="`sysProcessCodeForm${scope.$index}`"
+            :model="scope.row"
+            :inline-message="true"
+            @submit.native.prevent
+          >
+            <el-form-item
+              prop="sysProcessCode"
+              :rules="[
+                {
+                  required: true,
+                  message: '请输入工序编码',
+                  trigger: 'blur'
+                },
+                {
+                  validator: sysProcessCode,
+                  trigger: 'blur'
+                }
+              ]"
+            >
+              <el-input
+                v-model="scope.row.sysProcessCode"
+                name="sysProcessCode"
+                @blur="handleInputBlur"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工序">
+      <template slot-scope="scope">
+        <span>{{ scope.row.sysProcessName }}</span>
+        <div class="input-box" :data-index="scope.$index">
+          <el-form
+            :ref="`sysProcessNameForm${scope.$index}`"
+            :model="scope.row"
+            :inline-message="true"
+            @submit.native.prevent
+          >
+            <el-form-item
+              prop="sysProcessName"
+              :rules="[
+                {
+                  required: true,
+                  message: '请输入工序',
+                  trigger: 'blur'
+                }
+              ]"
+            >
+              <el-input
+                v-model="scope.row.sysProcessName"
+                name="sysProcessName"
+                @blur="handleInputBlur"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工序操作">
+      <template slot-scope="scope">
+        <el-button type="text" @click="deleteRowBySysProcess(scope.row)">删除</el-button>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="工作小组操作">
+      <template slot-scope="scope">
+        <el-button type="text" @click="addSysProcess(scope.row)">增加工序</el-button>
+        <el-button type="text" @click="deleteWorkGroup(scope.row)">删除</el-button></template>
+    </el-table-column>
+    <el-table-column align="center" label="工作模块操作">
+      <template slot-scope="scope">
+        <el-button type="text" @click="addWorkGroup(scope.row)">添加工作小组</el-button>
+        <el-button type="text" @click="deleteSysModule(scope.row)">删除</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+</template>
+
+<script>
+import { caculateObjectLength } from './../utils/utils'
+import mergeData from './../utils/mergeData'
+let COUNT = 0 // 编号
+export default {
+  props: {
+    data: {
+      type: Array,
+      default() {
+        return []
+      }
+    }
+  },
+  data() {
+    return {
+      listLoading: false,
+      editRow: null, // 当前编辑的行
+      tableData: []
+    }
+  },
+  computed: {
+    // 序号，工作模块编码，工作模块 合并数据
+    sysModuleMergeData() {
+      return mergeData({
+        tableData: this.tableData,
+        key: 'sysModuleId',
+        mergeDataFunction: (item1, item2) => {
+          return item1['sysModuleId'] === item2['sysModuleId']
+        }
+      })
+    },
+    // 工作小组合并数据
+    sysGroupMergetData() {
+      return mergeData({
+        tableData: this.tableData,
+        key: 'sysGroupId',
+        mergeDataFunction: (item1, item2) => {
+          return (
+            item1['sysModuleId'] === item2['sysModuleId'] &&
+            item1['sysGroupId'] === item2['sysGroupId']
+          )
+        }
+      })
+    }
+  },
+  mounted() {
+    this.$set(this, 'tableData', this.data)
+  },
+  methods: {
+    /**
+     * 单元格合并算法
+     */
+    mergeWorkModels({ row, column, rowIndex, columnIndex }) {
+      if (
+        columnIndex === 0 ||
+        columnIndex === 1 ||
+        columnIndex === 2 ||
+        columnIndex === 9
+      ) {
+        if (!caculateObjectLength(this.sysModuleMergeData)) {
+          return
+        }
+        // 工作模块编码单元格
+        if (this.sysModuleMergeData[rowIndex]) {
+          return {
+            rowspan: this.sysModuleMergeData[rowIndex]['rowspan'],
+            colspan: 1
+          }
+        } else {
+          return {
+            rowspan: 0,
+            cocolspan: 0
+          }
+        }
+      } else if (columnIndex === 3 || columnIndex === 4 || columnIndex === 8) {
+        if (!caculateObjectLength(this.sysGroupMergetData)) {
+          return
+        }
+        // 工作小组单元格
+        if (this.sysGroupMergetData[rowIndex]) {
+          return {
+            rowspan: this.sysGroupMergetData[rowIndex]['rowspan'],
+            colspan: 1
+          }
+        } else {
+          return {
+            rowspan: 0,
+            cocolspan: 0
+          }
+        }
+      }
+    },
+    /**
+     * 编辑点击单元格
+     */
+    editTableCell(row, column, cell, event) {
+      const forbidEditArr = ['编号', '工序操作', '工作小组操作', '工作模块操作']
+      if (forbidEditArr.indexOf(column.label) !== -1) {
+        return
+      }
+      this.editRow = row
+      // 显示编辑输入框，隐藏文字
+      cell.querySelector('.cell').classList.add('current-cell')
+      // 输入框聚焦
+      cell.querySelector('.cell .el-input input').focus()
+    },
+    /**
+     * 编辑单元格失去焦点
+     */
+    handleInputBlur(event) {
+      const target = event.target
+      let cell = target
+      let index = '0'
+      do {
+        cell = cell.parentNode
+        if (cell.classList.contains('input-box')) {
+          // 获取index
+          index = cell['attributes']['data-index']['nodeValue']
+        }
+      } while (!cell.classList.contains('cell'))
+      const name = target['name'] // 表单字段名
+      // 表单校验
+      const formInstance = this.$refs[name + 'Form' + index]
+      formInstance
+        .validate()
+        .then(() => {
+          // 校验成功
+          // 隐藏编辑模式
+          cell.classList.remove('current-cell')
+          // 更新表格数据
+          switch (name) {
+            case 'sysModuleCode':
+            case 'sysModuleName':
+              // 更新相等sysModuleId相等的模块数据
+              // eslint-disable-next-line no-case-declarations
+              const sysModuleId = this.editRow['sysModuleId']
+              for (let i = 0, len = this.tableData.length; i < len; i++) {
+                const item = this.tableData[i]
+                if (item['sysModuleId'] === sysModuleId) {
+                  item[name] = this.editRow[name]
+                }
+              }
+              break
+
+            default:
+              break
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    /**
+     * 校验工作模块编码
+     */
+    validWorkCode(rule, value, callback) {
+      const reg = /^\w+$/
+      if (!reg.test(value)) {
+        callback(new Error('工作编码由字母数字组成'))
+      } else {
+        callback()
+      }
+    },
+    /**
+     * 校验工作小组编码
+     */
+    validWorkGroupCode(rule, value, callback) {
+      const reg = /^\w+$/
+      if (!reg.test(value)) {
+        callback(new Error('工作编码由字母数字组成'))
+      } else {
+        callback()
+      }
+    },
+    /**
+     * 校验工序编码
+     */
+    sysProcessCode(rule, value, callback) {
+      const reg = /^\w+$/
+      if (!reg.test(value)) {
+        callback(new Error('工作编码由字母数字组成'))
+      } else {
+        callback()
+      }
+    },
+    /**
+     * 计算工作模块合并的数据范围
+     */
+    getSysModuleMergeData(key) {
+      const workModelsData = this.tableData
+      const len = workModelsData.length // 总数据长度
+      const mergeInfoMap = {}
+      let i = 0
+      while (i < len - 1) {
+        const currentRow = workModelsData[i] // 基准单元格
+        const currentRowId = currentRow[key]
+        if (!currentRowId) {
+          break
+        }
+        const mergeInfo = {
+          rowStartIndex: i,
+          rowspan: 1
+        }
+        let j
+        for (j = i + 1; j < len; j++) {
+          const compareRow = workModelsData[j] // 比较单元格
+          const compareRowId = compareRow[key]
+          if (!compareRowId) {
+            break
+          }
+          if (currentRowId === compareRowId) {
+            // 单元格合并范围+1
+            mergeInfo.rowspan++
+          } else {
+            break
+          }
+        }
+        // 单元格合并结束
+        i = j
+        // 建立行合并map
+        mergeInfoMap[mergeInfo['rowStartIndex']] = mergeInfo
+      }
+      return mergeInfoMap
+    },
+    /**
+     * 添加一个模块
+     */
+    addRowData(row) {
+      //   number: '1',
+      //   sysModuleCode: '', // 系统设置模块编号
+      //   sysModuleId: '', // 系统设置模块id
+      //   sysModuleName: '', // 系统设置模块名称
+      //   sysGroupCode: '', // 系统设置工作小组编号
+      //   sysGroupId: '', // 系统设置工作小组id
+      //   sysGroupName: '', // 系统设置工作小组名称
+      //   sysProcessCode: '', // 系统设置工序编号
+      //   sysProcessId: '', // 系统设置工序id
+      //   sysProcessName: '' // 系统设置工作小组名称
+      const _row = Object.assign(
+        {
+          number: this.countToString(++COUNT, 3),
+          sysModuleId: this.generateUID('sysModuleId'), // 生成工作模块唯一标识
+          sysGroupId: this.generateUID('sysGroupId'), // 生成工作小组唯一标识
+          sysProcessId: this.generateUID('sysProcessId'), // 生成工序唯一标识
+          sysModuleCode: '', // 系统设置模块编号
+          sysModuleName: '', // 系统设置模块名称
+          sysGroupCode: '', // 系统设置工作小组编号
+          sysGroupName: '', // 系统设置工作小组名称
+          sysProcessCode: '', // 系统设置工序编号
+          sysProcessName: '' // 系统设置工作小组名称
+        },
+        row
+      )
+      this.tableData.push(_row)
+    },
+    /**
+     * 通过key生成唯一标识
+     */
+    generateUID(key) {
+      return `${key}-${new Date().getTime()}`
+    },
+    /**
+     * 转换数字为字符串
+     */
+    countToString(count, length) {
+      count = count + ''
+      const countArr = count.split('')
+      while (countArr.length !== length) {
+        countArr.unshift('0')
+      }
+      return countArr.join('')
+    },
+    /**
+     * 删除模块
+     */
+    deleteSysModule(row) {
+      const sysModuleId = row['sysModuleId']
+      const _tableData = this.tableData.filter((item) => {
+        return item['sysModuleId'] !== sysModuleId
+      })
+      this.$set(this, 'tableData', _tableData)
+    },
+    /**
+     * 添加工作小组
+     */
+    addWorkGroup(row) {
+      const index = this.getIndexByRow(row)
+      // 复制编号，工作模块编码，工作模块名
+      const number = row['number'] // 编号
+      const sysModuleId = row['sysModuleId'] // 模块ID
+      const sysModuleCode = row['sysModuleCode'] // 工作模块编码名
+      const sysModuleName = row['sysModuleName']
+      // 生成工作小组唯一标识
+      const sysGroupId = this.generateUID('sysGroupId')
+      // 生成工序唯一标识
+      const sysProcessId = this.generateUID('sysProcessId')
+      const _row = {
+        number,
+        sysModuleId,
+        sysModuleCode,
+        sysModuleName,
+        sysGroupId,
+        sysProcessId,
+        sysGroupCode: '', // 系统设置工作小组编号
+        sysGroupName: '', // 系统设置工作小组名称
+        sysProcessCode: '', // 系统设置工序编号
+        sysProcessName: '' // 系统设置工作小组名称
+      }
+      this.tableData.splice(index + 1, 0, _row)
+    },
+    /**
+     * 删除工作小组
+     */
+    deleteWorkGroup(row) {
+      const sysGroupId = row['sysGroupId']
+      const _tableData = this.tableData.filter((item) => {
+        return item['sysGroupId'] !== sysGroupId
+      })
+      this.$set(this, 'tableData', _tableData)
+    },
+    /**
+     * 添加工序
+     */
+    addSysProcess(row) {
+      const index = this.getIndexByRow(row)
+      // 复制编号，工作模块编码，工作模块名
+      const number = row['number'] // 编号
+      const sysModuleId = row['sysModuleId'] // 模块ID
+      const sysModuleCode = row['sysModuleCode'] // 工作模块编码名
+      const sysModuleName = row['sysModuleName']
+      // 复制小组ID，小组名，小组编码
+      const sysGroupId = row['sysGroupId']
+      const sysGroupName = row['sysGroupName']
+      const sysGroupCode = row['sysGroupCode']
+      // 生成工序唯一标识
+      const sysProcessId = this.generateUID('sysProcessId')
+      const _row = {
+        number,
+        sysModuleId,
+        sysModuleCode,
+        sysModuleName,
+        sysGroupId,
+        sysGroupName,
+        sysGroupCode,
+        sysProcessId,
+        sysProcessCode: '', // 系统设置工序编号
+        sysProcessName: '' // 系统设置工作小组名称
+      }
+      this.tableData.splice(index + 1, 0, _row)
+    },
+    /**
+     * 删除工序
+     */
+    deleteRowBySysProcess(row) {
+      const sysProcessId = row['sysProcessId']
+      const _tableData = this.tableData.filter((item) => {
+        return item['sysProcessId'] !== sysProcessId
+      })
+      this.$set(this, 'tableData', _tableData)
+    },
+    /**
+     * 通过数据获取索引
+     */
+    getIndexByRow(row) {
+      let index = -1
+      for (let i = 0, len = this.tableData.length; i < len; i++) {
+        const item = this.tableData[i]
+        if (item === row) {
+          index = i
+          break
+        }
+      }
+      return index
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.input-box {
+  display: none;
+}
+.current-cell {
+  .input-box {
+    display: block;
+  }
+  span {
+    display: none;
+  }
+}
+</style>
+<style lang="scss">
+.editWorkTable {
+  .cell {
+    .el-form-item__error--inline {
+      margin-left: 0;
+    }
+  }
+  .el-button + .el-button {
+    margin-left: 0;
+  }
+}
+</style>

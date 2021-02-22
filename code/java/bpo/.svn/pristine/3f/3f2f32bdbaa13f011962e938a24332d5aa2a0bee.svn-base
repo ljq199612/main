@@ -1,0 +1,41 @@
+import request from '@/utils/request'
+
+export function getRoles(data) {
+  return request({
+    url: '/sysRole/findAll',
+    method: 'get',
+    params: data
+  })
+}
+
+export function getRolesNoPage(data) {
+  return request({
+    url: '/sysRole/findAllNoPage',
+    method: 'get',
+    params: data
+  })
+}
+
+export function deleteRole(data) {
+  return request({
+    url: '/sysRole/delete',
+    method: 'delete',
+    params: data
+  })
+}
+
+export function addRole(data) {
+  return request({
+    url: '/sysRole/insert',
+    method: 'get',
+    params: data
+  })
+}
+
+export function updateRole(data) {
+  return request({
+    url: '/sysRole/update',
+    method: 'get',
+    params: data
+  })
+}

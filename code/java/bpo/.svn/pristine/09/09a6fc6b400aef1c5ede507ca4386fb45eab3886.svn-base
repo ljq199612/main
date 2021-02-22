@@ -1,0 +1,121 @@
+<template>
+  <div>
+    <el-form :inline="true" class="bpoFormInline">
+      <el-form-item label-width="90px" label="系统模块：">
+        <el-select v-model="type" placeholder="请选择系统模块">
+          <el-option v-for="(item,index) in typeOptions" :key="index" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label-width="90px" label="日期：">
+        <el-date-picker
+          v-model="startDate"
+          type="date"
+          placeholder="请选择日期"
+          @change="submit"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <!-- <el-button @click="reset">重置</el-button> -->
+      </el-form-item>
+    </el-form>
+    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:10px;">
+      <line-chart ref="lineChart" :chart-data="lineChartData" :type="type" :x-axis-data="xAxisData" />
+    </el-row>
+  </div>
+</template>
+<script>
+import { findSysInfo } from '@/api/logMgt'
+import { parseTime } from '@/utils'
+import LineChart from './LineChart'
+
+export default {
+  name: 'SystemLog',
+  components: {
+    LineChart
+  },
+  data() {
+    return {
+      type: null,
+      startDate: '',
+      typeOptions: [
+        {
+          label: '全部',
+          value: null
+        },
+        {
+          label: 'CPU',
+          value: 1
+        },
+        {
+          label: '内存',
+          value: 2
+        },
+        {
+          label: '硬盘',
+          value: 3
+        }
+      ],
+      listLoading: false,
+      lineChartData: {
+        // cpuData: [100, 120, 161, 134, 105, 160, 165, 155, 176, 185, 122, 130],
+        // romData: [120, 82, 91, 154, 162, 140, 145, 182, 168, 142, 135, 99],
+        // hardDiskData: [130, 22, 241, 184, 132, 114, 115, 65, 76, 117, 165, 159]
+        cpuData: [],
+        romData: [],
+        hardDiskData: []
+      },
+      xAxisData: []
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList() {
+      let startDate = this.startDate
+      if (startDate) {
+        startDate = parseTime(startDate, '{y}-{m}-{d}')
+      }
+      findSysInfo({
+        startDate
+      }).then((res) => {
+        this.listLoading = false
+        const queryData = res.data.data || []
+        this.xAxisData = this.forMateChartData(queryData, 'time')
+        this.lineChartData = {
+          cpuData: this.forMateChartData(queryData, 'cpuUsed'),
+          romData: this.forMateChartData(queryData, 'ramUsed'),
+          hardDiskData: this.forMateChartData(queryData, 'romUsed')
+        }
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 格式化折线图数据
+    forMateChartData(list, key) {
+      const arr = []
+      list.forEach((item) => {
+        let val = item[key] || ''
+        if (key === 'time') {
+          val = `${val}:00:00`
+        }
+        arr.push(val)
+      })
+      return arr
+    },
+    reset() {
+      this.startDate = ''
+      this.type = null
+      this.getList()
+    },
+    submit() {
+      this.getList()
+    }
+  }
+}
+</script>

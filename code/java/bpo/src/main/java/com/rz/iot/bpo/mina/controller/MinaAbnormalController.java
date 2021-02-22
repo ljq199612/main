@@ -1,0 +1,98 @@
+package com.rz.iot.bpo.mina.controller;
+
+import com.rz.iot.bpo.framework.web.controller.BaseController;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.model.MinaAbnormal;
+import com.rz.iot.bpo.mina.model.show.MinaAbnormalShow;
+import com.rz.iot.bpo.mina.service.MinaAbnormalService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * @program: bpo-preview
+ * @description: 异常上报
+ * @author: YangShun
+ * @create: 2020-07-22 11:12
+ **/
+@RestController
+@RequestMapping("minaAbnormal")
+public class MinaAbnormalController extends BaseController {
+
+    @Autowired
+    private MinaAbnormalService abnormalService;
+
+    /**
+     * 查询所有异常上报信息
+     * @return
+     */
+    @GetMapping("findAll")
+    public Result findAll(String select){
+        startPage ();
+        List<MinaAbnormalShow> all = abnormalService.findAll (new BaseEntity (),select);
+        Result data = getData (all);
+        return data;
+    }
+
+    /**
+     * 获取单条异常信息
+     * @param id
+     * @return
+     */
+    @GetMapping("getDetail")
+    public Result getDetail(Integer id){
+        return abnormalService.getDetail (id);
+    }
+
+    /**
+     * 上报异常
+     * @param abnormal
+     * @return
+     */
+    @GetMapping("upload")
+    public Result upload(@Validated MinaAbnormal abnormal){
+        return abnormalService.insertAbnormal (abnormal);
+    }
+
+    /**
+     * 获取对应的所有中转场
+     * @return
+     */
+    @GetMapping("getTransfer")
+    public Result getTransfer(){
+        return abnormalService.getTransfer (new BaseEntity ());
+    }
+
+    /**
+     * 获取对应的所有项目
+     * @return
+     */
+    @GetMapping("getProject")
+    public Result getProject(){
+        return abnormalService.getProject (new BaseEntity ());
+    }
+
+    /**
+     * 获取所有的供应商
+     * @return
+     */
+    @GetMapping("getSupplier")
+    public Result getSupplier(){
+        return abnormalService.getSupplier (new BaseEntity ());
+    }
+
+    /**
+     * 在选择项目后获取项目中的人员
+     * @param projectId
+     * @return
+     */
+    @GetMapping("getPerson")
+    public Result getPerson(Integer projectId){
+        return abnormalService.getPerson (projectId);
+    }
+}

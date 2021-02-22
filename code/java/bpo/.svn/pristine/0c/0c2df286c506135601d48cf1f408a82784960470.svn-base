@@ -1,0 +1,17 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillReconciliationPersonal;
+
+public interface BpoBillReconciliationPersonalMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoBillReconciliationPersonal record);
+
+    int insertSelective(BpoBillReconciliationPersonal record);
+
+    BpoBillReconciliationPersonal selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoBillReconciliationPersonal record);
+
+    int updateByPrimaryKey(BpoBillReconciliationPersonal record);
+}

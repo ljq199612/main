@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoBillReconciliationPieceDetailedMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoBillReconciliationPieceDetailed" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="bill_reconciliation_id" property="billReconciliationId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER" />
+    <result column="billing_cycle" property="billingCycle" jdbcType="VARCHAR" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="fee_rule_type" property="feeRuleType" jdbcType="INTEGER" />
+    <result column="income" property="income" jdbcType="DECIMAL" />
+    <result column="deduction" property="deduction" jdbcType="DECIMAL" />
+    <result column="real_income" property="realIncome" jdbcType="DECIMAL" />
+    <result column="work_model_id" property="workModelId" jdbcType="INTEGER" />
+    <result column="work_group_id" property="workGroupId" jdbcType="INTEGER" />
+    <result column="process_id" property="processId" jdbcType="INTEGER" />
+    <result column="product_id" property="productId" jdbcType="INTEGER" />
+    <result column="pricing_interval_id" property="pricingIntervalId" jdbcType="INTEGER" />
+    <result column="upper_limit" property="upperLimit" jdbcType="INTEGER" />
+    <result column="lower_limit" property="lowerLimit" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="appeal_status" property="appealStatus" jdbcType="INTEGER" />
+    <result column="appeal_reason" property="appealReason" jdbcType="VARCHAR" />
+    <result column="update_user_id" property="updateUserId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationPieceDetailed" >
+    insert into bpo_bill_reconciliation_piece_detailed (id, bill_reconciliation_id, project_id, 
+      supplier_info_id, billing_cycle, person_id, 
+      fee_rule_type, income, deduction, 
+      real_income, work_model_id, work_group_id, 
+      process_id, product_id, pricing_interval_id, 
+      upper_limit, lower_limit, price, 
+      status, appeal_status, appeal_reason, 
+      update_user_id, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{billReconciliationId,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, 
+      #{supplierInfoId,jdbcType=INTEGER}, #{billingCycle,jdbcType=VARCHAR}, #{personId,jdbcType=INTEGER}, 
+      #{feeRuleType,jdbcType=INTEGER}, #{income,jdbcType=DECIMAL}, #{deduction,jdbcType=DECIMAL}, 
+      #{realIncome,jdbcType=DECIMAL}, #{workModelId,jdbcType=INTEGER}, #{workGroupId,jdbcType=INTEGER}, 
+      #{processId,jdbcType=INTEGER}, #{productId,jdbcType=INTEGER}, #{pricingIntervalId,jdbcType=INTEGER}, 
+      #{upperLimit,jdbcType=INTEGER}, #{lowerLimit,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
+      #{status,jdbcType=INTEGER}, #{appealStatus,jdbcType=INTEGER}, #{appealReason,jdbcType=VARCHAR}, 
+      #{updateUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationPieceDetailed" >
+    insert into bpo_bill_reconciliation_piece_detailed
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="billReconciliationId != null" >
+        bill_reconciliation_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id,
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle,
+      </if>
+      <if test="personId != null" >
+        person_id,
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type,
+      </if>
+      <if test="income != null" >
+        income,
+      </if>
+      <if test="deduction != null" >
+        deduction,
+      </if>
+      <if test="realIncome != null" >
+        real_income,
+      </if>
+      <if test="workModelId != null" >
+        work_model_id,
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id,
+      </if>
+      <if test="processId != null" >
+        process_id,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="pricingIntervalId != null" >
+        pricing_interval_id,
+      </if>
+      <if test="upperLimit != null" >
+        upper_limit,
+      </if>
+      <if test="lowerLimit != null" >
+        lower_limit,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="appealStatus != null" >
+        appeal_status,
+      </if>
+      <if test="appealReason != null" >
+        appeal_reason,
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="billReconciliationId != null" >
+        #{billReconciliationId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="income != null" >
+        #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realIncome != null" >
+        #{realIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="workModelId != null" >
+        #{workModelId,jdbcType=INTEGER},
+      </if>
+      <if test="workGroupId != null" >
+        #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="processId != null" >
+        #{processId,jdbcType=INTEGER},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=INTEGER},
+      </if>
+      <if test="pricingIntervalId != null" >
+        #{pricingIntervalId,jdbcType=INTEGER},
+      </if>
+      <if test="upperLimit != null" >
+        #{upperLimit,jdbcType=INTEGER},
+      </if>
+      <if test="lowerLimit != null" >
+        #{lowerLimit,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="appealStatus != null" >
+        #{appealStatus,jdbcType=INTEGER},
+      </if>
+      <if test="appealReason != null" >
+        #{appealReason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUserId != null" >
+        #{updateUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+</mapper>

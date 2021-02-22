@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoEvaluationResultMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoEvaluationResult">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER"/>
+        <result column="grade" property="grade" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="calculated" property="calculated" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="evaluation_time" property="evaluationTime" jdbcType="VARCHAR"/>
+        <result column="fee_expend_rate" property="feeExpendRate" jdbcType="VARCHAR"/>
+        <result column="assessment_quota" property="assessmentQuota" jdbcType="VARCHAR"/>
+        <result column="result_money" property="resultMoney" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="BpoEvaluationResultShowMap" type="com.rz.iot.bpo.model.show.BpoEvaluationResultShow">
+        <id column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <id column="project_sn" property="projectSn" jdbcType="VARCHAR"/>
+        <id column="supplier_name" property="supplierName" jdbcType="VARCHAR"/>
+        <id column="transfer_station_id" property="transferStationId" jdbcType="INTEGER"/>
+        <id column="transfer_station_name" property="transferStationName" jdbcType="VARCHAR"/>
+        <id column="transfer_station_code" property="transferStationCode" jdbcType="VARCHAR"/>
+
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER"/>
+        <result column="grade" property="grade" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="calculated" property="calculated" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="evaluation_time" property="evaluationTime" jdbcType="VARCHAR"/>
+        <result column="fee_expend_rate" property="feeExpendRate" jdbcType="VARCHAR"/>
+        <result column="assessment_quota" property="assessmentQuota" jdbcType="VARCHAR"/>
+        <result column="result_money" property="resultMoney" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, project_id,supplier_info_id, grade, user_id,calculated, status, create_time, update_time, evaluation_time,fee_expend_rate,assessment_quota,result_money
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_evaluation_result
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByProjectId" resultMap="BpoEvaluationResultShowMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_evaluation_result
+        where project_id = #{projectId,jdbcType=INTEGER}
+        and status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from bpo_evaluation_result
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoEvaluationResult">
+        insert into bpo_evaluation_result (id, project_id,supplier_info_id, grade,
+                                           user_id, status, create_time,
+                                           update_time, evaluation_time,fee_expend_rate,assessment_quota,result_money)
+        values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER},#{supplierInfoId,jdbcType=INTEGER}, #{grade,jdbcType=VARCHAR},
+                #{userId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP}, #{evaluationTime,jdbcType=VARCHAR},
+                #{feeExpendRate,jdbcType=VARCHAR},#{assessmentQuota,jdbcType=VARCHAR},#{resultMoney,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoEvaluationResult" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        insert into bpo_evaluation_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="supplierInfoId != null">
+                supplier_info_id,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="evaluationTime != null">
+                evaluation_time,
+            </if>
+            <if test="feeExpendRate != null">
+                fee_expend_rate,
+            </if>
+            <if test="assessmentQuota != null">
+                assessment_quota,
+            </if>
+            <if test="resultMoney != null">
+                result_money,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="supplierInfoId != null">
+                #{supplierInfoId,jdbcType=INTEGER},
+            </if>
+            <if test="grade != null">
+                #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="evaluationTime != null">
+                #{evaluationTime,jdbcType=VARCHAR},
+            </if>
+            <if test="fee_expend_rate != null">
+                #{feeExpendRate,jdbcType=VARCHAR},
+            </if>
+            <if test="assessmentQuota != null">
+                #{assessment_quota,jdbcType=VARCHAR},
+            </if>
+            <if test="resultMoney != null">
+                #{result_money,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoEvaluationResult">
+        update bpo_evaluation_result
+        <set>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="supplierInfoId != null">
+                supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="calculated != null">
+                calculated = #{calculated,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="evaluationTime != null">
+                evaluation_time = #{evaluationTime,jdbcType=VARCHAR},
+            </if>
+            <if test="feeExpendRate != null">
+                fee_expend_rate = #{feeExpendRate,jdbcType=VARCHAR},
+            </if>
+            <if test="assessmentQuota != null">
+                assessment_quota = #{assessmentQuota,jdbcType=VARCHAR},
+            </if>
+            <if test="resultMoney != null">
+                result_money = #{resultMoney,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoEvaluationResult">
+        update bpo_evaluation_result
+        set project_id      = #{projectId,jdbcType=INTEGER},
+            supplier_info_id   = #{supplierInfoId,jdbcType=INTEGER},
+            grade           = #{grade,jdbcType=VARCHAR},
+            user_id         = #{userId,jdbcType=INTEGER},
+            calculated      = #{calculated,jdbcType=INTEGER},
+            status          = #{status,jdbcType=INTEGER},
+            create_time     = #{createTime,jdbcType=TIMESTAMP},
+            update_time     = #{updateTime,jdbcType=TIMESTAMP},
+            evaluation_time = #{evaluationTime,jdbcType=VARCHAR},
+            fee_expend_rate = #{feeExpendRate,jdbcType=VARCHAR},
+            assessment_quota = #{assessmentQuota,jdbcType=VARCHAR},
+            result_money = #{resultMoney,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getProjectResultList" resultMap="BpoEvaluationResultShowMap">
+        SELECT
+        result.*,
+        project.project_name,
+        project.project_sn,
+        project.transfer_station_id,
+        transfer_station.`name` AS transfer_station_name,
+        transfer_station.`code` AS transfer_station_code
+        FROM
+        bpo_evaluation_result result
+        INNER JOIN bpo_project project ON project.id = result.project_id AND project.`status`=${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_transfer_station transfer_station ON transfer_station.id = project.transfer_station_id
+        AND transfer_station.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        WHERE
+        result.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="info != null and info !=''">
+            <if test="info.projectName != null and info.projectName != ''">
+                AND project.project_name LIKE concat('%',#{info.projectName},'%')
+            </if>
+            <if test="info.projectSn != null and info.projectSn != ''">
+                AND project.project_sn = #{info.projectSn}
+            </if>
+            <if test="info.evaluationTime != null and info.evaluationTime != ''">
+                AND result.evaluation_time = #{info.evaluationTime}
+            </if>
+            <if test="info.transferStationId != null and info.transferStationId != ''">
+                AND transfer_station.id = #{info.transferStationId}
+            </if>
+        </if>
+    </select>
+
+
+    <select id="getSupplierResultList" resultMap="BpoEvaluationResultShowMap">
+        SELECT
+        result.*,
+        project.project_name,
+        project.project_sn,
+        company.company_name AS supplier_name,
+        project.transfer_station_id,
+        transfer_station.`name` AS transfer_station_name,
+        transfer_station.`code` AS transfer_station_code
+        FROM
+        bpo_evaluation_result result
+        INNER JOIN bpo_supplier_info supplier_info ON supplier_info.id = result.supplier_info_id
+        AND supplier_info.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_project project ON project.id = supplier_info.project_id
+        AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_company company ON company.id = supplier_info.org_id
+        AND company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_PROVIDER}
+        AND company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_transfer_station transfer_station ON transfer_station.id = project.transfer_station_id
+        AND transfer_station.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        WHERE
+        result.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="info != null and info !=''">
+            <if test="info.projectName != null and info.projectName != ''">
+                AND project.project_name LIKE concat('%',#{info.projectName},'%')
+            </if>
+            <if test="info.supplierName != null and info.supplierName != ''">
+                AND company.company_name LIKE concat('%',#{info.supplierName},'%')
+            </if>
+            <if test="info.evaluationTime != null and info.evaluationTime != ''">
+                AND result.evaluation_time = #{info.evaluationTime}
+            </if>
+            <if test="info.transferStationId != null and info.transferStationId != ''">
+                AND transfer_station.id = #{info.transferStationId}
+            </if>
+        </if>
+    </select>
+
+    <select id="getResult" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_evaluation_result
+        where
+        status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+        <if test="info.evaluationTime != null and info.evaluationTime !=''">
+            AND evaluation_time = #{info.evaluationTime}
+        </if>
+        <if test="info.supplierInfoId != null and info.supplierInfoId !=''">
+            AND supplier_info_id = #{info.supplierInfoId}
+        </if>
+        <if test="info.id != null and info.id !=''">
+            AND id = #{info.id}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoAttendanceInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoAttendanceInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="class_sn" property="classSn" jdbcType="VARCHAR" />
+    <result column="attendance_date" property="attendanceDate" jdbcType="TIMESTAMP" />
+    <result column="clock_in_time" property="clockInTime" jdbcType="TIMESTAMP" />
+    <result column="clock_out_time" property="clockOutTime" jdbcType="TIMESTAMP" />
+    <result column="exclude_hour" property="excludeHour" jdbcType="REAL" />
+    <result column="arrival_time" property="arrivalTime" jdbcType="TIMESTAMP" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="dev_id" property="devId" jdbcType="INTEGER" />
+    <result column="working_hours" property="workingHours" jdbcType="REAL" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="attendance_hours" property="attendanceHours" jdbcType="REAL" />
+    <result column="wage_hours" property="wageHours" jdbcType="REAL" />
+    <result column="overtime_hours" property="overtimeHours" jdbcType="REAL" />
+    <result column="record_status" property="recordStatus" jdbcType="TINYINT" />
+    <result column="record_approval_status" property="recordApprovalStatus" jdbcType="TINYINT" />
+    <result column="approval_status" property="approvalStatus" jdbcType="TINYINT" />
+    <result column="approval_user_id" property="approvalUserId" jdbcType="INTEGER" />
+    <result column="approval_wage_hours" property="approvalWageHours" jdbcType="REAL" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="complain_remark" property="complainRemark" jdbcType="VARCHAR" />
+    <result column="approval_time" property="approvalTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="BpoAttendanceInfoShowMap" type="com.rz.iot.bpo.model.show.BpoAttendanceInfoShow" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="work_no" property="workNo" jdbcType="VARCHAR" />
+    <result column="station" property="station" jdbcType="VARCHAR" />
+    <result column="class_sn" property="classSn" jdbcType="VARCHAR" />
+    <result column="class_name" property="className" jdbcType="VARCHAR" />
+    <result column="attendance_date" property="attendanceDate" jdbcType="TIMESTAMP" />
+    <result column="clock_in_time" property="clockInTime" jdbcType="TIMESTAMP" />
+    <result column="clock_out_time" property="clockOutTime" jdbcType="TIMESTAMP" />
+    <result column="exclude_hour" property="excludeHour" jdbcType="REAL" />
+    <result column="arrival_time" property="arrivalTime" jdbcType="TIMESTAMP" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="dev_id" property="devId" jdbcType="INTEGER" />
+    <result column="working_hours" property="workingHours" jdbcType="REAL" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="attendance_hours" property="attendanceHours" jdbcType="REAL" />
+    <result column="wage_hours" property="wageHours" jdbcType="REAL" />
+    <result column="overtime_hours" property="overtimeHours" jdbcType="REAL" />
+    <result column="record_status" property="recordStatus" jdbcType="TINYINT" />
+    <result column="record_approval_status" property="recordApprovalStatus" jdbcType="TINYINT" />
+    <result column="approval_status" property="approvalStatus" jdbcType="TINYINT" />
+    <result column="approval_user_id" property="approvalUserId" jdbcType="INTEGER" />
+    <result column="approval_wage_hours" property="approvalWageHours" jdbcType="REAL" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="complain_remark" property="complainRemark" jdbcType="VARCHAR" />
+    <result column="approval_time" property="approvalTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, class_sn, person_id, attendance_date, clock_in_time, clock_out_time,
+    exclude_hour, arrival_time, start_time, end_time, dev_id, working_hours, status, attendance_hours,
+    wage_hours, overtime_hours, record_status, record_approval_status, approval_status, approval_user_id,
+    approval_wage_hours, remark, complain_remark, approval_time, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_attendance_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_attendance_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoAttendanceInfo" >
+    insert into bpo_attendance_info (id, project_id, class_sn,
+      person_id, attendance_date, clock_in_time, 
+      clock_out_time, exclude_hour, arrival_time, start_time,
+      end_time, dev_id, working_hours, 
+      status, attendance_hours, wage_hours, 
+      overtime_hours, record_status, record_approval_status,
+      approval_status, approval_user_id, approval_wage_hours, remark,
+      complain_remark, approval_time, create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, #{classSn,jdbcType=VARCHAR},
+      #{personId,jdbcType=INTEGER}, #{attendanceDate,jdbcType=TIMESTAMP}, #{clockInTime,jdbcType=TIMESTAMP}, 
+      #{clockOutTime,jdbcType=TIMESTAMP}, #{excludeHour,jdbcType=DOUBLE}, #{arrivalTime,jdbcType=TIMESTAMP}, #{startTime,jdbcType=TIMESTAMP},
+      #{endTime,jdbcType=TIMESTAMP}, #{devId,jdbcType=INTEGER}, #{workingHours,jdbcType=REAL}, 
+      #{status,jdbcType=TINYINT}, #{attendanceHours,jdbcType=REAL}, #{wageHours,jdbcType=REAL}, 
+      #{overtimeHours,jdbcType=REAL}, #{recordStatus,jdbcType=TINYINT}, #{recordApprovalStatus,jdbcType=TINYINT},
+      #{approvalStatus,jdbcType=TINYINT}, #{approvalUserId,jdbcType=INTEGER}, #{approvalWageHours,jdbcType=DOUBLE}, #{remark,jdbcType=VARCHAR},
+      #{complainRemark,jdbcType=VARCHAR}, #{approvalTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoAttendanceInfo" >
+    insert into bpo_attendance_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="classSn != null" >
+        class_sn,
+      </if>
+      <if test="personId != null" >
+        person_id,
+      </if>
+      <if test="attendanceDate != null" >
+        attendance_date,
+      </if>
+      <if test="clockInTime != null" >
+        clock_in_time,
+      </if>
+      <if test="clockOutTime != null" >
+        clock_out_time,
+      </if>
+      <if test="excludeHour != null" >
+        exclude_hour,
+      </if>
+      <if test="arrivalTime != null" >
+        arrival_time,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="devId != null" >
+        dev_id,
+      </if>
+      <if test="workingHours != null" >
+        working_hours,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="attendanceHours != null" >
+        attendance_hours,
+      </if>
+      <if test="wageHours != null" >
+        wage_hours,
+      </if>
+      <if test="overtimeHours != null" >
+        overtime_hours,
+      </if>
+      <if test="recordStatus != null" >
+        record_status,
+      </if>
+      <if test="recordApprovalStatus != null" >
+        record_approval_status,
+      </if>
+      <if test="approvalStatus != null" >
+        approval_status,
+      </if>
+      <if test="approvalUserId != null" >
+        approval_user_id,
+      </if>
+      <if test="approvalWageHours != null" >
+        approval_wage_hours,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="complainRemark != null" >
+        complain_remark,
+      </if>
+      <if test="approvalTime != null" >
+        approval_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="classSn != null" >
+        #{classSn,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceDate != null" >
+        #{attendanceDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clockInTime != null" >
+        #{clockInTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clockOutTime != null" >
+        #{clockOutTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="excludeHour != null" >
+        #{excludeHour,jdbcType=DOUBLE},
+      </if>
+      <if test="arrivalTime != null" >
+        #{arrivalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="devId != null" >
+        #{devId,jdbcType=INTEGER},
+      </if>
+      <if test="workingHours != null" >
+        #{workingHours,jdbcType=REAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="attendanceHours != null" >
+        #{attendanceHours,jdbcType=REAL},
+      </if>
+      <if test="wageHours != null" >
+        #{wageHours,jdbcType=REAL},
+      </if>
+      <if test="overtimeHours != null" >
+        #{overtimeHours,jdbcType=REAL},
+      </if>
+      <if test="recordStatus != null" >
+        #{recordStatus,jdbcType=TINYINT},
+      </if>
+      <if test="recordApprovalStatus != null" >
+        #{recordApprovalStatus,jdbcType=TINYINT},
+      </if>
+      <if test="approvalStatus != null" >
+        #{approvalStatus,jdbcType=TINYINT},
+      </if>
+      <if test="approvalUserId != null" >
+        #{approvalUserId,jdbcType=INTEGER},
+      </if>
+      <if test="approvalWageHours != null" >
+        #{approvalWageHours,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="complainRemark != null" >
+        #{complainRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalTime != null" >
+        #{approvalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoAttendanceInfo" >
+    update bpo_attendance_info
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="classSn != null" >
+        class_sn = #{classSn,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        person_id = #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceDate != null" >
+        attendance_date = #{attendanceDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clockInTime != null" >
+        clock_in_time = #{clockInTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clockOutTime != null" >
+        clock_out_time = #{clockOutTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="excludeHour != null" >
+        exclude_hour = #{excludeHour,jdbcType=DOUBLE},
+      </if>
+      <if test="arrivalTime != null" >
+        arrival_time = #{arrivalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="devId != null" >
+        dev_id = #{devId,jdbcType=INTEGER},
+      </if>
+      <if test="workingHours != null" >
+        working_hours = #{workingHours,jdbcType=REAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="attendanceHours != null" >
+        attendance_hours = #{attendanceHours,jdbcType=REAL},
+      </if>
+      <if test="wageHours != null" >
+        wage_hours = #{wageHours,jdbcType=REAL},
+      </if>
+      <if test="overtimeHours != null" >
+        overtime_hours = #{overtimeHours,jdbcType=REAL},
+      </if>
+      <if test="recordStatus != null" >
+        record_status = #{recordStatus,jdbcType=TINYINT},
+      </if>
+      <if test="recordApprovalStatus != null" >
+        record_approval_status = #{recordApprovalStatus,jdbcType=TINYINT},
+      </if>
+      <if test="approvalStatus != null" >
+        approval_status = #{approvalStatus,jdbcType=TINYINT},
+      </if>
+      <if test="approvalUserId != null" >
+        approval_user_id = #{approvalUserId,jdbcType=INTEGER},
+      </if>
+      <if test="approvalWageHours != null" >
+        approval_wage_hours = #{approvalWageHours,jdbcType=DOUBLE},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="complainRemark != null" >
+        complain_remark = #{complainRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalTime != null" >
+        approval_time = #{approvalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoAttendanceInfo" >
+    update bpo_attendance_info
+    set project_id = #{projectId,jdbcType=INTEGER},
+      class_sn = #{classSn,jdbcType=VARCHAR},
+      person_id = #{personId,jdbcType=INTEGER},
+      attendance_date = #{attendanceDate,jdbcType=TIMESTAMP},
+      clock_in_time = #{clockInTime,jdbcType=TIMESTAMP},
+      clock_out_time = #{clockOutTime,jdbcType=TIMESTAMP},
+      exclude_hour = #{excludeHour,jdbcType=DOUBLE},
+      arrival_time = #{arrivalTime,jdbcType=TIMESTAMP},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      dev_id = #{devId,jdbcType=INTEGER},
+      working_hours = #{workingHours,jdbcType=REAL},
+      status = #{status,jdbcType=TINYINT},
+      attendance_hours = #{attendanceHours,jdbcType=REAL},
+      wage_hours = #{wageHours,jdbcType=REAL},
+      overtime_hours = #{overtimeHours,jdbcType=REAL},
+      record_status = #{recordStatus,jdbcType=TINYINT},
+      record_approval_status = #{recordApprovalStatus,jdbcType=TINYINT},
+      approval_status = #{approvalStatus,jdbcType=TINYINT},
+      approval_user_id = #{approvalUserId,jdbcType=INTEGER},
+      approval_wage_hours = #{approvalWageHours,jdbcType=DOUBLE},
+      remark = #{remark,jdbcType=VARCHAR},
+      complain_remark = #{complainRemark,jdbcType=VARCHAR},
+      approval_time = #{approvalTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByDate" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_attendance_info
+    where DATE_FORMAT(attendance_date,"%Y-%m-%d") = #{date,jdbcType=VARCHAR}
+    and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="selectNextInfo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_attendance_info
+    where arrival_time > #{lastEndTime,jdbcType=TIMESTAMP}
+    and person_id = #{personId,jdbcType=INTEGER}
+    and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    order by arrival_time
+    LIMIT 0,1
+  </select>
+
+  <select id="getAll" resultMap="BpoAttendanceInfoShowMap">
+    select distinct ai.*,pj.project_name,ps.person_name,ps.work_no,ps.station
+    from bpo_attendance_info ai
+    LEFT JOIN bpo_project pj on ai.project_id = pj.id
+    LEFT JOIN bpo_person ps on ai.person_id = ps.id
+    LEFT JOIN workflow_info wi ON wi.info_id = ai.id
+    LEFT JOIN workflow_node_instance wni ON wni.instance_id = wi.instance_id
+    where ai.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <!--    <if test="projectName != null and projectName != ''" >-->
+    <!--      and pj.project_name like concat('%',#{projectName},'%')-->
+    <!--    </if>-->
+    <if test="userId != null">
+      and wni.assignee_user_id = #{userId}
+    </if>
+    <if test="projectId != null" >
+      and pj.project_id = #{projectId}
+    </if>
+    <if test="classSn != null and classSn != ''" >
+      and ai.class_sn like concat('%',#{classSn},'%')
+    </if>
+    <if test="personInfo != null and personInfo != ''" >
+      and (ps.personName like concat('%',#{personInfo},'%') or ps.work_no like concat('%',#{personInfo},'%'))
+    </if>
+    <if test="date != null and date != ''" >
+      and DATE_FORMAT(attendance_date,"%Y-%m-%d") = #{date,jdbcType=VARCHAR}
+    </if>
+    <if test="approvalStatus != null and approvalStatus != ''" >
+      and approval_status = #{approvalStatus,jdbcType=Integer}
+    </if>
+    <choose>
+      <when test="approvalType != null and recordApprovalType == 1">
+        and record_approval_status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@PENDING_REVIEW}
+      </when>
+      <when test="approvalType != null and recordApprovalType == 2">
+        and record_approval_status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@PENDING_CONFIRM}
+      </when>
+      <when test="approvalType != null and recordApprovalType == 3">
+        and record_approval_status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@CONFIRMED}
+      </when>
+    </choose>
+    <choose>
+      <when test="type != null and type == 2">
+        and record_status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@ATTENDANCE_NORMAL}
+      </when>
+      <when test="type != null and type == 3">
+        and record_status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@ATTENDANCE_NORMAL}
+      </when>
+    </choose>
+    order by ps.person_name,ai.attendance_date desc
+  </select>
+
+
+
+  <select id="mpGetAll" resultType="com.rz.iot.bpo.mina.model.show.MinaAttendanceInfoShow">
+    SELECT
+	bai.id,
+	bp.person_name as personName,
+	bp.sex,
+	bp.age,
+	bpj.project_name as projectName,
+	sc.company_name as companyName,
+	bcg.class_name as className,
+	bai.record_approval_status as recordApprovalStatus,
+	bai.start_time as startTime,
+	bai.end_time as endTime,
+	bai.working_hours as workingHours,
+	bai.attendance_hours as attendanceHours,
+	bai.clock_in_time as clockInTime,
+	bai.clock_out_time as clockOutTime
+    FROM
+	bpo_attendance_info bai
+	LEFT JOIN bpo_person bp ON bai.person_id = bp.id
+	LEFT JOIN bpo_project bpj ON bai.project_id = bpj.id
+	LEFT JOIN bpo_transfer_station bts ON bpj.transfer_station_id = bts.id
+	LEFT JOIN bpo_classes_generate bcg ON bai.class_sn = bcg.class_sn
+	LEFT JOIN sys_company sc ON sc.id = bp.company_id
+	where
+    1 = 1
+    <if test="stationId != null" >
+      and bts.id = #{stationId}
+    </if>
+    <if test="date != null" >
+      and DATE_FORMAT(bai.attendance_date,"%Y-%m-%d") = #{date}
+    </if>
+    <if test="personName != null" >
+      and bp.person_name like concat('%',#{personName},'%')
+    </if>
+    <if test="companyId != null" >
+      and sc.id = #{companyId}
+    </if>
+    <if test="projectId != null" >
+      and bpj.id = #{projectId}
+    </if>
+    <if test="classId != null" >
+      and bcg.id = #{classId}
+    </if>
+    <if test="status != null" >
+      and bai.status = #{status}
+    </if>
+    <if test="personType != null" >
+      and bp.person_type = #{personType}
+    </if>
+  </select>
+
+  <select id="mpGetDetail" resultType="com.rz.iot.bpo.mina.model.show.MinaAttendanceDetailShow">
+    SELECT
+    bai.id,
+	bcg.class_name as className,
+	bai.arrival_time as arrivalTime,
+	bai.start_time as startTime,
+	bai.end_time as endTime,
+	bai.working_hours as workingHours,
+	bp.project_name as projectName,
+	bai.clock_in_time as clockInTime,
+	bai.clock_out_time as clockOutTime,
+	bai.record_status as recordStatus,
+	bai.wage_hours as wageHours,
+	bai.approval_status as approvalStatus,
+	bai.record_approval_status as recordApprovalStatus
+    FROM
+	bpo_attendance_info bai
+	LEFT JOIN bpo_classes_generate bcg ON bai.class_id = bcg.id
+	LEFT JOIN bpo_project bp ON bai.project_id = bp.id
+	where
+	bai.id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="mpGetListByMonth" resultMap="BpoAttendanceInfoShowMap">
+    select distinct ai.*,ps.station
+    from bpo_attendance_info ai
+    LEFT JOIN bpo_person ps on ai.person_id = ps.id
+    where ai.attendance_date between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+    and ps.user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByIdAndUserId" resultMap="BaseResultMap">
+    select distinct ai.*
+    from bpo_attendance_info ai
+    LEFT JOIN bpo_person ps on ai.person_id = ps.id
+    where ai.id = #{id,jdbcType=INTEGER}
+    and ps.user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="abnormalList" resultMap="BpoAttendanceInfoShowMap">
+    select distinct ai.*,bcg.class_name
+    from bpo_attendance_info ai
+    LEFT JOIN bpo_person ps on ai.person_id = ps.id
+    LEFT JOIN bpo_classes_generate bcg ON ai.class_id = bcg.id
+    where ai.approval_status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@ATTENDANCE_NORMAL}
+    and ps.user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectConfirmedByDate" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_attendance_info
+    where DATE_FORMAT(approval_time,'%Y-%m-%d') = #{date,jdbcType=VARCHAR}
+    and record_approval_status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@CONFIRMED}
+  </select>
+</mapper>

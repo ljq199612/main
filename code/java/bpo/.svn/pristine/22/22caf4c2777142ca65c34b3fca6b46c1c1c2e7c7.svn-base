@@ -1,0 +1,37 @@
+package com.rz.iot.bpo.mina.service;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.model.param.MinaScheduleRuleParam;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+
+
+public interface MinaScheduleService {
+
+    Result addScheduleRule(MinaScheduleRuleParam scheduleRuleParam);
+
+    Result<MinaClassGenerateShow> getClassGenerate(Integer projectId);
+
+//    Result addClassFromExternal(BpoClassesParam bpoClassesParam);
+//
+//    Result<BpoClassesShow> getClassList(Integer projectId);
+//
+//    Result<BpoScheduleRuleShow> getScheduleRule(Integer projectId);
+//
+//    Result<BpoProjectEmployeeShow> getEmployeeData(Integer projectId);
+//
+//    Result addClassGenerate(BpoClassesGenerateParam bpoClassesGenerateParam);
+//
+//    Result updateClassFromExternal(BpoUpdateClassesParam bpoClassesParam);
+//
+//    Result updateClassGenerate(BpoClassesGenerateParam bpoClassesGenerateParam);
+//
+//    Result updateScheduleRule(MinaScheduleRuleParam scheduleRuleParam);
+//
+//    Result deleteClassFromExternal(Integer classId);
+//
+//    Result deleteClassGenerate(Integer scheduleId);
+//
+//    Result deleteScheduleRule(Integer scheduleRuleId);
+//
+
+}

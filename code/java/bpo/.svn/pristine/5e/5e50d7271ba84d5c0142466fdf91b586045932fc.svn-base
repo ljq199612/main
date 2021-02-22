@@ -1,0 +1,35 @@
+package com.rz.iot.bpo.model.param;
+
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class BpoOutputParam {
+
+    private Integer id;
+
+    private Integer transferStationId;
+
+    private Integer projectId;
+
+    private Integer supplierId;
+
+    private Byte type;
+
+    private Date periodStartTime;
+
+    private Date periodEndTime;
+
+    private Integer workModelId;
+
+    private Integer workGroupId;
+
+    private Integer processId;
+
+    private Integer productId;
+
+    private Integer productPriceId;
+
+    private Integer output;
+}

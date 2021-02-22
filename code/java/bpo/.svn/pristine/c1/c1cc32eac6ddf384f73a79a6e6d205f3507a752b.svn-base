@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rz.iot.bpo.mapper.BpoTransferStationMapper">
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoTransferStation">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="region_name" jdbcType="VARCHAR" property="regionName" />
+    <result column="business_name" jdbcType="VARCHAR" property="businessName" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="link_man" jdbcType="VARCHAR" property="linkMan" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="detail_address" jdbcType="VARCHAR" property="detailAddress" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, code, city_id, region_name, business_name, type, link_man, phone, remark,
+    status, detail_address, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_transfer_station
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bpo_transfer_station
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoTransferStation">
+    insert into bpo_transfer_station (id, name, code,
+      city_id, region_name, business_name,
+      type, link_man, phone,
+      remark, status, detail_address,
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},
+      #{cityId,jdbcType=INTEGER}, #{regionName,jdbcType=VARCHAR}, #{businessName,jdbcType=VARCHAR},
+      #{type,jdbcType=VARCHAR}, #{linkMan,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+      #{remark,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{detailAddress,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoTransferStation" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into bpo_transfer_station
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="cityId != null">
+        city_id,
+      </if>
+      <if test="regionName != null">
+        region_name,
+      </if>
+      <if test="businessName != null">
+        business_name,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="linkMan != null">
+        link_man,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="detailAddress != null">
+        detail_address,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null">
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="regionName != null">
+        #{regionName,jdbcType=VARCHAR},
+      </if>
+      <if test="businessName != null">
+        #{businessName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="linkMan != null">
+        #{linkMan,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="detailAddress != null">
+        #{detailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoTransferStation">
+    update bpo_transfer_station
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null">
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="regionName != null">
+        region_name = #{regionName,jdbcType=VARCHAR},
+      </if>
+      <if test="businessName != null">
+        business_name = #{businessName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="linkMan != null">
+        link_man = #{linkMan,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="detailAddress != null">
+        detail_address = #{detailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoTransferStation">
+    update bpo_transfer_station
+    set name = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      region_name = #{regionName,jdbcType=VARCHAR},
+      business_name = #{businessName,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      link_man = #{linkMan,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      detail_address = #{detailAddress,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <resultMap id="findAllMap" type="com.rz.iot.bpo.model.show.BpoTransferStationShow">
+    <id property="id" column="id"/>
+    <result property="name" column="name"/>
+    <result property="code" column="code"/>
+    <result property="status" column="status"/>
+    <result property="typeName" column="dictLabel"/>
+    <result property="value" column="dictValue"/>
+    <association property="sysAreaRel" javaType="com.rz.iot.bpo.model.SysAreaRel">
+      <id property="id" column="areaId"/>
+      <result property="provinceId" column="provinceId"/>
+      <result property="provinceName" column="provinceName"/>
+      <result property="cityId" column="cityId"/>
+      <result property="cityName" column="cityName"/>
+      <result property="districtId" column="districtId"/>
+      <result property="districtName" column="districtName"/>
+      <result property="status" column="status"/>
+    </association>
+    <collection property="sysDeptShow" select="findDeptShow" column="{deptId=dept_id}"/>
+  </resultMap>
+  <select id="findDeptShow" resultMap="findDeptByDeptId">
+    select
+    dept_id,dept_name,
+    (
+  case is_top when ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_DEPT_IS_TOP}
+  THEN ${@com.rz.iot.bpo.common.constant.DictDataConstants@NOT_VERIFY_STATUS}
+  ELSE
+  parent_id
+  END
+  ) as parent_id
+    from
+    sys_dept
+    where dept_id = #{deptId}
+  </select>
+  <resultMap id="findDeptByDeptId" type="com.rz.iot.bpo.model.show.bpoPerson.SysDeptShow">
+    <result column="dept_id" property="deptId"/>
+    <result column="dept_name" property="deptName"/>
+    <collection property="deptShowList" column="{deptId=parent_id}" select="findDeptShow" ofType="com.rz.iot.bpo.model.show.bpoPerson.SysDeptShow"/>
+  </resultMap>
+
+  <select id="findAll" parameterType="com.rz.iot.bpo.model.param.BpoTransferStationParam" resultMap="findAllMap">
+    SELECT
+    station.id AS id,station.name AS name,station.code AS code,station.`type` AS `type`,station.`status` AS `status`,dict.dictName AS dictName,dict.dictType AS dictType,
+    dict.dictLabel AS dictLabel,dict.dictValue AS dictValue,station.areaId as areaId,station.provinceId,station.provinceName,station.cityId,station.cityName,station.districtId,station.districtName,
+    sub_rel.dept_id
+    FROM
+    (
+    SELECT
+    station.id AS id, station.name AS name, station.code AS code, station.`type`,
+    station.status,rel.id as areaId,rel.province_id AS provinceId,rel.province_name AS provinceName,rel.city_id AS cityId,rel.city_name AS cityName,rel.district_id AS districtId,rel.district_name AS districtName
+    FROM bpo_transfer_station station
+    LEFT JOIN sys_area_rel rel ON station.city_id = rel.id AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}) station
+    LEFT JOIN (
+    SELECT d_type.dict_name AS dictName,d_type.dict_type AS dictType,d_data.dict_label AS dictLabel,d_data.dict_value AS dictValue
+    FROM sys_dict_type d_type
+    LEFT JOIN sys_dict_data d_data ON d_type.dict_id = d_data.dict_id AND d_data.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    WHERE d_type.dict_type = #{dictType} AND d_type.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}) dict ON station.`type` = dict.dictValue
+    LEFT JOIN sys_dept_sub_rel sub_rel ON sub_rel.sub_id = station.id AND sub_rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION}
+    where true
+    <if test="type != null and type != ''">
+      and dict.`dictValue` = #{type}
+    </if>
+    <if test="transferName != null and transferName != ''">
+      and station.name like concat('%',#{transferName},'%')
+    </if>
+    <if test="areaId != null">
+      and station.areaId = #{areaId}
+    </if>
+    <if test="status != null and status != 0">
+      and station.`status` = #{status}
+    </if>
+    <if test="status == null or status == 0">
+      and station.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </if>
+    <if test="dataScope != null">
+      AND ${dataScope}
+    </if>
+  </select>
+
+  <select id="isExistCode" parameterType="com.rz.iot.bpo.model.BpoTransferStation" resultType="com.rz.iot.bpo.model.BpoTransferStation">
+    select
+    <include refid="Base_Column_List"></include>
+    from
+    bpo_transfer_station
+    where status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    and code = #{code}
+    <if test="id != null">
+      AND id != #{id}
+    </if>
+  </select>
+
+  <select id="detail" parameterType="java.lang.Integer" resultType="com.rz.iot.bpo.model.show.BpoTSFDetail">
+     select
+    station.id as id,station.code as `code`,station.city_id as areaId,station.region_name as regionName,station.type as type,station.name as `name`,station.link_man as linkMan,station.business_name as businessName,station.phone as phone,
+		station.remark as remark,station.`status` as `status`,station.detail_address as detailAddress,station.create_time as createTime,station.update_time as updateTime,
+		IFNULL(rel.province_id,0) as provinceId,IFNULL(rel.province_name,'') as provinceName,IFNULL(rel.city_id,0) as cityId,IFNULL(rel.city_name,'') as cityName,
+		IFNULL(rel.district_id,0) as districtId,IFNULL(rel.district_name,'') as districtName
+    from bpo_transfer_station station
+	LEFT JOIN sys_area_rel rel ON rel.id = station.city_id AND rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+	where station.id = #{value} and station.`status` != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+  </select>
+    <select id="findAllByCityId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from bpo_transfer_station
+        where city_id = #{sysAreaId,jdbcType=VARCHAR}
+    </select>
+
+  <select id="findAllTrans" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from bpo_transfer_station
+  </select>
+
+  <select id="findAllByLoginUserId" resultMap="BaseResultMap">
+    SELECT tran.*, dept_sub_rel.dept_id
+    FROM bpo_transfer_station tran
+    LEFT JOIN sys_dept_sub_rel dept_sub_rel
+    ON dept_sub_rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    AND dept_sub_rel.sub_id = tran.id
+    AND dept_sub_rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION}
+    WHERE
+    tran.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <if test="param.dataScope != null and param.dataScope != ''">
+      AND ${param.dataScope}
+    </if>
+  </select>
+
+  <insert id="insertDeptStaRel">
+    INSERT INTO sys_dept_sub_rel(sub_id,sub_type,dept_id)
+    VALUES(#{stationId},${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION},#{deptId})
+  </insert>
+
+  <update id="updateStatus">
+    update bpo_transfer_station set `status` = #{status} where id = #{id}
+  </update>
+</mapper>

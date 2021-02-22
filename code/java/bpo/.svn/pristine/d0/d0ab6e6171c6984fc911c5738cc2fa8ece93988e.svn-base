@@ -1,0 +1,768 @@
+<template>
+  <CfPanel title="设备管理" class="main createProject" :back-to="onBackTo">
+    <div class="create-project">
+      <div class="create-project-step">
+        <div class="step-wrapper">
+          <el-steps :active="1">
+            <el-step title="录入基本信息" :icon="stepIcon(1)" />
+            <el-step title="录入配置信息" :icon="stepIcon(2)" status="wait" />
+            <el-step title="录入计费规则" :icon="stepIcon(3)" status="wait" />
+            <el-step title="设置供应商" :icon="stepIcon(4)" status="wait" />
+          </el-steps>
+        </div>
+        <div class="form-wrapper">
+          <!-- 录入基本信息 -->
+          <step1 v-show="activeStep === 1" @handlerNext="handlerNext" />
+          <!-- 录入配置信息 -->
+          <step2 v-show="activeStep === 2" @handlerNext="handlerNext" @handlerLast="handlerLast" />
+          <div v-show="activeStep === 3" class="step-3-form">
+            <div class="fee-radio">
+              <label for="" class="label">请选择计费方式：</label>
+              <el-radio
+                v-model="computationalType"
+                :label="1"
+              >按件计费</el-radio>
+              <el-radio
+                v-model="computationalType"
+                :label="2"
+              >按小时计费</el-radio>
+            </div>
+            <div class="button-wrapper">
+              <el-button
+                type="primary"
+                icon="el-icon-plus"
+                @click="handlerAddBillingRule"
+              >新增计费规则</el-button>
+            </div>
+            <div
+              v-if="billingRuleByCountList.length"
+              class="table-form-wrapper"
+            >
+              <div
+                v-for="item in billingRuleByCountList"
+                :key="item"
+                class="table-form-item"
+              >
+                <div class="input-wrapper">
+                  <div class="input-item">
+                    <label for="" class="label">规则名称：</label>
+                    <div class="input-item-component">
+                      <el-input
+                        v-model.trim="item.ruleName"
+                        placeholder="请输入内容"
+                      />
+                    </div>
+                  </div>
+                  <div class="input-item">
+                    <label for="" class="label">优先级：</label>
+                    <div class="input-item-component">
+                      <el-input
+                        v-model.trim="item.priorityLevel"
+                        placeholder="请输入内容"
+                      />
+                    </div>
+                  </div>
+                  <div class="input-item">
+                    <label for="" class="label">生效日期：</label>
+                    <div class="input-item-component">
+                      <el-date-picker
+                        v-model.trim="item.effectiveTime"
+                        type="date"
+                        placeholder="选择日期"
+                      />
+                    </div>
+                  </div>
+                  <div class="input-item">
+                    <label for="" class="label">失效日期：</label>
+                    <div class="input-item-component">
+                      <el-date-picker
+                        v-model.trim="item.finishTime"
+                        type="date"
+                        placeholder="选择日期"
+                      />
+                    </div>
+                  </div>
+                  <div class="button-item">
+                    <span>折叠</span>
+                    <span>删除</span>
+                  </div>
+                </div>
+                <editBillingRulesTable :data="item.editBillingRulesTableData" />
+              </div>
+            </div>
+          </div>
+          <div v-show="activeStep === 4" class="step-4-form">
+            <div class="tab-wrapper">
+              <el-tabs v-model="tabSupplier">
+                <el-tab-pane label="供应商列表" name="first">
+                  <div class="button-wrapper">
+                    <el-button
+                      type="primary"
+                      plain
+                      disabled
+                    >主要按钮</el-button>
+                    <el-button
+                      type="primary"
+                      icon="el-icon-plus"
+                    >新增供应商</el-button>
+                  </div>
+                  <div class="supplier-list-wrapper">
+                    <tree-transfer
+                      :title="title"
+                      :from_data="selectedSupplierList"
+                      :to_data="supplierList"
+                      :default-props="defaultProps"
+                      :mode="mode"
+                      :button_text="button_text"
+                      height="340px"
+                      :filter="false"
+                      open-all
+                    />
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
+          </div>
+          <!-- <div class="control-wrapper">
+            <el-button
+              type="primary"
+              class="last-step"
+              plain
+              @click="handlerLast"
+            >上一步</el-button><el-button
+              type="primary"
+              class="next-step"
+              @click="handlerNext"
+            >下一步</el-button>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </CfPanel>
+</template>
+
+<script type="text/javascript">
+import {
+  // getPartyAData,
+  // getContractList,
+  // getUserCompany,
+  // getProjectSnToCreate,
+  // addProjectBasicInformation,
+  getSupplierList,
+  getTransferStationByDistrictId,
+  getAllProvince,
+  getCity,
+  getDistrict,
+  addProjectConfig
+} from '@/api/projectManage/createProject'
+import treeTransfer from 'el-tree-transfer'
+// import addPartyA from './components/addPartyA'
+import editBillingRulesTable from './components/editBillingRulesTable'
+// import mindmap from '@hellowuxin/mindmap'
+// import addModuleDialog from './components/addModuleDialog'
+import CfPanel from '@/components/Panel'
+import step1 from './components/step1'
+import step2 from './components/step2'
+
+export default {
+  name: 'CreateProject',
+  components: {
+    // addPartyA,
+    treeTransfer,
+    editBillingRulesTable,
+    // mindmap,
+    // addModuleDialog,
+    CfPanel,
+    step1,
+    step2
+  },
+  data() {
+    return {
+      editBillingRulesTableData: [],
+      value: '',
+      props: { multiple: true },
+      list: [],
+      listLoading: false,
+      checked: false,
+      tabSupplier: 'first',
+      // 分割线
+      activeStep: 2, // 当前步骤
+      // 按件计费规则列表
+      billingRuleByCountList: [],
+      computationalType: 1, // 计费方式
+      billingRuleByTimeList: [], // 按小时计费规则列表
+      step3FormData: {},
+      activeName: 'second',
+      workModelsData: [],
+      mode: 'transfer', // transfer addressList
+      title: ['已选择供应商', '未选择供应商'],
+      button_text: ['删除', '添加'],
+      selectedSupplierList: [], // 已选择供应商数据
+      supplierList: [], // 未选择供应商数据
+      defaultProps: {
+        label: 'companyName',
+        children: 'children'
+      }
+    }
+  },
+  computed: {},
+  created() {
+    // this.getSupplierList()
+    // this.getAllProvince()
+  },
+  mounted() {
+  },
+  methods: {
+    /**
+     * 步骤条类
+     */
+    stepIcon(stepNum) {
+      if (this.activeStep >= stepNum) {
+        return 'el-icon-success'
+      } else {
+        return 'dot'
+      }
+    },
+    /**
+     * 获取供应商数据
+     */
+    getSupplierList() {
+      getSupplierList()
+        .then((res) => {
+          const result = res['data']
+          this.supplierList = result['data']['sysCompanyList']
+          // 供应商数据调整
+          this.supplierList.forEach((item) => {
+            item.label = item.companyName
+          })
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message:
+              err.message || '获取供应商数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    caculateObjectLength(object) {
+      let count = 0
+      for (var key in object) {
+        if (object.hasOwnProperty(key)) {
+          count++
+        }
+      }
+      return count
+    },
+    // 上一步
+    handlerLast(params) {
+      this.activeStep = params.step - 1
+    },
+    // 下一步
+    handlerNext(params) {
+      // this.activeStep++
+      this.activeStep = params.step + 1
+      switch (params.step) {
+        case 1:
+          // this.handlerStep1()
+          break
+        case 2:
+          // this.handlerStep2()
+          break
+        case 3:
+          break
+        case 4:
+          break
+        default:
+          break
+      }
+    },
+    handlerStep2() {
+      // 校验表单
+      this.$refs['step2Form']
+        .validate()
+        .then(() => {
+          // 校验校验表格
+          this.validateConfigTable()
+            .then(() => {
+              // 合并表格数据
+              const tableData = this.generateConfigTableData()
+              const _data = Object.assign(
+                { workModels: tableData },
+                this.step2FormData
+              )
+              // 提交数据
+              this.addProjectConfig(_data)
+                .then(() => {
+                  // 跳转下一步
+                  this.$message({
+                    type: 'succss',
+                    message: '保存配置信息成功'
+                  })
+                  this.activeStep++
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+            })
+            .catch((err) => {
+              this.$message({
+                type: 'error',
+                message: err || '表格数据有误'
+              })
+            })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    /**
+     * 录入配置信息
+     */
+    addProjectConfig(data) {
+      return new Promise((resolve, reject) => {
+        addProjectConfig(data)
+          .then((res) => {
+            resolve(res)
+          })
+          .catch((err) => {
+            this.$message({
+              type: 'error',
+              message: err || '录入配置数据失败'
+            })
+          })
+      })
+    },
+    /**
+     * 校验配置表格
+     */
+    validateConfigTable() {
+      const tableData = this.workModelsData
+      return new Promise((resolve, reject) => {
+        // 校验数据长度
+        if (!tableData.length) {
+          reject('模块/工序/小组至少需要有一条数据')
+        }
+        // 校验数据字段
+        for (let i = 0, len = tableData.length; i < len; i++) {
+          const item = tableData[i]
+          for (const key in item) {
+            if (item.hasOwnProperty(key)) {
+              !item[key] && reject(`请将第${i + 1}行数据补充完整`)
+            }
+          }
+        }
+        resolve()
+      })
+    },
+    /**
+     * table数据合成提交所需数据格式
+     */
+    generateConfigTableData() {
+      const tableData = this.workModelsData
+      const _data = [] // 合并后的数据
+      for (let i = 0, len = tableData.length; i < len; i++) {
+        const item = tableData[i]
+
+        const sysModuleIdIndex = getIndexByKey(_data, item, 'sysModuleId')
+        if (sysModuleIdIndex !== -1) {
+          // 合并模块数据
+          const sysModuleGroupIdIndex = getIndexByKey(
+            _data[sysModuleIdIndex]['bpoGroupParamList'],
+            item,
+            'sysGroupId'
+          )
+
+          if (sysModuleGroupIdIndex !== -1) {
+            // 说明已经有小组
+            // 提取工序数据
+            _data[sysModuleIdIndex]['bpoGroupParamList'][sysModuleGroupIdIndex][
+              'processes'
+            ].push({
+              sysProcessId: item['sysProcessId'],
+              sysProcessCode: item['sysProcessCode'],
+              sysProcessName: item['sysProcessName']
+            })
+          } else {
+            // 说明是新的小组
+            // 提取小组数据
+            _data[sysModuleIdIndex]['bpoGroupParamList'].push({
+              sysGroupId: item['sysGroupId'],
+              sysGroupCode: item['sysGroupCode'],
+              sysGroupName: item['sysGroupName'],
+              processes: []
+            })
+          }
+        } else {
+          // 没有找到合并数据
+          // 提取模块数据
+          const _row = {
+            number: item['number'],
+            sysModuleId: item['sysModuleId'],
+            sysModuleName: item['sysModuleName'],
+            bpoGroupParamList: []
+          }
+          // 提取工作数据
+          _row['bpoGroupParamList'].push({
+            sysGroupId: item['sysGroupId'],
+            sysGroupCode: item['sysGroupCode'],
+            sysGroupName: item['sysGroupName'],
+            processes: []
+          })
+          // 提取工序数据
+          _row['bpoGroupParamList'][0]['processes'].push({
+            sysProcessId: item['sysProcessId'],
+            sysProcessCode: item['sysProcessCode'],
+            sysProcessName: item['sysProcessName']
+          })
+          _data.push(_row)
+        }
+      }
+
+      /**
+       * 根据模块ID获取_data数据索引
+       */
+      function getIndexByKey(data, row, key) {
+        let index = -1
+        for (let i = 0, len = data.length; i < len; i++) {
+          const item = data[i]
+          if (item[key] === row[key]) {
+            index = i
+            break
+          }
+        }
+        return index
+      }
+
+      return _data
+    },
+    /**
+     * 处理中转站数据变化
+     */
+    handlerTransferStationChange(id) {
+      this.step2FormData.transferStationName = this.step2FormData.transferStationList.find(
+        (item) => item.id === id
+      )['name']
+    },
+    // 获取所有省
+    getAllProvince() {
+      getAllProvince()
+        .then((res) => {
+          const result = res['data']
+          const provinces = result['data']
+          this.step2FormData.provinceData = provinces
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取省数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 通过省code获取市
+     */
+    getCity(code) {
+      // 设置省数据
+      this.step2FormData.provinceName = this.step2FormData.provinceData.find(
+        (item) => item.code === code
+      )['name']
+      // 清空城市和区域
+      this.step2FormData.cityId = ''
+      this.step2FormData.districtId = ''
+      getCity({
+        code
+      })
+        .then((res) => {
+          const result = res['data']
+          const cityDatas = result['data']
+          this.step2FormData.cityData = cityDatas
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取市数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 通过市code获取区
+     */
+    getDistrict(code) {
+      // 设置市数据
+      this.step2FormData.cityName = this.step2FormData.cityData.find(
+        (item) => item.code === code
+      )['name']
+      // 清空区数据
+      this.step2FormData.districtId = ''
+      getDistrict({ code })
+        .then((res) => {
+          const result = res['data']
+          const districtData = result['data']
+          this.step2FormData.districtData = districtData
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取市数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 处理区变化
+     */
+    handlerDistrictChange(code) {
+      // 设置区数据
+      this.step2FormData.districtName = this.step2FormData.districtData.find(
+        (item) => item.code === code
+      )['name']
+      const districtId = code
+      // 清空中转站的选择
+      this.step2FormData.transferStationId = ''
+      getTransferStationByDistrictId({ districtId })
+        .then((res) => {
+          const result = res['data']
+          this.step2FormData.transferStationList = result['data']
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message:
+              err.message || '获取中转场数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 新增计费规则
+     */
+    handlerAddBillingRule() {
+      this.billingRuleByCountList.push({
+        ruleName: '', // 计费规则名
+        computationalType: this.computationalType, // 计费规则类型
+        priorityLevel: '', // 优先级
+        effectiveTime: '', // 生效日期
+        finishTime: '', // 失效日期
+        editBillingRulesTableData: [] // 表格数据
+      })
+    },
+    onBackTo() {}
+  }
+}
+</script>
+<style lang="scss" scoped>
+$orange-color: #ff6b00;
+.createProject {
+  font-family: Microsoft YaHei;
+  .step-wrapper {
+    padding: 40px 46px 28px 46px;
+    border-bottom: 1px solid #e8e9f3;
+  }
+  .form-wrapper {
+    padding-top: 30px;
+    .label,
+    .text {
+      display: inline-block;
+      font-weight: normal;
+      font-size: 12px;
+      height: 12px;
+      line-height: 12px;
+    }
+    .label {
+      font-weight: 700;
+      color: #606266;
+      width: 100px;
+      text-align: right;
+      &.require {
+        &::before {
+          position: relative;
+          top: 1px;
+          content: '*';
+          display: inline-block;
+          margin-right: 2px;
+          color: $orange-color;
+        }
+      }
+    }
+    .text {
+      font-weight: 400;
+      color: #000000;
+    }
+    .form-item {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      &.form-item-textarea {
+        height: auto;
+        margin-top: 10px;
+        align-items: flex-start;
+      }
+      &.form-item-button {
+        .el-select {
+          width: 230px;
+        }
+      }
+      &.form-item-cascader {
+        .el-cascader {
+          width: 100%;
+        }
+      }
+      .form-component {
+        min-width: 230px;
+        margin-left: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .add-a {
+        height: 28px;
+        &:hover {
+          color: $orange-color;
+        }
+        background-color: #fff;
+        margin-left: 10px;
+      }
+    }
+
+    .step-3-form {
+      .fee-radio {
+        margin: 0 28px;
+      }
+      .button-wrapper {
+        margin: 12px 28px 20px 28px;
+      }
+      .table-form-wrapper {
+        margin: 0 28px;
+        padding: 20px;
+        background: rgba(241, 242, 246, 1);
+        border-radius: 3px;
+        .input-wrapper {
+          margin-bottom: 20px;
+          display: flex;
+          .input-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            .label {
+              width: auto;
+            }
+            .input-item-component {
+              padding-right: 50px;
+              flex: 1;
+            }
+            .el-date-editor.el-input {
+              width: 100%;
+            }
+          }
+          .button-item {
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+    }
+    .step-4-form {
+      .button-wrapper {
+        padding: 15px 0 32px 0;
+      }
+      .tab-wrapper {
+        padding: 0 28px;
+      }
+    }
+  }
+  .control-wrapper {
+    margin-top: 34px;
+    padding-left: 120px;
+    padding-bottom: 33px;
+    .el-button {
+      width: 100px;
+    }
+    .el-button + .el-button {
+      margin-left: 20px;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.createProject {
+  .step-wrapper {
+    // 覆盖步骤条样式
+    .el-step__icon-inner[class*='el-icon']:not(.is-status) {
+      font-size: 34px;
+    }
+    .el-step__head.is-finish{
+      .el-step__line{
+        background: #ff6b00;
+      }
+    }
+    // .el-step__line {
+    //   background-color: #e8e9f3;
+    // }
+    .el-step__main {
+      .el-step__title {
+        font-size: 12px;
+        color: #666;
+        text-indent: -14px;
+      }
+    }
+    .el-icon-success {
+      color: #ff6b00;
+    }
+    // 自定义点图标
+    .el-step__icon-inner.dot {
+      &::before {
+        content: '';
+        display: block;
+        height: 34px;
+        width: 34px;
+        border-radius: 50%;
+        background-color: #e8e9f3;
+      }
+    }
+  }
+  .el-tabs__item {
+    font-weight: bold;
+    color: #333;
+    &.is-active {
+      color: #ff6b00;
+    }
+  }
+  .el-tabs__nav-wrap::after {
+    height: 1px;
+  }
+  .step-4-form {
+    .supplier-list-wrapper {
+      .transfer-title {
+        height: 30px;
+        line-height: 28px;
+        span {
+          font-size: 12px;
+          color: #aaaaaa;
+        }
+      }
+      .transfer-center {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+      .transfer-center-item {
+        .el-button {
+          line-height: 12px;
+          span,
+          i {
+            font-size: 12px;
+          }
+        }
+        &:nth-of-type(1) {
+          // 删除按钮
+          .el-button--primary {
+            background-color: #ffecdf;
+            color: #ff6b00;
+            &.is-disabled {
+              color: #ffa666;
+              background-color: #fff0e6;
+              border-color: #ffe1cc;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>

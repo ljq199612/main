@@ -1,0 +1,42 @@
+import request from '@/utils/request'
+
+export function getAllAttendance(params) {
+  return request({
+    url: '/attendanceInfo/getAll',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getClassGenerate(params) {
+  return request({
+    url: '/schedule/getClassGenerate',
+    method: 'get',
+    params: params
+  })
+}
+
+export function clockDetail(params) {
+  return request({
+    url: '/attendanceInfo/clockDetail',
+    method: 'get',
+    params: params
+  })
+}
+
+export function auditDetail(params) {
+  return request({
+    url: '/attendanceInfo/auditDetail',
+    method: 'get',
+    params: params
+  })
+}
+
+export function exportAttendance(params) {
+  return request({
+    url: '/attendanceInfo/export',
+    method: 'get',
+    params: params
+  })
+}
+

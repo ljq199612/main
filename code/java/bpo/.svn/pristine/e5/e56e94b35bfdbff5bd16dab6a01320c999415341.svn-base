@@ -1,0 +1,363 @@
+<template>
+  <div>
+    <div class="dataPermissionInfo">
+      <CfPanel title="新增数据权限" :back-to="onBackTo">
+        <el-form
+          label-width="180px"
+          class="edit-permission"
+        >
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="组织类型">
+                <el-input v-if="disabled===true" v-model="entity.orgName" class="half" :disabled="disabled" />
+                <el-select v-else v-model="entity.orgKey" filterable placeholder="请选择组织类型" class="cover">
+                  <el-option v-for="(item,index) in orgOptions" :key="index" :label="item.orgName" :value="item.orgKey" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="角色类型">
+                <el-input v-if="disabled===true" v-model="entity.roleName" class="half" :disabled="disabled" />
+                <el-select v-else v-model="entity.roleKey" filterable placeholder="请选择角色类型" class="cover">
+                  <el-option v-for="(item,index) in roleOptions" :key="index" :label="item.roleName" :value="item.id" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col v-if="!isMenu" :span="12">
+              <el-form-item label="用户名">
+                <el-input v-model="entity.username" class="half" :disabled="disabled" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item
+            v-loading="loadingOwned || loadingNotOwned"
+            label="权限列表"
+          >
+            <div
+              v-if="isMenu"
+              class="transfer-container"
+            >
+              <!--              <el-transfer
+                v-model="value"
+                :titles="titles"
+                :button-texts="buttonTexts"
+                :props="propAlias"
+                :data="dataSource"
+                readonly
+                @change="onChange"
+              />-->
+              <tree-transfer
+                id="menuId"
+                :title="titles"
+                :button-texts="buttonTexts"
+                :from_data="ownedMenu"
+                :to_data="unownedMenu"
+                pid="parentId"
+                :default-props="{ key: 'menuId', label: 'menuName' }"
+                height="400px"
+                width="600px"
+                filter
+                open-all
+                @addBtn="removeMenuOption"
+                @removeBtn="addMenuOption"
+                @change="onChange"
+              />
+            </div>
+            <div
+              v-else
+              class="transfer-container"
+            >
+              <!--<el-tabs
+                v-model="activeName"
+                tab-position="left"
+                style="height: 288px;"
+              >
+                <el-tab-pane
+                  name="0"
+                  label="灯光节点"
+                />
+                <el-tab-pane
+                  name="1"
+                  label="灯光节点组"
+                />
+                <el-tab-pane
+                  name="2"
+                  label="强电"
+                />
+                <el-tab-pane
+                  name="3"
+                  label="脱机主控"
+                />
+              </el-tabs>-->
+              <el-transfer
+                v-model="subValue"
+                :titles="titles"
+                :button-texts="buttonTexts"
+                :props="propAlias"
+                :data="subData"
+                @change="onChange"
+              />
+
+            </div>
+          </el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item class="bpoButtonGroup">
+                <el-button type="warning" size="medium" @click="onEditSubmit('form')">提交</el-button>
+                <el-button size="medium" @click="onBackTo">关闭</el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </CfPanel>
+    </div>
+  </div>
+</template>
+
+<script>
+import CfPanel from '@/components/Panel'
+import treeTransfer from 'el-tree-transfer' // 引入
+
+import { mapGetters } from 'vuex'
+import {
+  findAll,
+  menuOwned,
+  menuNotOwned,
+  addMenu,
+  delMenu,
+  dataOwned,
+  dataNotOwned,
+  addData,
+  delData,
+  menuDetail,
+  dataDetail
+} from '@/api/permissionCtrl'
+import { findOrgType } from '../../api/orgnization'
+import { getRolesNoPage } from '../../api/role'
+
+export default {
+  name: 'DataPermissionInfo',
+  components: { CfPanel, treeTransfer },
+  data() {
+    return {
+      entity: {},
+      type: this.$route.params.type,
+      isMenu: this.$route.params.type !== 'data',
+      disabled: this.$route.params.disabled,
+      propAlias: { key: 'menuId', label: 'menuName' },
+      titles: ['拥有权限', '未拥有权限'],
+      buttonTexts: ['添加', '删除'],
+
+      orgOptions: [],
+      loadingOwned: false,
+      loadingNotOwned: false,
+
+      value: [],
+      ownedMenu: [],
+      unownedMenu: [],
+      dataSource: [],
+
+      subValue: [],
+      subData: []
+    }
+  },
+  computed: {
+    ...mapGetters(['name', 'roles'])
+  },
+  created() {
+    const entity = this.$route.params.entity
+    if (entity) {
+      this.entity = JSON.parse(entity)
+      this.editFn(this.type, this.entity)
+    } else {
+      this.getDicOptions()
+    }
+  },
+
+  methods: {
+    getDicOptions() {
+      getRolesNoPage().then(res => {
+        this.roleOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+
+    addMenuOption(fromData, toData, obj) {
+      var params = {
+        'orgId': this.entity.orgId, // 组织类型id
+        'roleId': this.entity.roleId, // 角色id
+        'menuIds': obj.keys// 菜单id
+      }
+      addMenu(params).then(response => {})
+    },
+    removeMenuOption(fromData, toData, obj) {
+      var params = {
+        'orgId': this.entity.orgId, // 组织类型id
+        'roleId': this.entity.roleId, // 角色id
+        'menuIds': obj.keys// 菜单id
+      }
+      delMenu(params).then(response => {})
+    },
+
+    onBackTo() {
+      this.$router.go(-1)
+    },
+    // 查询提交回调
+    onSubmit() {
+      this.fetchData(this.queryData)
+    },
+    resetForm() {
+      this.queryData = {
+        areaName: '',
+        name: '',
+        type: ''
+      }
+      this.onSubmit()
+    },
+    createStateFilter(queryString) {
+      return state => {
+        return state.areaName.toLowerCase().indexOf(queryString.toLowerCase()) >= 0
+      }
+    },
+    // 表格数据
+    fetchData(params = {}) {
+      this.listLoading = true
+      findAll({ pageNum: this.tableData.pageNum, ...params }).then(response => {
+        this.tableData.list = response.data.list
+        this.tableData.total = response.data.total
+        this.listLoading = false
+      })
+    },
+    // 分页
+    handleCurrentChange(val) {
+      this.tableData.pageNum = val
+      this.fetchData()
+    },
+    editFn(type, row) {
+      this.loadingNotOwned = true
+      if (type === 'data') {
+        this.propAlias = { key: 'moduleId', label: 'moduleName' }
+        dataDetail(row).then(response => {
+          this.loadingNotOwned = false
+          response.data.data.unData.forEach(item => {
+            this.subData.push(item)
+          })
+          response.data.data.data.forEach(item => {
+            this.subValue.push(item)
+          })
+        })
+      } else {
+        this.propAlias = { key: 'menuId', label: 'menuName' }
+        menuDetail(row).then(response => {
+          this.loadingNotOwned = false
+          this.entity = response.data.data
+          response.data.data.unMenuShow.forEach(item => {
+            this.unownedMenu.push(item)
+          })
+          response.data.data.menuShow.forEach(item => {
+            this.value.push(item[this.propAlias.key])
+            this.ownedMenu.push(item)
+          })
+        })
+      }
+    },
+    editFn1(type, row) {
+      this.showDialog = true
+      this.rowData = row
+      this.isMenu = true
+
+      let getOwned = menuOwned
+      let getNotOwned = menuNotOwned
+
+      if (type === 'data') {
+        this.isMenu = false
+        this.propAlias = { key: 'moduleId', label: 'moduleName' }
+        getOwned = dataOwned
+        getNotOwned = dataNotOwned
+      }
+
+      this.loadingOwned = true
+      this.loadingNotOwned = true
+      this.dataSource = []
+      this.value = []
+      this.subValue = [[], [], [], []]
+      this.subData = [[], [], [], []]
+
+      getOwned({ pageSize: 1000, userId: row.id }).then(response => {
+        this.loadingOwned = false
+
+        response.data.data.forEach(item => {
+          if (this.isMenu) {
+            this.dataSource.push(item)
+          } else {
+            this.subData.push(item)
+          }
+        })
+      })
+
+      getNotOwned({ pageSize: 1000, userId: row.id }).then(response => {
+        this.loadingNotOwned = false
+        response.data.data.forEach(item => {
+          if (this.isMenu) {
+            this.value.push(item[this.propAlias.key])
+            this.dataSource.push(item)
+          } else {
+            this.subValue.push(item[this.propAlias.key])
+            this.subData.push(item)
+          }
+        })
+      })
+    },
+    onChange(values, type, keys) {
+      const params = {
+        orgId: this.entity.orgKey,
+        roleId: this.entity.roleId,
+        userId: this.entity.userId
+      }
+      let addFn = addMenu
+      let deleteFn = delMenu
+      if (this.isMenu) {
+        params.menuIds = keys
+      } else {
+        addFn = addData
+        deleteFn = delData
+
+        params.businesses = []
+        this.subData[this.activeName].forEach(item => {
+          if (keys.includes(item.businessId)) {
+            params.businesses.push({
+              businessType: item.businessType,
+              businessId: item.businessId
+            })
+          }
+        })
+      }
+      if (type === 'left') {
+        addFn(params).then(response => {})
+      } else {
+        deleteFn(params).then(response => {})
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+  .dataPermissionInfo{
+    .half{
+      width: 50%;
+      min-width: 200px;
+    }
+    .cf-button-group {
+      margin-bottom: 0;
+      text-align: right;
+    }
+  }
+</style>

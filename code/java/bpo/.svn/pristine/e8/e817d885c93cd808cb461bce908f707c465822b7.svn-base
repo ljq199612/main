@@ -1,0 +1,30 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.BillSelectPersonParam;
+import com.rz.iot.bpo.service.BpoBillPayablePersonService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+@RestController
+@RequestMapping("/bpoBillHandle")
+public class BpoBillPayablePersonController {
+
+    @Resource
+    BpoBillPayablePersonService bpoBillPayablePersonService;
+
+    @GetMapping("/findAllBillPerson")
+    public Result findAllBillPerson(BillSelectPersonParam select){
+        return bpoBillPayablePersonService.findAllBillPerson(select);
+    }
+
+    public Result findBillPersonDetail(Integer id){
+        return null;
+    }
+
+
+
+}

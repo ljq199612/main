@@ -1,0 +1,146 @@
+import Layout from '@/views/layout/Layout'
+
+const supplierManageRouter = {
+  path: '/supplier',
+  component: Layout,
+  redirect: '/supplier/clientManage',
+  name: 'supplierManage',
+  meta: {
+    title: '商务管理',
+    icon: 'supplier',
+    childrenFilter: false
+  },
+  children: [
+    {
+      path: 'clientManage',
+      component: () => import('@/views/supplierManage/clientManage'),
+      name: 'ClientManage',
+      meta: { title: '客户管理' }
+    },
+    {
+      path: 'addClient',
+      component: () => import('@/views/supplierManage/clientManage/addClient'),
+      name: 'AddClient',
+      hidden: true,
+      meta: { title: '新增客户' }
+    },
+    {
+      path: 'updateClient',
+      component: () => import('@/views/supplierManage/clientManage/addClient'),
+      name: 'UpdateClient',
+      hidden: true,
+      meta: { title: '修改客户' }
+    },
+    {
+      path: 'clientDetail',
+      component: () => import('@/views/supplierManage/clientManage/detail'),
+      name: 'ClientDetail',
+      hidden: true,
+      meta: { title: '客户详情' }
+    },
+    {
+      path: 'supplierMgt',
+      component: () => import('@/views/supplierManage/supplierMgt'),
+      name: 'SupplierMgt',
+      meta: { title: '供应商管理' },
+      children: [
+        {
+          path: 'salaryRules',
+          component: () => import('@/views/supplierManage/supplierMgt/salaryRules'),
+          name: 'SalaryRules',
+          meta: { title: '计费规则' }
+        },
+        {
+          path: 'addRules',
+          hidden: true,
+          component: () => import('@/views/supplierManage/supplierMgt/addRule'),
+          name: 'AddRules',
+          meta: { title: '新增计费规则' }
+        }
+      ]
+    },
+    {
+      path: 'supplierAssessment',
+      component: () => import('@/views/supplierManage/supplierAssessmentMgt'),
+      name: 'SupplierAssessment',
+      meta: { title: '供应商考核' },
+      children: [
+        {
+          path: 'supplierAssessment',
+          component: () => import('@/views/supplierManage/supplierAssessmentMgt/supplierAssessment'),
+          name: 'SupplierAssessment',
+          meta: { title: '供应商考核' }
+        },
+        {
+          path: 'addAssessment',
+          component: () => import('@/views/supplierManage/supplierAssessmentMgt/addAssessment'),
+          hidden: true,
+          name: 'AddAssessment',
+          meta: { title: '新增考核' }
+        },
+        {
+          path: 'assessmentDetail',
+          component: () => import('@/views/supplierManage/supplierAssessmentMgt/detail'),
+          name: 'AssessmentDetail',
+          meta: { title: '供应商考核详情' }
+        }
+      ]
+    },
+    {
+      path: 'supplierInfo',
+      component: () => import('@/views/supplierManage/suppliers'),
+      name: 'SupplierInfo',
+      meta: { title: '供应商管理' },
+      children: [
+        {
+          path: 'supplierList',
+          component: () => import('@/views/supplierManage/suppliers/supplierTabs'),
+          name: 'SupplierList',
+          meta: { title: '供应商管理' }
+        },
+        {
+          path: 'supplierInfo',
+          component: () => import('@/views/supplierManage/suppliers/supplierInfo'),
+          name: 'supplierInfo',
+          hidden: true,
+          meta: { title: '供应商信息' }
+        },
+        {
+          path: 'supplierDetail',
+          component: () => import('@/views/supplierManage/suppliers/supplierDetail'),
+          name: 'supplierDetail',
+          hidden: true,
+          meta: { title: '供应商详情' }
+        }
+      ]
+    },
+    {
+      path: 'contractManage',
+      name: 'contractManage',
+      component: () => import('@/views/contractManage/contractManage'),
+      meta: {
+        title: '合同管理'
+      }
+    },
+    {
+      path: 'contractInfo',
+      name: 'contractInfo',
+      component: () => import('@/views/contractManage/contractInfo'),
+      hidden: true,
+      meta: {
+        title: '合同信息'
+      }
+    },
+    {
+      path: 'contractDetail',
+      name: 'contractDetail',
+      component: () => import('@/views/contractManage/contractDetail'),
+      hidden: true,
+      meta: {
+        title: '合同详情'
+      }}
+
+  ]
+}
+
+export default supplierManageRouter

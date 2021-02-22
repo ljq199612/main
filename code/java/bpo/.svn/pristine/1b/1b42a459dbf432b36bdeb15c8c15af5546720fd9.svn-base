@@ -1,0 +1,275 @@
+<template>
+  <CfPanel v-loading="listLoading" title="客户详情" :back-to="backTo" class="addclient-container main">
+    <div class="page-body-title page-body-title_first">客户信息</div>
+    <div class="client-info-body">
+      <ul class="rule-list">
+        <li v-for="(item, key) of infoForm" :key="key" :style="{display: key==='remark' ? 'block':'inline-block'}">
+          <span class="rule-label">{{ item.label }}：</span>
+          <div v-if="key === 'type'" class="rule-value">{{ item.value|filterType }}</div>
+          <div v-else-if="key !== 'remark'" class="rule-value">{{ item.value }}</div>
+          <pre v-else class="rule-value">{{ item.value }}</pre>
+        </li>
+      </ul>
+    </div>
+    <div class="page-body-title">公司信息</div>
+    <div class="company-body">
+      <ul class="rule-list">
+        <li v-for="(item) of companyForm" :key="item.label">
+          <span class="rule-label">{{ item.label }}：</span>
+          <div class="rule-value">{{ item.value }}</div>
+        </li>
+      </ul>
+    </div>
+    <div class="page-body-title">合同信息</div>
+    <div class="client-info-body">
+      <ul class="rule-list">
+        <li>
+          <span class="rule-label">场地名称：</span>
+          <div class="rule-value">{{ contractForm.projectName }}</div>
+        </li>
+        <li>
+          <span class="rule-label">项目名称：</span>
+          <div class="rule-value">{{ contractForm.name }}</div>
+        </li>
+        <li style="width:100%;">
+          <span class="rule-label">合同列表：</span>
+          <div class="rule-value block-value">
+            <el-table
+              :data="contractForm.table"
+              class="bpoTable"
+              fit
+            >
+              <!-- <el-table-column align="center" label="序号" width="80">
+                <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+              </el-table-column> -->
+              <el-table-column show-overflow-tooltip align="left" label="合同名称" min-width="80" prop="name" />
+              <el-table-column show-overflow-tooltip align="left" label="合同编号" min-width="80" prop="contractCode">
+                <template slot-scope="scope">
+                  <el-button type="text" style="color:#4794F7" @click="viewContract(scope.row.id)">{{ scope.row.contractCode }}</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column show-overflow-tooltip align="center" label="签订日期" min-width="80" prop="signTime" />
+              <el-table-column show-overflow-tooltip align="center" label="开始日期" min-width="80" prop="startTime" />
+              <el-table-column show-overflow-tooltip align="center" label="结束日期" min-width="80" prop="endTime" />
+              <el-table-column show-overflow-tooltip align="left" label="结算类型" min-width="80" prop="name">
+                <template slot-scope="scope">
+                  {{ scope.row.type|filterCalcType }}
+                </template>
+              </el-table-column>
+              <el-table-column show-overflow-tooltip align="left" label="保证金额" min-width="80" prop="cashDeposit" />
+              <el-table-column align="left" label="操作" width="70">
+                <template slot-scope="scope">
+                  <el-button type="text" style="color:#4794F7" @click="download(scope.row.id)">下载</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </CfPanel>
+</template>
+<script>
+import { getCustomerById, downloadContract } from '@/api/clientMgt'
+import CfPanel from '@/components/Panel'
+import { typeMap } from '../constant'
+
+export default {
+  name: 'ClientDetail',
+  components: {
+    CfPanel
+  },
+  filters: {
+    filterCalcType(val) {
+      if (/1/.test(val)) {
+        return '按小时计费'
+      }
+      return '按工序计费'
+    },
+    filterType(type) {
+      if (typeMap[type]) {
+        return typeMap[type]
+      }
+      return ''
+    }
+  },
+  data() {
+    return {
+      listLoading: false,
+      queryForm: {
+        id: this.$route.query.id,
+        projectId: this.$route.query.projectId
+      },
+      infoForm: {
+        'company.companyName': {
+          label: '客户名称',
+          value: ''
+        },
+        'company.companyCode': {
+          label: '客户编码',
+          value: ''
+        },
+        'company.nickName': {
+          label: '客户简称',
+          value: ''
+        },
+        type: {
+          label: '客户类型',
+          value: ''
+        },
+        'company.contacts': {
+          label: '联系人',
+          value: ''
+        },
+        'company.phone': {
+          label: '联系方式',
+          value: ''
+        },
+        detailAddress: {
+          label: '详细地址',
+          value: ''
+        },
+        cusCompany: {
+          label: '签约公司',
+          value: ''
+        },
+        creditCode: {
+          label: '统一社会信用代码',
+          value: ''
+        },
+        legalName: {
+          label: '法人代表',
+          value: ''
+        },
+        belogGroupName: {
+          label: '集团公司',
+          value: ''
+        },
+        region: {
+          label: '大区',
+          value: ''
+        },
+        businessArea: {
+          label: '业务区',
+          value: ''
+        },
+        remark: {
+          label: '备注',
+          value: ''
+        }
+      },
+      companyForm: {
+        deptName: {
+          label: '客户归属',
+          value: ''
+        }, // 客户归属
+        chargeMan: {
+          label: '业务负责人',
+          value: ''
+        }, // 业务负责人
+        chargeManPhone: {
+          label: '联系方式',
+          value: ''
+        }
+      },
+      contractForm: {
+        projectName: '',
+        name: '',
+        table: []
+      }
+    }
+  },
+  created() {
+    this.getCustomerById()
+  },
+  methods: {
+    backTo() {
+      this.$router.go(-1)
+    },
+    // 获取客户详情
+    getCustomerById() {
+      this.listLoading = true
+      getCustomerById(this.queryForm).then((res) => {
+        this.listLoading = false
+        const detailData = res.data.data || {}
+        this.copyDetailByKey(this.infoForm, detailData)
+        this.copyDetailByKey(this.companyForm, detailData)
+        this.contractForm.projectName = detailData.project.projectName
+        this.contractForm.name = detailData.transferStation.name
+        this.contractForm.table = Array.isArray(detailData.bpoContractInfo) ? detailData.bpoContractInfo : [detailData.bpoContractInfo]
+        // this.detailData = res.data.data || {}
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 通过键值复制对象
+    copyDetailByKey(target, origin) {
+      Object.keys(target).forEach((key) => {
+        const keyArr = key.split('.')
+        let value = origin[key]
+        // 二级属性处理
+        if (keyArr[1]) {
+          value = origin[keyArr[0]][keyArr[1]]
+        }
+        if (Reflect.has(origin, keyArr[0])) {
+          target[key].value = value
+        }
+      })
+    },
+    // 查看合同
+    viewContract(id) {
+      this.$router.push({
+        name: 'contractDetail',
+        query: {
+          id
+        }
+      })
+    },
+    download(id) {
+      window.open(`${downloadContract}?id=${id}`)
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.rule-list{
+  padding: 0;
+  font-size: 0;
+  li{
+    overflow: hidden;
+    font-size: 14px;
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+    line-height: 20px;
+    margin-bottom: 12px;
+  }
+  .rule-label{
+    float: left;
+    text-align: right;
+    width: 130px;
+    color: #666666;
+  }
+  .rule-value{
+    margin-left: 135px;
+    color: #333333;
+    font-size: 13px;
+  }
+  pre{
+    margin: 0;
+    font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .block-value{
+    width: calc(100% - 135px);
+  }
+}
+.bpo-table{
+  margin-top: 0;
+}
+</style>

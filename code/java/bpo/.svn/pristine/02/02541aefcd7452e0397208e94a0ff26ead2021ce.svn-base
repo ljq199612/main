@@ -1,0 +1,43 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.mapper.BpoBillSupplierDayMapper;
+import com.rz.iot.bpo.mapper.BpoBillSupplierMonthMapper;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillDayShow;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillMonthShow;
+import com.rz.iot.bpo.service.BpoBillSupplierService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@Service
+public class BpoBillSupplierServiceImpl implements BpoBillSupplierService {
+
+    @Resource
+    private BpoBillSupplierDayMapper supplierDayMapper;
+
+    @Resource
+    private BpoBillSupplierMonthMapper supplierMonthMapper;
+
+
+    @Override
+    public List<BpoBillDayShow> selectAllDay(BaseEntity entity, BillSelectParam params) {
+        List<BpoBillDayShow> bpoBillDayShows = supplierDayMapper.selectAllDayAccount(entity,params);
+        return bpoBillDayShows;
+    }
+
+    @Override
+    public List<BpoBillMonthShow> selectAllMonth(BaseEntity entity, BillSelectParam params) {
+        List<BpoBillMonthShow> bpoBillMonthShows = supplierMonthMapper.selectAllMonthAccount(entity,params);
+        return bpoBillMonthShows;
+    }
+
+    @Override
+    public BpoBillDayShow findDayDetail(Integer id) {
+        BpoBillDayShow bpoBillDayShow = supplierDayMapper.selectDetailById(id);
+        return bpoBillDayShow;
+    }
+
+}

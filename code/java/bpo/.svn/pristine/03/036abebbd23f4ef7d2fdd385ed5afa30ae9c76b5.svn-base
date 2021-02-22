@@ -1,0 +1,85 @@
+import { asyncRoutes, constantRoutes } from '@/router'
+// import { router } from '@/api/permission'
+/**
+ * 通过meta.role判断是否与当前用户权限匹配
+ * @param roles
+ * @param route
+ */
+function hasPermission(menus, route) {
+  if (!route.name) {
+    return false
+  } else if (Object.keys(menus).indexOf(route.name) >= 0) {
+    return route.name
+  }
+}
+
+/**
+ * 递归过滤异步路由表，返回符合用户权限的路由表
+ * @param asyncRouterMap
+ * @param menus
+ */
+export function filterAsyncRoutes(asyncRouterMap, menus) {
+  const accessedRouters = asyncRouterMap.filter(route => {
+    const keyName = hasPermission(menus, route)
+    if (keyName) {
+      if (route.meta.childrenFilter && route.children && route.children.length) {
+        route.children = filteSubAsyncRouter(route.children, menus[keyName])
+      }
+      return true
+    }
+    return false
+  })
+  return accessedRouters
+}
+
+function filteSubAsyncRouter(asyncRouterMap, lists) {
+  const accessedRouters = asyncRouterMap.filter(route => {
+    return !!route.name && lists.indexOf(route.name) >= 0
+  })
+  return accessedRouters
+}
+
+const permission = {
+  state: {
+    routes: constantRoutes,
+    dashboard: false,
+    addRoutes: []
+  },
+  mutations: {
+    SET_ROUTERS: (state, routers) => {
+      state.addRoutes = routers
+      state.routes = constantRoutes.concat(routers)
+    },
+    SET_DASH: (state) => {
+      state.dashboard = true
+    }
+  },
+  actions: {
+    GenerateRoutes({ commit, rootGetters }, data) {
+      return new Promise((resolve, reject) => {
+        commit('SET_ROUTERS', asyncRoutes)
+        const permissions = rootGetters.user.permissions
+
+        const permissions_ = {}
+        permissions.forEach(item1 => {
+          if (item1.routerName === 'systemManage') {
+            permissions_[item1.routerName] = item1.children.map(item2 => {
+              return item2.routerName
+            })
+          } else {
+            item1.children.forEach(item2 => {
+              permissions_[item2.routerName] = item2.routerName
+            })
+          }
+        })
+
+        const accessedRouters = filterAsyncRoutes(asyncRoutes, permissions_)
+        console.log(accessedRouters)
+        commit('SET_ROUTERS', accessedRouters)
+        resolve()
+      })
+    }
+  }
+}
+
+export default permission

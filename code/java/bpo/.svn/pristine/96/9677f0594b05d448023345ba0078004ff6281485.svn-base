@@ -1,0 +1,564 @@
+<template>
+  <CfPanel title="项目管理" class="main projectManageList">
+    <el-form :inline="true" :model="formInline" class="bpoFormInline">
+      <el-form-item label="项目名称：">
+        <el-input
+          v-model.trim="formInline.companyId"
+          placeholder="请输入项目名称"
+        />
+      </el-form-item>
+      <el-form-item label="项目归属：">
+        <el-select v-model="formInline.deptId" placeholder="请选择项目归属">
+          <el-option
+            v-for="item in deptData"
+            :key="item.deptId"
+            :label="item.deptName"
+            :value="item.deptId"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="场地名称：">
+        <el-input
+          v-model.trim="formInline.companyId"
+          placeholder="请输入场地名称"
+        />
+      </el-form-item>
+      <el-form-item label="计价方式：">
+        <el-select
+          v-model="formInline.networkStatus"
+          placeholder="请选择计价方式"
+        >
+          <el-option label="全部" value="0" />
+          <el-option label="在线" value="1" />
+          <el-option label="离线" value="2" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <div class="controlBtnWrapper">
+      <el-button type="primary" icon="el-icon-plus" @click="toCreatePorject">新增</el-button>
+      <el-button type="warning" plain>配置考核规则</el-button>
+    </div>
+    <el-table
+      v-loading="listLoading"
+      :data="equipmentList"
+      class="bpoTable"
+      fit
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column label="项目名称" min-width="120">
+        <template slot-scope="scope">{{
+          scope.row.bpoTransferStation && scope.row.bpoTransferStation.name
+        }}</template>
+      </el-table-column>
+      <el-table-column label="项目编码" min-width="80">
+        <template slot-scope="scope">{{ scope.row.transBelong }}</template>
+      </el-table-column>
+      <el-table-column label="项目归属" min-width="80">
+        <template slot-scope="scope">{{ scope.row.deviceName }}</template>
+      </el-table-column>
+      <el-table-column label="场地" min-width="80">
+        <template slot-scope="scope">{{ scope.row.deviceSn }}</template>
+      </el-table-column>
+      <el-table-column label="甲方" min-width="120">
+        <template slot-scope="scope">{{ scope.row.ip }}</template>
+      </el-table-column>
+      <el-table-column label="计费方式" min-width="120">
+        <template slot-scope="scope">{{ scope.row.gateType }}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="200">
+        <template slot-scope="scope">
+          <el-button
+            type="text"
+            style="color:#4794F7"
+            size="mini"
+            @click="toProjectDetails(scope.row.id)"
+          >详情</el-button>
+          <el-button
+            type="text"
+            style="color:#19D185"
+            size="mini"
+            @click="handlerUpdate(scope.row)"
+          >修改</el-button>
+          <el-button
+            v-if="scope.row.status != 'deleted'"
+            size="mini"
+            type="text"
+            style="color:#F52222"
+            @click="handlerDelete(scope.$index, scope.row)"
+          >删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      lang-type="zh"
+      :page.sync="formInline.pageNum"
+      :limit.sync="formInline.pageSize"
+      @pagination="getFuzzyDetails"
+    />
+    <el-dialog
+      class="bpoDialog configDialog"
+      title="配置设备"
+      :visible.sync="configDialogVisible"
+    >
+      <el-form ref="entity" label-width="100px" :model="entity">
+        <el-form-item label="闸机模式：">
+          <el-select v-model="entity.workMode" placeholder="请选择闸机模式">
+            <el-option
+              v-for="item in gateTypeData"
+              :key="item.id"
+              :label="item.dictLabel"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数据上传方式：">
+          <el-select
+            v-model="entity.dataUploadMethod"
+            placeholder="请选择数据上传方式"
+          >
+            <el-option
+              v-for="item in upLoadTypeData"
+              :key="item.id"
+              :label="item.dictLabel"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="服务器端口：">
+          <el-input v-model.trim="entity.cloundConfigPort" />
+        </el-form-item>
+        <el-form-item label="服务器IP：">
+          <el-input v-model.trim="entity.cloundConfigIP" />
+        </el-form-item>
+        <el-form-item class="bpoButtonGroup pull-right">
+          <el-button type="primary" @click="submitConfig">提交</el-button>
+          <el-button @click="closeConfigDialog">关闭</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </CfPanel>
+</template>
+
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import {
+  getAllTransferStationByLoginUserId,
+  getFuzzyDetails,
+  refreshEquipment,
+  synchronizationEquipment,
+  getOfflineInformation,
+  deleteEquipment,
+  getEquipmentGetDept,
+  getEquipmentGateType,
+  getEquipmentUpLoad,
+  configEquipment,
+  getAppConfig
+} from '@/api/equipmentManage/equipmentManage'
+export default {
+  name: 'ProjectManageList',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      transferStation: [], // 场地名称
+      deptData: [], // 场地归属数据
+      equipmentList: [], // 设备列表数据
+      selectedEquipmentList: [], // 选中设备数据
+      total: 0, // 总条数
+      listLoading: false, // 表格加载状态
+      formInline: {
+        deptId: '', // 场地归属id
+        transferStationId: '', // 场地名称的id
+        companyId: '', // 设备归属id
+        networkStatus: '', // 网络状态
+        pageNum: 1,
+        pageSize: 20
+      },
+      configDialogVisible: false, // 配置弹窗
+      entity: {
+        // 配置弹框数据
+        deviceNo: '', // 设备序列号
+        workMode: '', // 闸机模式
+        dataUploadMethod: '', // 数据上传方式
+        cloundConfigPort: '', // 上传端口号
+        cloundConfigIP: '' // 服务器IP
+      },
+      gateTypeData: [], // 闸机模式数据
+      upLoadTypeData: [] // 数据上传方式
+    }
+  },
+  computed: {},
+  created() {
+    // 查询场地
+    this.getAllTransferStation()
+    // 查询表格
+    this.getFuzzyDetails()
+    // 查询场地归属
+    this.getEquipmentGetDept()
+    // 查询闸机模式
+    this.getEquipmentGateType()
+    // 查询数据上传方式
+    this.getEquipmentUpLoad()
+  },
+  mounted() {},
+  methods: {
+    /**
+     * 跳转新增项目
+     */
+    toCreatePorject() {
+      this.$router.push({ path: '/project/createProject' })
+    },
+    /**
+     * 跳转项目详情
+     */
+    toProjectDetails(id) {
+      this.$router.push({
+        path: '/project/projectManageDetail',
+        query: {
+          id
+        }
+      })
+    },
+    /**
+     * 获取场地名称
+     */
+    getAllTransferStation() {
+      getAllTransferStationByLoginUserId()
+        .then((res) => {
+          const result = res['data']
+          this.transferStation = result['data'] || []
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取场地名称失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 获取场地归属
+     */
+    getEquipmentGetDept() {
+      getEquipmentGetDept()
+        .then((res) => {
+          const result = res['data']
+          this.deptData = result['data'] || []
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取场地归属失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 获取设备列表数据
+     */
+    getFuzzyDetails() {
+      this.listLoading = true
+      getFuzzyDetails(this.formInline)
+        .then((res) => {
+          const result = res['data']['data']
+          this.total = result['total']
+          this.equipmentList = result['list'] || []
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取设备列表失败，服务端错误，请联系管理员'
+          })
+        })
+        .finally(() => {
+          this.listLoading = false
+        })
+    },
+    /**
+     * 搜索逻辑
+     */
+    submit() {
+      this.getFuzzyDetails()
+    },
+    /**
+     * 初始化搜索条件搜索
+     */
+    reset() {
+      const initParams = {
+        transferStationId: '', // 场地名称的id
+        companyId: '', // 设备归属id
+        networkStatus: '', // 网络状态
+        pageNum: 1,
+        pageSize: 20
+      }
+      Object.assign(this.formInline, initParams)
+      this.getFuzzyDetails()
+    },
+    /**
+     * 处理选中checkbox
+     */
+    handleSelectionChange(val) {
+      this.selectedEquipmentList = val
+    },
+    /**
+     * 刷新设备信息
+     */
+    refreshEquipment() {
+      const params = {
+        selects: []
+      }
+      this.selectedEquipmentList.forEach((item) => {
+        params.selects.push(item.deviceSn)
+      })
+      this.listLoading = true
+      refreshEquipment(params)
+        .then((res) => {
+          const result = res['data']['data'] || []
+          // 循环比较数组数据进行更新
+          for (let i = 0; i < result.length; i++) {
+            const item = result[i]
+            this.updateEquipmentListData(item)
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取设备列表失败，服务端错误，请联系管理员'
+          })
+        })
+        .finally(() => {
+          this.listLoading = false
+        })
+    },
+    /**
+     * 同步设备信息
+     */
+    synchronizationEquipment() {
+      const params = {
+        selects: []
+      }
+      this.selectedEquipmentList.forEach((item) => {
+        params.selects.push(item.deviceSn)
+      })
+      this.listLoading = true
+      synchronizationEquipment(params)
+        .then((res) => {
+          const result = res['data']['data'] || []
+          // 循环比较数组数据进行更新
+          for (let i = 0; i < result.length; i++) {
+            const item = result[i]
+            this.updateEquipmentListData(item)
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取设备列表失败，服务端错误，请联系管理员'
+          })
+        })
+        .finally(() => {
+          this.listLoading = false
+        })
+    },
+    /**
+     * 更新表格数据
+     */
+    updateEquipmentListData(item) {
+      for (let j = 0; j < this.equipmentList.length; j++) {
+        const target = this.equipmentList[j]
+        if (item['id'] === target['id']) {
+          // 进行数据替换
+          Object.assign(target, item)
+          break
+        }
+      }
+    },
+    /**
+     * 获取离线信息
+     */
+    getOfflineInformation(row) {
+      const params = {
+        id: row.id
+      }
+      getOfflineInformation(params)
+        .then((res) => {
+          const result = res['data']
+          this.$alert(result['data'], '信息', {
+            confirmButtonText: '确定'
+          })
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取离线信息失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 配置操作
+     */
+    hanlderConfig(row) {
+      this.getAppConfig(row.deviceSn).then(() => {
+        this.configDialogVisible = true
+      })
+    },
+    /**
+     * 跳转到详情
+     */
+    handlerDetails(row) {
+      this.$router.push({
+        path: '/equipment/equipmentManageDetails',
+        query: {
+          id: row.id
+        }
+      })
+    },
+    /**
+     * 跳转到修改
+     */
+    handlerUpdate(row) {
+      this.$router.push({
+        path: '/equipment/equipmentManageEdit',
+        query: {
+          id: row.id
+        }
+      })
+    },
+    /**
+     * 删除
+     */
+    handlerDelete(index, row) {
+      this.$confirm('确定删除该设备？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          deleteEquipment({
+            id: row.id
+          })
+            .then(() => {
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              this.equipmentList.splice(index, 1)
+            })
+            .catch((err) => {
+              this.$message.error(err.message || '删除失败')
+            })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    /**
+     * 关闭配置弹窗
+     */
+    closeConfigDialog() {
+      this.configDialogVisible = false
+    },
+    /**
+     * 获取闸机模式
+     */
+    getEquipmentGateType() {
+      getEquipmentGateType()
+        .then((res) => {
+          const result = res['data']['data']
+          this.gateTypeData = result
+        })
+        .catch((err) => {
+          this.$message.error(
+            err.message || '获取闸机模式数据失败，服务端错误，请联系管理员'
+          )
+        })
+    },
+    getEquipmentUpLoad() {
+      getEquipmentUpLoad()
+        .then((res) => {
+          const result = res['data']['data']
+          this.upLoadTypeData = result
+        })
+        .catch((err) => {
+          this.$message.error(
+            err.message || '获取数据上传模式失败，服务端错误，请联系管理员'
+          )
+        })
+    },
+    /**
+     * 提交配置弹窗
+     */
+    submitConfig() {
+      this.$refs['entity'].validate((valid) => {
+        if (valid) {
+          this.configEquipment(this.entity)
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    /**
+     * 配置设备信息
+     */
+    configEquipment(data) {
+      configEquipment(data)
+        .then((res) => {
+          const result = res['data']['data']
+          const item = result[0]
+          // 更新表格数据
+          this.updateEquipmentListData(item)
+          this.$message({
+            type: 'success',
+            message: '配置成功!'
+          })
+          this.configDialogVisible = false
+        })
+        .catch((err) => {
+          this.$message.error(
+            err.message || '修改设备配置信息失败，服务端错误，请联系管理员'
+          )
+        })
+    },
+    /**
+     * 获取配置信息
+     */
+    getAppConfig(sn) {
+      return new Promise((resolve, reject) => {
+        getAppConfig({
+          sn
+        })
+          .then((res) => {
+            const result = res['data']['data']
+            Object.assign(this.entity, {
+              deviceNo: result.deviceNo, // 设备序列号
+              workMode: result.workMode, // 闸机模式
+              dataUploadMethod: result.dataUploadMethod || '', // 数据上传方式
+              cloundConfigPort: result.cloundConfigPort || '', // 上传端口号
+              cloundConfigIp: result.cloundConfigIp // 服务器IP
+            })
+            resolve()
+          })
+          .catch((err) => {
+            this.$message.error(
+              err.message || '获取设备配置信息失败，服务端错误，请联系管理员'
+            )
+            reject()
+          })
+      })
+    }
+  }
+}
+</script>
+<style lang="scss">
+.projectManageList {
+  .controlBtnWrapper {
+    padding-top: 19px;
+    margin-bottom: 26px;
+  }
+}
+</style>

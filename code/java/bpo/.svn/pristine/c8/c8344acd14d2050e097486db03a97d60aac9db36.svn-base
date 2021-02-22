@@ -1,0 +1,30 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.BpoBillTimeMapper;
+import com.rz.iot.bpo.model.param.BillSelectPersonParam;
+import com.rz.iot.bpo.model.show.BpoBillPayablePersonShow;
+import com.rz.iot.bpo.service.BpoBillPayablePersonService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@Service
+public class BpoBillPayablePersonServiceImpl implements BpoBillPayablePersonService {
+
+    @Resource
+    BpoBillTimeMapper bpoBillTimeMapper;
+
+    @Override
+    public Result findAllBillPerson(BillSelectPersonParam select) {
+
+        List<BpoBillPayablePersonShow> bpoBillPayablePersonShow = bpoBillTimeMapper.findAllBillPerson(select);
+        return Result.success(bpoBillPayablePersonShow);
+    }
+
+    @Override
+    public Result findBillPersonDetail(Integer id) {
+        return null;
+    }
+}

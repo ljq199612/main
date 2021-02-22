@@ -1,0 +1,23 @@
+package com.rz.iot.bpo.model.param.bpoBill;
+
+import lombok.Data;
+
+/**
+ * @program: bpo-preview
+ * @description: 账单应收搜索参数
+ * @author: YangShun
+ * @create: 2020-07-29 11:38
+ **/
+@Data
+public class BillSelectParam {
+    //日期
+    private String date;
+    //项目id
+    private Integer projectId;
+    //中转场id
+    private Integer transId;
+    //供应商详情id 或 收款方详情id
+    private Integer supplierId;
+    //客户详情id 或 付款方详情id
+    private Integer CustomId;
+}

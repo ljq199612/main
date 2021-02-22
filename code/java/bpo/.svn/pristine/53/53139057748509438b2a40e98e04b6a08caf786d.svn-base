@@ -1,0 +1,40 @@
+import Layout from '@/views/layout/Layout'
+import equipmentManageList from '@/views/equipmentManage/equipmentManageList'
+import equipmentManageDetails from '@/views/equipmentManage/equipmentManageDetails'
+import equipmentManageEdit from '@/views/equipmentManage/equipmentManageEdit'
+
+const equipmentManageRouter = {
+  path: '/equipment',
+  component: Layout,
+  redirect: '/equipment/list',
+  name: 'equipmentManage',
+  meta: {
+    title: '设备管理',
+    icon: 'equipment',
+    childrenFilter: false
+  },
+  children: [
+    {
+      path: 'list',
+      component: equipmentManageList,
+      name: 'equipmentManageList',
+      meta: { title: '设备管理' },
+      children: []
+    },
+    {
+      path: 'equipmentManageDetails',
+      component: equipmentManageDetails,
+      name: 'equipmentManageDetails',
+      hidden: true,
+      meta: { title: '设备详情' }
+    },
+    {
+      path: 'equipmentManageEdit',
+      component: equipmentManageEdit,
+      name: 'equipmentManageEdit',
+      hidden: true,
+      meta: { title: '编辑设备' }
+    }
+  ]
+}
+export default equipmentManageRouter

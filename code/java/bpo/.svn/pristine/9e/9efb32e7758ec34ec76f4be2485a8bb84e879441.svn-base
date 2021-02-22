@@ -1,0 +1,17 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillReconciliationSupplier;
+
+public interface BpoBillReconciliationSupplierMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoBillReconciliationSupplier record);
+
+    int insertSelective(BpoBillReconciliationSupplier record);
+
+    BpoBillReconciliationSupplier selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoBillReconciliationSupplier record);
+
+    int updateByPrimaryKey(BpoBillReconciliationSupplier record);
+}

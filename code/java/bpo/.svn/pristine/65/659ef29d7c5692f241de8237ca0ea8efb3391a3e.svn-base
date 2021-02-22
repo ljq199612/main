@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoBillReconciliationMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoBillReconciliation" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER" />
+    <result column="billing_cycle" property="billingCycle" jdbcType="VARCHAR" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="payer_id" property="payerId" jdbcType="INTEGER" />
+    <result column="payee_id" property="payeeId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="month_bill_id" property="monthBillId" jdbcType="INTEGER" />
+    <result column="reconciliation_way" property="reconciliationWay" jdbcType="INTEGER" />
+    <result column="reconciliation_type" property="reconciliationType" jdbcType="INTEGER" />
+    <result column="fee_rule_type" property="feeRuleType" jdbcType="INTEGER" />
+    <result column="total_output" property="totalOutput" jdbcType="INTEGER" />
+    <result column="total_hours" property="totalHours" jdbcType="REAL" />
+    <result column="reconciliation_status" property="reconciliationStatus" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, supplier_info_id, billing_cycle, bill_type, payer_id, payee_id, project_id, month_bill_id, 
+    reconciliation_way, reconciliation_type, fee_rule_type, total_output, total_hours, 
+    reconciliation_status, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_bill_reconciliation
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByMonthBillKey" resultType="com.rz.iot.bpo.model.BpoBillReconciliation">
+    select <include refid="Base_Column_List"/>
+    FROM bpo_bill_reconciliation where
+    month_bill_id = #{monthId}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_bill_reconciliation
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoBillReconciliation" >
+    insert into bpo_bill_reconciliation (id, supplier_info_id, billing_cycle, 
+      bill_type, payer_id, payee_id, 
+      project_id, month_bill_id, reconciliation_way, 
+      reconciliation_type, fee_rule_type, total_output, 
+      total_hours, reconciliation_status, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{supplierInfoId,jdbcType=INTEGER}, #{billingCycle,jdbcType=VARCHAR}, 
+      #{billType,jdbcType=INTEGER}, #{payerId,jdbcType=INTEGER}, #{payeeId,jdbcType=INTEGER}, 
+      #{projectId,jdbcType=INTEGER}, #{monthBillId,jdbcType=INTEGER}, #{reconciliationWay,jdbcType=INTEGER}, 
+      #{reconciliationType,jdbcType=INTEGER}, #{feeRuleType,jdbcType=INTEGER}, #{totalOutput,jdbcType=INTEGER}, 
+      #{totalHours,jdbcType=REAL}, #{reconciliationStatus,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliation" useGeneratedKeys="true" keyProperty="id">
+    insert into bpo_bill_reconciliation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id,
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle,
+      </if>
+      <if test="billType != null" >
+        bill_type,
+      </if>
+      <if test="payerId != null" >
+        payer_id,
+      </if>
+      <if test="payeeId != null" >
+        payee_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="monthBillId != null" >
+        month_bill_id,
+      </if>
+      <if test="reconciliationWay != null" >
+        reconciliation_way,
+      </if>
+      <if test="reconciliationType != null" >
+        reconciliation_type,
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type,
+      </if>
+      <if test="totalOutput != null" >
+        total_output,
+      </if>
+      <if test="totalHours != null" >
+        total_hours,
+      </if>
+      <if test="reconciliationStatus != null" >
+        reconciliation_status,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null" >
+        #{billType,jdbcType=INTEGER},
+      </if>
+      <if test="payerId != null" >
+        #{payerId,jdbcType=INTEGER},
+      </if>
+      <if test="payeeId != null" >
+        #{payeeId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="monthBillId != null" >
+        #{monthBillId,jdbcType=INTEGER},
+      </if>
+      <if test="reconciliationWay != null" >
+        #{reconciliationWay,jdbcType=INTEGER},
+      </if>
+      <if test="reconciliationType != null" >
+        #{reconciliationType,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="totalOutput != null" >
+        #{totalOutput,jdbcType=INTEGER},
+      </if>
+      <if test="totalHours != null" >
+        #{totalHours,jdbcType=REAL},
+      </if>
+      <if test="reconciliationStatus != null" >
+        #{reconciliationStatus,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliation" >
+    update bpo_bill_reconciliation
+    <set >
+      <if test="supplierInfoId != null" >
+        supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle = #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null" >
+        bill_type = #{billType,jdbcType=INTEGER},
+      </if>
+      <if test="payerId != null" >
+        payer_id = #{payerId,jdbcType=INTEGER},
+      </if>
+      <if test="payeeId != null" >
+        payee_id = #{payeeId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="monthBillId != null" >
+        month_bill_id = #{monthBillId,jdbcType=INTEGER},
+      </if>
+      <if test="reconciliationWay != null" >
+        reconciliation_way = #{reconciliationWay,jdbcType=INTEGER},
+      </if>
+      <if test="reconciliationType != null" >
+        reconciliation_type = #{reconciliationType,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type = #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="totalOutput != null" >
+        total_output = #{totalOutput,jdbcType=INTEGER},
+      </if>
+      <if test="totalHours != null" >
+        total_hours = #{totalHours,jdbcType=REAL},
+      </if>
+      <if test="reconciliationStatus != null" >
+        reconciliation_status = #{reconciliationStatus,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoBillReconciliation" >
+    update bpo_bill_reconciliation
+    set supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      billing_cycle = #{billingCycle,jdbcType=VARCHAR},
+      bill_type = #{billType,jdbcType=INTEGER},
+      payer_id = #{payerId,jdbcType=INTEGER},
+      payee_id = #{payeeId,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=INTEGER},
+      month_bill_id = #{monthBillId,jdbcType=INTEGER},
+      reconciliation_way = #{reconciliationWay,jdbcType=INTEGER},
+      reconciliation_type = #{reconciliationType,jdbcType=INTEGER},
+      fee_rule_type = #{feeRuleType,jdbcType=INTEGER},
+      total_output = #{totalOutput,jdbcType=INTEGER},
+      total_hours = #{totalHours,jdbcType=REAL},
+      reconciliation_status = #{reconciliationStatus,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

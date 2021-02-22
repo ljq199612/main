@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaScheduleToEmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaScheduleToEmployee">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="schedule_id" jdbcType="INTEGER" property="scheduleId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="process_id" jdbcType="INTEGER" property="processId"/>
+        <result column="product_id" jdbcType="INTEGER" property="productId"/>
+        <result column="group_id" jdbcType="INTEGER" property="groupId"/>
+        <result column="update_user_id" jdbcType="INTEGER" property="updateUserId"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="MinaScheduleToEmployeeShowMap" type="com.rz.iot.bpo.mina.model.show.MinaScheduleToEmployeeShow">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <result column="work_group_name" property="workGroupName" jdbcType="VARCHAR"/>
+        <result column="work_group_id" property="workGroupId" jdbcType="INTEGER"/>
+
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIME"/>
+        <result column="end_time" property="endTime" jdbcType="TIME"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIME"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+        <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+        <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+        <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+        <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="class_type" property="classType" jdbcType="TINYINT"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <resultMap id="MinaPersonMap" type="com.rz.iot.bpo.mina.model.MinaPerson">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="person_name" property="personName" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="INTEGER"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="id_card" property="idCard" jdbcType="VARCHAR"/>
+        <result column="nation" property="nation" jdbcType="VARCHAR"/>
+        <result column="birth" property="birth" jdbcType="VARCHAR"/>
+        <result column="id_card_address" property="idCardAddress" jdbcType="VARCHAR"/>
+        <result column="work_no" property="workNo" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="sync_sf" property="syncSf" jdbcType="TINYINT"/>
+        <result column="sf_work_no" property="sfWorkNo" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="account_id" property="accountId" jdbcType="INTEGER"/>
+        <result column="person_type" property="personType" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="dimission_type" property="dimissionType" jdbcType="INTEGER"/>
+        <result column="dimission_reason" property="dimissionReason" jdbcType="VARCHAR"/>
+        <result column="station" property="station" jdbcType="VARCHAR"/>
+        <result column="station_level" property="stationLevel" jdbcType="INTEGER"/>
+        <result column="wage_id" property="wageId" jdbcType="INTEGER"/>
+        <result column="dimission_time" property="dimissionTime" jdbcType="TIMESTAMP"/>
+        <result column="contract_id" property="contractId" jdbcType="INTEGER"/>
+        <result column="company_id" property="companyId" jdbcType="INTEGER"/>
+        <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, schedule_id, user_id, process_id, product_id, group_id, update_user_id, status,
+        create_time, update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_schedule_to_employee
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from bpo_schedule_to_employee
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleToEmployee">
+        insert into bpo_schedule_to_employee (id, schedule_id, user_id,
+        process_id, product_id, group_id,
+        update_user_id, status, create_time,
+        update_time)
+        values (#{id,jdbcType=INTEGER}, #{scheduleId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
+        #{processId,jdbcType=INTEGER}, #{productId,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER},
+        #{updateUserId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleToEmployee">
+        insert into bpo_schedule_to_employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="scheduleId != null">
+                schedule_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="processId != null">
+                process_id,
+            </if>
+            <if test="productId != null">
+                product_id,
+            </if>
+            <if test="groupId != null">
+                group_id,
+            </if>
+            <if test="updateUserId != null">
+                update_user_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleId != null">
+                #{scheduleId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="processId != null">
+                #{processId,jdbcType=INTEGER},
+            </if>
+            <if test="productId != null">
+                #{productId,jdbcType=INTEGER},
+            </if>
+            <if test="groupId != null">
+                #{groupId,jdbcType=INTEGER},
+            </if>
+            <if test="updateUserId != null">
+                #{updateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleToEmployee">
+        update bpo_schedule_to_employee
+        <set>
+            <if test="scheduleId != null">
+                schedule_id = #{schedule,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="processId != null">
+                process_id = #{processId,jdbcType=INTEGER},
+            </if>
+            <if test="productId != null">
+                product_id = #{productId,jdbcType=INTEGER},
+            </if>
+            <if test="groupId != null">
+                group_id = #{groupId,jdbcType=INTEGER},
+            </if>
+            <if test="updateUserId != null">
+                update_user_id = #{updateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaScheduleToEmployee">
+        update bpo_schedule_to_employee
+        set schedule_id = #{scheduleId,jdbcType=INTEGER},
+        user_id = #{userId,jdbcType=INTEGER},
+        process_id = #{processId,jdbcType=INTEGER},
+        product_id = #{productId,jdbcType=INTEGER},
+        group_id = #{groupId,jdbcType=INTEGER},
+        update_user_id = #{updateUserId,jdbcType=INTEGER},
+        status = #{status,jdbcType=INTEGER},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="deleteStatusByScheduleId">
+        update bpo_schedule_to_employee
+        set
+        status = #{status,jdbcType=INTEGER}
+
+        where schedule_id = #{scheduleId,jdbcType=INTEGER}
+    </update>
+
+    <select id="ScheduleEmployeeNum" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*) AS schduled_num
+        FROM
+            bpo_classes_user_rel class_user
+        WHERE
+            class_user.class_generate_id = #{classGenerateId}
+        AND class_user.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    </select>
+
+    <select id="findAll" resultMap="MinaScheduleToEmployeeShowMap">
+        SELECT
+            class_gen.*,
+            project.project_name AS project_name,
+            class_group_rel.work_group_id AS work_group_id,
+            work_group.group_name AS workgroup_name,
+            class_count.employee_num
+        FROM
+            bpo_classes_generate class_gen
+        JOIN
+            bpo_project project
+        ON
+            class_gen.project_id = project.id
+        AND class_gen.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_classes_group_rel class_group_rel ON class_group_rel.class_generate_id = class_gen.id
+        LEFT JOIN bpo_work_group work_group ON work_group.id = class_group_rel.work_group_id
+        LEFT JOIN (
+            SELECT
+                class_generate_id,
+                COUNT(*) AS employee_num
+            FROM
+                bpo_classes_user_rel
+            WHERE
+                `status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            GROUP BY
+                class_generate_id
+        ) class_count ON class_count.class_generate_id = class_gen.id
+    </select>
+
+
+    <select id="selectByProjectIds" resultMap="MinaScheduleToEmployeeShowMap">
+        SELECT
+            class_gen.*,
+            project.project_name AS project_name,
+            bpo_classes_group_rel.work_group_id AS work_group_id,
+            bpo_work_group.group_name AS workgroup_name,
+            class_count.employee_num
+        FROM
+            bpo_classes_generate class_gen
+        JOIN bpo_project project
+        ON class_gen.project_id = project.id
+        AND class_gen.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND class_gen.project_id
+        IN
+            <foreach collection="list" item="pId" index="index" open="(" close=")" separator=",">
+                #{pId}
+            </foreach>
+        LEFT JOIN bpo_classes_group_rel ON bpo_classes_group_rel.class_generate_id = class_gen.id
+        LEFT JOIN bpo_work_group ON bpo_work_group.id = bpo_classes_group_rel.work_group_id
+        LEFT JOIN (
+        SELECT
+            class_generate_id,
+            COUNT(*) AS employee_num
+            FROM
+            bpo_classes_user_rel
+            WHERE
+            `status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMclass_genL_STATUS}
+            GROUP BY
+            class_generate_id
+        ) class_count ON class_count.class_generate_id = class_gen.id
+    </select>
+
+    <!--[START] -->
+    <!-- 对排班人员的操作 -->
+
+    <sql id="Selective_Set_Person_Value">
+        <set>
+            <if test="personName != null">
+                person_name = #{personName,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="idCard != null">
+                id_card = #{idCard,jdbcType=VARCHAR},
+            </if>
+            <if test="nation != null">
+                nation = #{nation,jdbcType=VARCHAR},
+            </if>
+            <if test="birth != null">
+                birth = #{birth,jdbcType=VARCHAR},
+            </if>
+            <if test="idCardAddress != null">
+                id_card_address = #{idCardAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="workNo != null">
+                work_no = #{workNo,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="syncSf != null">
+                sync_sf = #{syncSf,jdbcType=TINYINT},
+            </if>
+            <if test="sfWorkNo != null">
+                sf_work_no = #{sfWorkNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="accountId != null">
+                account_id = #{accountId,jdbcType=INTEGER},
+            </if>
+            <if test="personType != null">
+                person_type = #{personType,jdbcType=TINYINT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="dimissionType != null">
+                dimission_type = #{dimissionType,jdbcType=INTEGER},
+            </if>
+            <if test="dimissionReason != null">
+                dimission_reason = #{dimissionReason,jdbcType=VARCHAR},
+            </if>
+            <if test="station != null">
+                station = #{station,jdbcType=VARCHAR},
+            </if>
+            <if test="stationLevel != null">
+                station_level = #{stationLevel,jdbcType=INTEGER},
+            </if>
+            <if test="wageId != null">
+                wage_id = #{wageId,jdbcType=INTEGER},
+            </if>
+            <if test="dimissionTime != null">
+                dimission_time = #{dimissionTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="contractId != null">
+                contract_id = #{contractId,jdbcType=INTEGER},
+            </if>
+            <if test="companyId != null">
+                company_id = #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="deptId != null">
+                dept_id = #{deptId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+    </sql>
+
+    <update id="updatePersonByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaPerson">
+        update bpo_person
+        <include refid="Selective_Set_Person_Value"/>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updatePersonByPrimaryKeyList" parameterType="java.util.List">
+        update bpo_person
+        <include refid="Selective_Set_Person_Value"/>
+        where id in
+        <foreach collection="list" item="classId" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+
+    <select id="selectPersonByProjectId" resultMap="MinaPersonMap" parameterType="java.lang.Integer">
+        SELECT
+            bpo_person.*
+        FROM
+            bpo_person
+        WHERE
+            bpo_person`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND bpo_person.project_id = #{projectId}
+    </select>
+
+    <select id="selectPersonByProjectIdAndDateInterval" resultType="com.rz.iot.bpo.mina.model.MinaPerson">
+        SELECT
+            bpo_person.*
+        FROM
+            bpo_person
+        JOIN bpo_classes_user_rel ON bpo_person.project_id = bpo_classes_user_rel.project_id
+        WHERE
+            bpo_person.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND bpo_person.project_id = #{param1}
+        AND cycle BETWEEN #{param2}
+        AND #{param3}
+    </select>
+
+    <select id="selectPersonByProjectIdAndDate" resultType="com.rz.iot.bpo.mina.model.MinaPerson">
+        SELECT bpo_person.*
+        FROM  bpo_person
+        JOIN bpo_classes_user_rel ON bpo_person.project_id = bpo_classes_user_rel.project_id
+        WHERE
+            bpo_person.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND bpo_person.project_id = #{param1}
+        AND cycle = #{param2}
+    </select>
+
+    <select id="selectPersonByGroupAndDateInterval" resultType="com.rz.iot.bpo.mina.model.MinaPerson">
+        SELECT
+            bpo_person.*
+        FROM
+            bpo_classes_user_rel class_user
+        JOIN bpo_person ON bpo_person.id = class_user.project_id
+        WHERE
+            class_user.class_group_id = #{param1}
+        AND class_user.`status`  = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND cycle BETWEEN #{param2}
+        AND #{param3}
+
+    </select>
+
+    <select id="selectPersonByGroupAndDate" resultType="com.rz.iot.bpo.mina.model.MinaPerson">
+        SELECT
+            bpo_person.*
+        FROM
+            bpo_classes_user_rel class_user
+        JOIN bpo_person ON bpo_person.id = class_user.project_id
+        WHERE
+            class_user.class_group_id = #{param1}
+        AND class_user.`status`  = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND cycle = #{param2}
+    </select>
+    <!--[END]-->
+
+    <!--[START]-->
+    <!-- 排班到个人的关联结构 -->
+    <resultMap id="ClassesUserRelMap" type="com.rz.iot.bpo.mina.model.MinaClassesUserRel">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="class_generate_id" property="classGenerateId" jdbcType="INTEGER"/>
+        <result column="class_group_id" property="classGroupId" jdbcType="INTEGER"/>
+        <result column="cycle" property="cycle" jdbcType="DATE"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="person_id" property="personId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Selective_Classes_User_Rel_Column_Key">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="classGenerateId != null">
+                class_generate_id,
+            </if>
+            <if test="classGroupId != null">
+                class_group_id,
+            </if>
+            <if test="cycle != null">
+                cycle,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="classSn != null">
+                class_sn,
+            </if>
+            <if test="personId != null">
+                person_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+    </sql>
+    <sql id="Selective_Classes_User_Rel_Column_Value">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="classGenerateId != null">
+                #{classGenerateId,jdbcType=INTEGER},
+            </if>
+            <if test="classGroupId != null">
+                #{classGroupId,jdbcType=INTEGER},
+            </if>
+            <if test="cycle != null">
+                #{cycle,jdbcType=DATE},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="classSn != null">
+                #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="personId != null">
+                #{personId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </sql>
+    <sql id="Classes_User_Rel_Column_Key_For_List">
+        class_generate_id, class_group_id, cycle, project_id, class_sn, person_id, status
+    </sql>
+    <sql id="Classes_User_Rel_Column_Value_For_List">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            #{item.classGenerateId,jdbcType=INTEGER},
+            #{item.classGroupId,jdbcType=INTEGER},
+            #{item.cycle,jdbcType=DATE},
+            #{item.projectId,jdbcType=INTEGER},
+            #{item.classSn,jdbcType=VARCHAR},
+            #{item.personId,jdbcType=INTEGER},
+            #{item.status,jdbcType=INTEGER},
+        </trim>
+    </sql>
+    <insert id="insertClassesUserRel" parameterType="com.rz.iot.bpo.mina.model.MinaClassesUserRel">
+        insert into bpo_classes_user_rel
+        (<include refid="Selective_Classes_User_Rel_Column_Key"/>)
+        values (<include refid="Selective_Classes_User_Rel_Column_Value"/>)
+    </insert>
+
+
+    <insert id="insertClassesUserRelBatch" parameterType="java.util.List">
+        insert into bpo_classes_user_rel
+        (<include refid="Classes_User_Rel_Column_Key_For_List"/>)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (<include refid="Classes_User_Rel_Column_Value_For_List"/>)
+        </foreach>
+    </insert>
+
+    <update id="deleteScheduledPerson" parameterType="java.lang.Integer">
+        UPDATE bpo_classes_user_rel set status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+        WHERE id = #{id}
+    </update>
+
+
+
+    <!--[END]-->
+
+</mapper>

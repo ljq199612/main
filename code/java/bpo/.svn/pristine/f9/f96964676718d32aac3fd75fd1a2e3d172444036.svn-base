@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysOrgRoleMenuMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysOrgRoleMenu" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="org_id" property="orgId" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="menu_id" property="menuId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, org_id, role_id, menu_id, status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_org_role_menu
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_org_role_menu
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysOrgRoleMenu" >
+    insert into sys_org_role_menu (id, org_id, role_id, 
+      menu_id, status)
+    values (#{id,jdbcType=INTEGER}, #{orgId,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}, 
+      #{menuId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysOrgRoleMenu" >
+    insert into sys_org_role_menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orgId != null" >
+        org_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="menuId != null" >
+        menu_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orgId != null" >
+        #{orgId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="menuId != null" >
+        #{menuId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysOrgRoleMenu" >
+    update sys_org_role_menu
+    <set >
+      <if test="orgId != null" >
+        org_id = #{orgId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="menuId != null" >
+        menu_id = #{menuId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysOrgRoleMenu" >
+    update sys_org_role_menu
+    set org_id = #{orgId,jdbcType=INTEGER},
+      role_id = #{roleId,jdbcType=INTEGER},
+      menu_id = #{menuId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <resultMap id="allMenuChildren" type="com.rz.iot.bpo.model.show.SysMenuShow">
+    <id property="menuId" column="menuId"/>
+    <result property="menuName" column="menuName"/>
+    <result property="routerName" column="routeName"/>
+    <result property="perms" column="perms"/>
+    <result property="parentId" column="parent_id"/>
+    <collection property="children" column="{menuId=menuId}" select="getChildrenMenu"/>
+  </resultMap>
+
+  <select id="getChildrenMenu" resultMap="allMenuChildren">
+        select menu.menu_id as menuId,menu.menu_name as menuName,menu.router_name as routeName,menu.perms as perms,menu.parent_id from sys_menu menu
+        where parent_id = #{menuId} and menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="getAllMenuChildren" resultMap="allMenuChildren">
+    select menu.menu_id as menuId,menu.menu_name as menuName,menu.router_name as routeName,menu.perms as perms,menu.parent_id from sys_menu menu
+    where menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    and menu.parent_id = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_NO_PARENT}
+  </select>
+
+
+  <resultMap id="findMenuPer" type="com.rz.iot.bpo.model.show.SysMenuShow">
+    <id column="menu_id" property="menuId"/>
+    <result column="menu_name" property="menuName"/>
+    <result column="router_name" property="routerName"/>
+    <result column="perms" property="perms"/>
+    <result column="parent_id" property="parentId"/>
+    <collection property="children" column="{menuId=menu_id,orgId=orgId,roleId=roleId}" select="menuPer"/>
+  </resultMap>
+
+  <select id="menuPer" resultMap="findMenuPer">
+    select menu.menu_id,menu.menu_name,menu.router_name,menu.perms,#{orgId} as orgId,#{roleId} as roleId,menu.parent_id from sys_menu menu
+    where menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    AND menu.menu_id in (
+    select rel.menu_id from sys_org_role_menu rel
+    where rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} and rel.org_id = #{orgId} and rel.role_id = #{roleId}
+    ) AND menu.parent_id = #{menuId}
+  </select>
+
+  <select id="findMenuPerByOrgRole" resultMap="findMenuPer">
+    select menu.menu_id,menu.menu_name,menu.router_name,menu.perms,#{orgId} as orgId,#{roleId} as roleId,menu.parent_id from sys_menu menu
+    where menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    AND menu.menu_id in (
+    select rel.menu_id from sys_org_role_menu rel
+    where rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} and rel.org_id = #{orgId} and rel.role_id = #{roleId}
+    ) AND menu.parent_id = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_NO_PARENT}
+  </select>
+
+  <resultMap id="findUnMenuPer" type="com.rz.iot.bpo.model.show.SysMenuShow">
+    <id property="menuId" column="menu_id"/>
+    <result property="menuName" column="menu_name"/>
+    <result property="routerName" column="router_name"/>
+    <result property="perms" column="perms"/>
+    <result property="parentId" column="parent_id"/>
+    <collection property="children" column="menuId=menu_id,orgId=orgId,roleId=roleId" select="unMenuPer"/>
+  </resultMap>
+
+  <select id="unMenuPer" resultMap="findUnMenuChildrenOver">
+    select menu.menu_id as menuId,menu.menu_name as menuName,menu.router_name as routeName,menu.perms as perms,menu.parent_id from sys_menu menu
+    where menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    and menu.menu_id not in
+		  (
+		  select menu.menu_id from sys_org_role_menu rel
+		  LEFT JOIN sys_menu menu ON rel.menu_id = menu.menu_id AND menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    		where rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} and rel.org_id = #{orgId} and rel.role_id = #{roleId}
+			and rel.menu_id not in (select parent_id from sys_menu menu where menu.menu_type = 'F')
+		  )
+    and menu.parent_id = #{menuId}
+  </select>
+  <resultMap id="findUnMenuChildrenOver" type="com.rz.iot.bpo.model.show.SysMenuShow">
+    <id property="menuId" column="menuId"/>
+    <result property="menuName" column="menuName"/>
+    <result property="routerName" column="routerName"/>
+    <result property="perms" column="perms"/>
+    <result property="parentId" column="parent_id"/>
+    <collection property="children" column="menuId=menuId" select="findUnMenuChildrenOverSelect"/>
+  </resultMap>
+
+
+  <select id="findUnMenuChildrenOverSelect" resultType="com.rz.iot.bpo.model.show.SysMenuShow">
+    select menu.menu_id as menuId,menu.menu_name as menuName,menu.parent_id as parentId,menu.router_name as routeName,menu.perms as perms,#{orgId} as orgId,#{roleId} as roleId from sys_menu menu
+    where parent_id = #{menuId} and menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <resultMap id="findUnMenuChildren" type="com.rz.iot.bpo.model.show.SysMenuShow">
+    <id property="menuId" column="menu_id"/>
+    <result property="menuName" column="menu_name"/>
+    <result property="routerName" column="router_name"/>
+    <result property="perms" column="perms"/>
+    <collection property="children" column="orgId=orgId,roleId=roleId" select="unMenuPer"/>
+  </resultMap>
+
+
+
+  <select id="findUnMenuPerByOrgRole" resultMap="findUnMenuPer">
+    select menu.menu_id,menu.menu_name,menu.router_name,menu.perms as perms,#{orgId} as orgId,#{roleId} as roleId,menu.parent_id from sys_menu menu
+    where parent_id = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_NO_PARENT} and menu.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+  <insert id="insertMenuPer">
+    insert into sys_org_role_menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orgId != null" >
+        org_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="menuIds != null" >
+        menu_id,
+      </if>
+    </trim>
+    values
+    <foreach collection="menuIds" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="orgId != null" >
+          #{orgId,jdbcType=INTEGER},
+        </if>
+        <if test="roleId != null" >
+          #{roleId,jdbcType=INTEGER},
+        </if>
+        <if test="item != null" >
+          #{item,jdbcType=INTEGER},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+  
+  <update id="updateMenuPer">
+    update sys_org_role_menu set status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    where
+    org_id = #{orgId}
+    and 
+    role_id = #{roleId}
+    and
+    menu_id
+    in
+    <foreach collection="menuIds" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
+
+  <select id="findUnRelRoleByOrgKey" parameterType="java.lang.String" resultType="java.util.Map">
+        select role.id as roleId,role.role_name as roleName from sys_role role
+    where
+    role.id not in
+    (
+    select rel.role_id as roleId from sys_org_role_menu rel
+            left join sys_org org ON rel.org_id = org.id AND org.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            where org.id = #{orgKey} and rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            group by rel.role_id
+    )
+  </select>
+  <select id="findMenuAll" parameterType="com.rz.iot.bpo.model.show.SysPerMenuShow" resultType="com.rz.iot.bpo.model.show.SysPerMenuShow">
+    select role.id as roleId,role.role_name as roleName,org.id as orgId,org.org_name as orgName,rel.create_time as createTime from sys_org_role_menu rel,
+    sys_role role,
+    sys_org org
+    where
+    rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    and
+    role.id = rel.role_id and role.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    and
+    org.id = rel.org_id and org.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <if test="orgId != null">
+      AND org.id = #{orgId}
+    </if>
+    <if test="roleId != null">
+      AND role.id = #{roleId}
+    </if>
+    group by role.id,org.id
+  </select>
+
+  <select id="findMenuRelByOrgRole" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from sys_org_role_menu
+        where role_id = #{roleId} and org_id = #{orgId}
+  </select>
+</mapper>

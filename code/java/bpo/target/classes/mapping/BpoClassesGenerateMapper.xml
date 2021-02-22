@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoClassesGenerateMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoClassesGenerate">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+        <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+        <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+        <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+        <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="INTEGER"/>
+        <result column="class_type" property="classType" jdbcType="TINYINT"/>
+    </resultMap>
+    <resultMap id="BpoClassGenerateShowMap" type="com.rz.iot.bpo.model.show.BpoClassGenerateShow">
+        <id column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <collection property="bpoClassesGenerateList" ofType="com.rz.iot.bpo.model.BpoClassesGenerate">
+            <result column="id" property="id" jdbcType="INTEGER"/>
+            <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+            <result column="class_name" property="className" jdbcType="VARCHAR"/>
+            <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+            <result column="start_date" property="startDate" jdbcType="DATE"/>
+            <result column="end_date" property="endDate" jdbcType="DATE"/>
+            <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+            <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+            <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+            <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+            <result column="type" property="type" jdbcType="INTEGER"/>
+            <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+            <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+            <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+            <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+            <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+            <result column="status" property="status" jdbcType="INTEGER"/>
+            <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+            <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+            <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+            <result column="source" property="source" jdbcType="INTEGER"/>
+            <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+            <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+            <result column="contents" property="contents" jdbcType="VARCHAR"/>
+            <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="INTEGER"/>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, batch_id, class_name, class_sn, start_date, end_date, start_time, end_time, arrive_time,exclude_hour,
+    type, is_special, special_allowance, meal_allowance, night_allowance, is_allowance,
+    status, people_number, project_id, create_time, update_time, source, schedule_status,
+    update_user_id,contents,is_class_group_rel,class_type
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_classes_generate
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByProjectId" resultMap="BpoClassGenerateShowMap" parameterType="java.lang.Integer">
+        select
+            id, batch_id, class_name, class_sn, start_date, end_date, start_time, end_time, arrive_time,exclude_hour,
+            type, is_special, special_allowance, meal_allowance, night_allowance, is_allowance,
+            cg.status, people_number, project_id, cg.create_time, cg.update_time, source, schedule_status,
+            update_user_id,su.username
+        from bpo_classes_generate cg
+        left join sys_user su on cg.update_user_id = su.user_id
+        where project_id = #{projectId,jdbcType=INTEGER}
+        and cg.status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from bpo_classes_generate
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoClassesGenerate">
+        insert into bpo_classes_generate (id, batch_id, class_name,
+                                          class_sn, start_date, end_date,
+                                          start_time, end_time, arrive_time,exclude_hour,
+                                          type, is_special, special_allowance,
+                                          meal_allowance, night_allowance, is_allowance,
+                                          status, people_number, project_id,
+                                          create_time, update_time, source,
+                                          schedule_status, update_user_id)
+        values (#{id,jdbcType=INTEGER}, #{batchId,jdbcType=INTEGER}, #{className,jdbcType=VARCHAR},
+                #{classSn,jdbcType=VARCHAR}, #{startDate,jdbcType=DATE}, #{endDate,jdbcType=DATE},
+                #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{arriveTime,jdbcType=TIMESTAMP},#{excludeHour,jdbcType=INTEGER},
+                #{type,jdbcType=INTEGER}, #{isSpecial,jdbcType=INTEGER}, #{specialAllowance,jdbcType=VARCHAR},
+                #{mealAllowance,jdbcType=VARCHAR}, #{nightAllowance,jdbcType=VARCHAR}, #{isAllowance,jdbcType=INTEGER},
+                #{status,jdbcType=INTEGER}, #{peopleNumber,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{source,jdbcType=INTEGER},
+                #{scheduleStatus,jdbcType=TINYINT}, #{updateUserId,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoClassesGenerate">
+        insert into bpo_classes_generate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="batchId != null">
+                batch_id,
+            </if>
+            <if test="className != null">
+                class_name,
+            </if>
+            <if test="classSn != null">
+                class_sn,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="arriveTime != null">
+                arrive_time,
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="isSpecial != null">
+                is_special,
+            </if>
+            <if test="specialAllowance != null">
+                special_allowance,
+            </if>
+            <if test="mealAllowance != null">
+                meal_allowance,
+            </if>
+            <if test="nightAllowance != null">
+                night_allowance,
+            </if>
+            <if test="isAllowance != null">
+                is_allowance,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="peopleNumber != null">
+                people_number,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status,
+            </if>
+            <if test="updateUserId != null">
+                update_user_id,
+            </if>
+            <if test="contents != null">
+                contents,
+            </if>
+            <if test="isClassGroupRel != null">
+                is_class_group_rel,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="batchId != null">
+                #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="className != null">
+                #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="classSn != null">
+                #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="isSpecial != null">
+                #{isSpecial,jdbcType=INTEGER},
+            </if>
+            <if test="specialAllowance != null">
+                #{specialAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="mealAllowance != null">
+                #{mealAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="nightAllowance != null">
+                #{nightAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="isAllowance != null">
+                #{isAllowance,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="updateUserId != null">
+                #{updateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="contents != null">
+                #{contents,jdbcType=VARCHAR},
+            </if>
+            <if test="isClassGroupRel != null">
+                #{is_class_group_rel,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoClassesGenerate">
+        update bpo_classes_generate
+        <set>
+            <if test="batchId != null">
+                batch_id = #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="className != null">
+                class_name = #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="classSn != null">
+                class_sn = #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                arrive_time = #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour = #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="isSpecial != null">
+                is_special = #{isSpecial,jdbcType=INTEGER},
+            </if>
+            <if test="specialAllowance != null">
+                special_allowance = #{specialAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="mealAllowance != null">
+                meal_allowance = #{mealAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="nightAllowance != null">
+                night_allowance = #{nightAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="isAllowance != null">
+                is_allowance = #{isAllowance,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                people_number = #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status = #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="updateUserId != null">
+                update_user_id = #{updateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="contents != null">
+                contents = #{contents,jdbcType=VARCHAR},
+            </if>
+            <if test="isClassGroupRel != null">
+                is_class_group_rel = #{isClassGroupRel,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoClassesGenerate">
+        update bpo_classes_generate
+        set batch_id          = #{batchId,jdbcType=INTEGER},
+            class_name        = #{className,jdbcType=VARCHAR},
+            class_sn          = #{classSn,jdbcType=VARCHAR},
+            start_date        = #{startDate,jdbcType=DATE},
+            end_date          = #{endDate,jdbcType=DATE},
+            start_time        = #{startTime,jdbcType=TIMESTAMP},
+            end_time          = #{endTime,jdbcType=TIMESTAMP},
+            arrive_time       = #{arriveTime,jdbcType=TIMESTAMP},
+            exclude_hour      = #{excludeHour,jdbcType=INTEGER},
+            type              = #{type,jdbcType=INTEGER},
+            is_special        = #{isSpecial,jdbcType=INTEGER},
+            special_allowance = #{specialAllowance,jdbcType=VARCHAR},
+            meal_allowance    = #{mealAllowance,jdbcType=VARCHAR},
+            night_allowance   = #{nightAllowance,jdbcType=VARCHAR},
+            is_allowance      = #{isAllowance,jdbcType=INTEGER},
+            status            = #{status,jdbcType=INTEGER},
+            people_number     = #{peopleNumber,jdbcType=INTEGER},
+            project_id        = #{projectId,jdbcType=INTEGER},
+            create_time       = #{createTime,jdbcType=TIMESTAMP},
+            update_time       = #{updateTime,jdbcType=TIMESTAMP},
+            source            = #{source,jdbcType=INTEGER},
+            schedule_status   = #{scheduleStatus,jdbcType=TINYINT},
+            update_user_id    = #{updateUserId,jdbcType=INTEGER},
+            contents   = #{contents,jdbcType=VARCHAR},
+            is_class_group_rel    = #{isClassGroupRel,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <resultMap id="personArrangeMap" type="com.rz.iot.bpo.model.show.personClass.BpoPersonArrangeShow">
+        <id column="stationId" property="stationId"/>
+        <result column="stationName" property="stationName"/>
+        <collection property="bpoProjectClasses" resultMap="bpoProjectMap"/>
+    </resultMap>
+    <resultMap id="bpoProjectMap" type="com.rz.iot.bpo.model.show.personClass.BpoProjectClass">
+        <id column="projectId" property="projectId"/>
+        <result column="projectName" property="projectName"/>
+        <collection property="bpoClassList" select="findBpoClass" column="projectId" ofType="com.rz.iot.bpo.model.show.personClass.BpoClass"/>
+    </resultMap>
+
+    <resultMap id="bpoClassMap" type="com.rz.iot.bpo.model.show.personClass.BpoClass">
+        <id column="classId" property="classId"/>
+        <result column="classSn" property="classSn"/>
+        <result column="classType" property="classType"/>
+        <result column="arriveTime" property="arriveTime"/>
+        <result column="startTime" property="startTime"/>
+        <result column="endTime" property="endTime"/>
+        <result column="excludeHour" property="excludeHour"/>
+        <result column="feeHour" property="feeHour"/>
+        <result column="startDate" property="startDate"/>
+        <result column="endDate" property="endDate"/>
+        <result column="actualNum" property="actualNum"/>
+        <result column="classNum" property="classNum"/>
+        <collection property="workGroups" column="classId" select="findGroup"/>
+    </resultMap>
+
+    <select id="findGroup" resultType="com.rz.iot.bpo.model.BpoWorkGroup">
+       select
+        work_group.id as id,work_group.group_name as groupName
+        from
+        bpo_classes_generate class
+        LEFT JOIN bpo_classes_user_rel class_user_rel ON class_user_rel.class_generate_id = class.id AND class_user_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_work_group work_group ON work_group.id = class_user_rel.class_group_id AND work_group.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where class.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        and class.id = #{classId}
+        and work_group.id IS NOT NULL
+    </select>
+
+    <select id="findBpoClass" resultMap="bpoClassMap">
+        select
+        class.id as classId,class.class_sn as classSn,class.class_type as classType,class.arrive_time as arriveTime,class.start_time as startTime,class.end_time as endTime,
+        DATE_FORMAT(TIMEDIFF(class.start_time,class.arrive_time),'%H') as excludeHour,DATE_FORMAT(TIMEDIFF(class.end_time,class.arrive_time),'%H') AS feeHour,
+        DATE_FORMAT(class.start_date,'%Y-%m-%d') as startDate,DATE_FORMAT(class.start_date,'%w') as startWeek,
+        DATE_FORMAT(class.end_date,'%Y-%m-%d') as endDate,DATE_FORMAT(class.end_date,'%w') as endWeek,class.people_number as actualNum,count(class_user_rel.person_id) as classNum
+        from bpo_project project
+        LEFT JOIN bpo_transfer_station station ON project.transfer_station_id = station.id AND station.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_classes_generate class ON class.project_id = project.id AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_classes_user_rel class_user_rel ON class_user_rel.class_generate_id = class.id AND class_user_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND project.id = #{projectId}
+        AND class.id IS NOT NULL
+        group by class.id
+    </select>
+
+    <select id="findAll" resultMap="personArrangeMap">
+        select station.id as stationId,station.name as stationName,project.id as projectId,project.project_name as projectName from bpo_transfer_station station
+        LEFT JOIN sys_dept_sub_rel rel ON station.id = rel.sub_id AND rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION} AND rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_project project ON project.transfer_station_id = station.id AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where
+        station.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="stationId != null">
+            AND station.id = #{stationId}
+        </if>
+        <if test="projectId != null">
+            AND project.id = #{projectId}
+        </if>
+        <if test="base.dataScope!=null">
+            and ${base.dataScope}
+        </if>
+        AND
+        project.id IS NOT NULL
+        AND
+        (case #{userId}
+        when ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_ADMIN}
+        THEN
+        true
+        ELSE
+        project.id in (select module_id from sys_user_module_rel where user_id = #{userId} and `type` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO})
+        END)
+    </select>
+
+    <resultMap id="getClassGenerateListMap" type="com.rz.iot.bpo.model.show.BpoClassGenerateListShow">
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <result column="project_sn" property="projectSn" jdbcType="VARCHAR"/>
+        <result column="transfer_station_id" property="transferStationId" jdbcType="INTEGER"/>
+        <result column="transfer_station_name" property="transferStationName" jdbcType="VARCHAR"/>
+        <result column="transfer_station_code" property="transferStationCode" jdbcType="VARCHAR"/>
+        <result column="person_number" property="personNumber" jdbcType="INTEGER"/>
+
+        <result column="class_id" property="id" jdbcType="INTEGER"/>
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+        <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+        <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+        <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+        <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="INTEGER"/>
+
+        <collection property="bpoClassesGroupRelShows" ofType="com.rz.iot.bpo.model.show.BpoClassesGroupRelShow">
+            <result column="group_rel_id" property="id" jdbcType="INTEGER" />
+            <result column="project_id" property="projectId" jdbcType="INTEGER" />
+            <result column="class_sn" property="classSn" jdbcType="VARCHAR" />
+            <result column="work_group_id" property="workGroupId" jdbcType="INTEGER" />
+            <result column="class_generate_id" property="classGenerateId" jdbcType="INTEGER" />
+            <result column="work_group_name" property="workGroupName" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <select id="getClassGenerateList" resultMap="getClassGenerateListMap">
+        SELECT
+            class.*,
+            class.id AS class_id,
+            project.project_name,
+            project.project_sn,
+            tr.id AS transfer_station_id,
+            tr.`name` AS transfer_station_name,
+            tr.`code` AS transfer_station_code,
+            group_rel.*,
+            group_rel.id AS group_rel_id,
+            gp.group_name AS work_group_name,
+            IFNULL( user_rel.person_number, 0 ) AS person_number
+        FROM
+            bpo_classes_generate class
+            LEFT JOIN bpo_project project ON project.id = class.project_id
+            AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            LEFT JOIN bpo_transfer_station tr ON tr.id = project.transfer_station_id
+            AND tr.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            LEFT JOIN bpo_classes_group_rel group_rel ON group_rel.class_generate_id = class.id
+            AND group_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            AND class.is_class_group_rel = 1
+            LEFT JOIN bpo_work_group gp ON gp.id = group_rel.work_group_id
+            AND gp.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            LEFT JOIN (
+                SELECT
+                user_rel.class_generate_id,
+                COUNT( user_rel.id ) AS person_number
+                FROM
+                bpo_classes_user_rel user_rel
+                WHERE
+                user_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+                GROUP BY
+                user_rel.class_generate_id
+            ) user_rel ON user_rel.class_generate_id = class.id
+        WHERE
+            class.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            <if test="info !=null">
+                <if test="info.projectId !=null and info.projectId != ''">
+                    AND class.project_id = 42
+                </if>
+                <if test="info.transferStationName !=null and info.transferStationName != ''">
+                    AND tr.name LIKE concat('%',#{info.transferStationName},'%')
+                </if>
+--                 预留通过时间查询,单时间查询如下
+                <!--<if test="info.projectId !=null and info.projectId != ''">
+                    AND '2020-07-29' BETWEEN class.start_date
+                    AND class.end_date
+                </if>-->
+            </if>
+
+
+    </select>
+    <resultMap id="groupClassMap" type="com.rz.iot.bpo.model.show.personClass.BpoGroupShow">
+        <id property="workGroupId" column="workGroupId"/>
+        <result property="workGroupName" column="workGroupName"/>
+        <collection property="personShowList" column="workGroupId" select="selectPersonByGroup"/>
+    </resultMap>
+
+    <select id="selectPersonByGroup" resultType="com.rz.iot.bpo.model.show.personClass.BpoPersonShow">
+        select person.id as personId,person.person_name as personName,person.work_no as workNo,person.person_type as personType,wage.wage_type as wageType,
+         person.station as station,company.company_name as belongCompany from bpo_classes_user_rel group_rel
+        LEFT JOIN bpo_work_group work_group ON group_rel.class_group_id = work_group.id AND work_group.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         LEFT JOIN bpo_person person ON group_rel.person_id = person.id AND person.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         LEFT JOIN bpo_person_wage wage ON wage.id = person.wage_id AND wage.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         LEFT JOIN sys_company company ON person.company_id = company.id
+         where group_rel.class_group_id = #{workGroupId}
+    </select>
+
+    <select id="getGroupsByClassId" resultMap="groupClassMap">
+        select group_rel.class_group_id as workGroupId,work_group.group_name as workGroupName from bpo_classes_user_rel group_rel
+        LEFT JOIN bpo_work_group work_group ON group_rel.class_group_id = work_group.id AND work_group.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where group_rel.class_group_id = #{value} and group_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    </select>
+
+    <select id="getPersonNoGroup" resultType="com.rz.iot.bpo.model.show.personClass.BpoPersonShow">
+         select person.id as personId,person.person_name as personName,person.work_no as workNo,person.person_type as personType,wage.wage_type as wageType,
+         person.station as station,company.company_name as belongCompany from bpo_classes_user_rel group_rel
+        LEFT JOIN bpo_work_group work_group ON group_rel.class_group_id = work_group.id AND work_group.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         LEFT JOIN bpo_person person ON group_rel.person_id = person.id AND person.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         LEFT JOIN bpo_person_wage wage ON wage.id = person.wage_id AND wage.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         LEFT JOIN sys_company company ON person.company_id = company.id AND company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+         where group_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS} AND group_rel.class_group_id IS NULL
+			AND group_rel.class_generate_id = #{value} AND person.id IS NOT NULL
+    </select>
+
+    <select id="getPersonNoClass" resultType="com.rz.iot.bpo.model.show.personClass.BpoPersonShow">
+
+    </select>
+</mapper>

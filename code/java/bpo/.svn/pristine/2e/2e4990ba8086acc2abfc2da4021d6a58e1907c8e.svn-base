@@ -1,0 +1,52 @@
+package com.rz.iot.bpo.model.show.bpoBill;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * @program: bpo-preview
+ * @description: 用于展示供应商日账单
+ * @author: YangShun
+ * @create: 2020-07-29 15:30
+ **/
+@Data
+public class BpoBillDayShow {
+    //id
+    private Integer id;
+    //场地id
+    private Integer transferId;
+    //场地
+    private String transferName;
+    //项目id
+    private Integer projectId;
+    //项目
+    private String projectName;
+    //客户id
+    private Integer customerId;
+    //客户
+    private String customer;
+    //供应商id
+    private Integer supplierId;
+    //供应商
+    private String supplierName;
+    //账单日期
+    private String billDate;
+    //计价方式
+    private Integer feeRuleType;
+    //总件量
+    private Integer totalOutput;
+    //总工时
+    private BigDecimal totalTime;
+    //总人数
+    private Integer totalPeaple;
+    //结算标准
+    private BigDecimal supplierSalary;
+    //扣款
+    private BigDecimal totalDeduction;
+    //账单金额
+    private BigDecimal realBillAmount;
+    //账单状态
+    private Integer reconciliationStatus;
+
+}

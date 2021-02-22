@@ -1,0 +1,43 @@
+{
+  "groups": [
+    {
+      "name": "swagger",
+      "type": "com.rz.iot.bpo.framework.config.SwaggerConfig",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig"
+    },
+    {
+      "name": "swagger.contact",
+      "type": "com.rz.iot.bpo.framework.config.SwaggerConfig$Contact",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig",
+      "sourceMethod": "getContact()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "swagger.base-package",
+      "type": "java.lang.String",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig"
+    },
+    {
+      "name": "swagger.description",
+      "type": "java.lang.String",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig"
+    },
+    {
+      "name": "swagger.terms-of-service-url",
+      "type": "java.lang.String",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig"
+    },
+    {
+      "name": "swagger.title",
+      "type": "java.lang.String",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig"
+    },
+    {
+      "name": "swagger.version",
+      "type": "java.lang.String",
+      "sourceType": "com.rz.iot.bpo.framework.config.SwaggerConfig"
+    }
+  ],
+  "hints": []
+}

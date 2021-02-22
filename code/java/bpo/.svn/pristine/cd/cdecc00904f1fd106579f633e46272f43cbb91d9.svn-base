@@ -1,0 +1,140 @@
+<template>
+  <div>
+    <el-form :inline="true" class="bpoFormInline">
+      <el-form-item label-width="90px" label="开始日期：">
+        <el-date-picker
+          v-model="queryForm.startDate"
+          type="date"
+          placeholder="选择开始日期"
+          @change="submit"
+        />
+      </el-form-item>
+      <el-form-item label-width="90px" label="截至日期：">
+        <el-date-picker
+          v-model="queryForm.endDate"
+          type="date"
+          placeholder="选择截止日期"
+          @change="submit"
+        />
+      </el-form-item>
+      <el-form-item label-width="90px" label="用户类型：">
+        <el-select v-model="queryForm.type" placeholder="请选择用户类型" @change="submit">
+          <el-option v-for="(item,index) in userOptions" :key="index" :label="item.roleName" :value="item.roleKey" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <el-button type="primary" icon="icon-export" style="margin:15px 0 10px" @click="exportExcel">
+      导出
+    </el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="tableList"
+      class="bpoTable"
+      fit
+    >
+      <el-table-column align="center" label="序号" width="80">
+        <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="所属组织" min-width="80" prop="orgName" />
+      <el-table-column align="left" label="用户名" min-width="80" prop="userName" />
+      <el-table-column align="left" label="登录地点" min-width="80" prop="loginLocation" />
+      <el-table-column align="left" label="操作终端类型" min-width="80" prop="browser">
+        <template slot-scope="scope">{{ scope.row.browser }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="登录地址" min-width="80" prop="ipaddr" />
+      <el-table-column align="left" label="登录日期" min-width="80" prop="loginTime" />
+      <el-table-column align="left" label="登录类型" width="80">
+        <template slot-scope="scope">
+          {{ scope.row.msg }}
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="page.pageNum" :limit.sync="page.pageSize" @pagination="getList" />
+  </div>
+</template>
+<script>
+import { exportLoginLog, findUserRole, findAllLogin } from '@/api/logMgt'
+import Pagination from '@/components/Pagination'
+
+export default {
+  name: 'LoginLog',
+  components: {
+    Pagination
+  },
+  data() {
+    return {
+      queryForm: {
+        startDate: '',
+        endDate: '',
+        type: ''
+      },
+      userOptions: [],
+      listLoading: false,
+      page: {
+        pageNum: 1,
+        pageSize: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      tableList: [],
+      total: 0
+    }
+  },
+  created() {
+    this.getUserTypes()
+    this.getList()
+  },
+  methods: {
+    getUserTypes() {
+      findUserRole().then((res) => {
+        this.userOptions = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    getList() {
+      this.listLoading = true
+      findAllLogin({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...this.queryForm
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.tableList = data.list || []
+        this.total = data.total
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    reset() {
+      this.page.pageNum = 1
+      this.queryForm.dictName = ''
+      this.queryForm.dictType = ''
+      this.queryForm.status = null
+      this.getList()
+    },
+    submit() {
+      this.page.pageNum = 1
+      this.getList()
+    },
+    exportExcel() {
+      window.open(exportLoginLog)
+    }
+  }
+}
+</script>

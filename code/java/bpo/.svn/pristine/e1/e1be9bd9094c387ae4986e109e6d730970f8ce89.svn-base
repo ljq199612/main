@@ -1,0 +1,156 @@
+import request from '@/utils/request'
+
+/**
+ * 中转场信息列表（当前部门及以下）用于查询界面
+ */
+export function getAllTransferStationByLoginUserId() {
+  return request({
+    url: '/transferStation/findAllByLoginUserId',
+    method: 'get'
+  })
+}
+
+/**
+ * 转场信息列表（当前部门）(用于修改界面的)
+ */
+export function findAllInDepByLoginUserId() {
+  return request({
+    url: '/transferStation/findAllInDepByLoginUserId ',
+    method: 'get'
+  })
+}
+
+/**
+ * 查询设备列表数据
+ */
+export function getFuzzyDetails(params) {
+  return request({
+    url: '/equipment/getFuzzyDetails',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 刷新设备信息
+ * @param {*} params
+ */
+export function refreshEquipment(data) {
+  return request({
+    url: '/equipment/refresh',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 同步设备信息
+ * @param {*} params
+ */
+export function synchronizationEquipment(data) {
+  return request({
+    url: '/equipment/synchronization',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取离线信息
+ * @param {*} params
+ */
+export function getOfflineInformation(params) {
+  return request({
+    url: '/equipment/getOfflineInformation',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 删除设备
+ */
+export function deleteEquipment(params) {
+  return request({
+    url: '/equipment/deleteEquipment',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取设备详情
+ * @param {*} params
+ */
+export function getEquipmentDetail(params) {
+  return request({
+    url: '/equipment/getDetail',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 修改一个设备信息
+ * @param {*} params
+ */
+export function updateEquipment(data) {
+  return request({
+    url: '/equipment/updateEquipment',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取场地归属
+ */
+export function getEquipmentGetDept() {
+  return request({
+    url: '/equipment/getDept',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取闸机模式
+ */
+export function getEquipmentGateType() {
+  return request({
+    url: '/equipment/getGateType',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取数据上传方式
+ */
+export function getEquipmentUpLoad() {
+  return request({
+    url: '/equipment/getUpLoad',
+    method: 'get'
+  })
+}
+
+/**
+ * 修改设备配置信息
+ */
+export function configEquipment(params) {
+  return request({
+    url: '/equipment/configEquipment',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 根据sn从设备获取设备信息
+ * @param {*} params
+ */
+export function getAppConfig(params) {
+  return request({
+    url: '/equipment/getAppConfig',
+    method: 'get',
+    params
+  })
+}

@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoEvaluationResultRecordMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoEvaluationResultRecord">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER"/>
+        <result column="result_id" property="resultId" jdbcType="INTEGER"/>
+        <result column="evaluation_item_id" property="evaluationItemId" jdbcType="INTEGER"/>
+        <result column="evaluation_item_name" property="evaluationItemName" jdbcType="VARCHAR"/>
+        <result column="weight" property="weight" jdbcType="INTEGER"/>
+        <result column="evaluation_content_id" property="evaluationContentId" jdbcType="INTEGER"/>
+        <result column="evaluation_content_name" property="evaluationContentName" jdbcType="VARCHAR"/>
+        <result column="evaluation_standard_id" property="evaluationStandardId" jdbcType="INTEGER"/>
+        <result column="single_score" property="singleScore" jdbcType="INTEGER"/>
+        <result column="single_weight" property="singleWeight" jdbcType="INTEGER"/>
+        <result column="evaluation_standard_name" property="evaluationStandardName" jdbcType="VARCHAR"/>
+        <result column="evaluation_standard_desc" property="evaluationStandardDesc" jdbcType="VARCHAR"/>
+        <result column="score_standard_unit" property="scoreStandardUnit" jdbcType="VARCHAR"/>
+        <result column="score_standard_points" property="scoreStandardPoints" jdbcType="INTEGER"/>
+        <result column="upper_limit" property="upperLimit" jdbcType="INTEGER"/>
+        <result column="score_type" property="scoreType" jdbcType="INTEGER"/>
+        <result column="score" property="score" jdbcType="INTEGER"/>
+        <result column="weighted_score" property="weightedScore" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="evaluation_time" property="evaluationTime" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="BpoEvaluationResultRecordShowMap" type="com.rz.iot.bpo.model.show.BpoEvaluationResultRecordShow">
+        <id column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="grade" property="grade" jdbcType="VARCHAR"/>
+        <result column="calculated" property="calculated" jdbcType="INTEGER"/>
+        <collection property="evaluationTimeList" ofType="com.rz.iot.bpo.model.show.EvaluationTimeShow">
+            <result column="evaluation_time" property="evaluationTime" jdbcType="INTEGER"/>
+            <collection property="bpoEvaluationItemList" ofType="com.rz.iot.bpo.model.BpoEvaluationItem">
+                <id column="evaluation_item_id" property="id" jdbcType="INTEGER"/>
+                <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+                <result column="evaluation_item_name" property="evaluationItemName" jdbcType="VARCHAR"/>
+                <result column="weight" property="weight" jdbcType="INTEGER"/>
+                <collection property="bpoEvaluationContentList" ofType="com.rz.iot.bpo.model.BpoEvaluationContent">
+                    <result column="evaluation_content_id" property="id" jdbcType="INTEGER"/>
+                    <result column="evaluation_content_name" property="evaluationContentName" jdbcType="VARCHAR"/>
+                    <collection property="bpoEvaluationStandardList"
+                                ofType="com.rz.iot.bpo.model.BpoEvaluationStandard">
+                        <result column="evaluation_standard_id" property="id" jdbcType="INTEGER"/>
+                        <result column="id" property="recordId" jdbcType="INTEGER"/>
+                        <result column="single_weight" property="singleWeight" jdbcType="INTEGER"/>
+                        <result column="single_score" property="singleScore" jdbcType="INTEGER"/>
+                        <result column="username" property="userName" jdbcType="VARCHAR"/>
+                        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+                        <result column="weighted_score" property="weightedScore" jdbcType="VARCHAR"/>
+                        <result column="evaluation_standard_name" property="evaluationStandardName" jdbcType="VARCHAR"/>
+                        <result column="evaluation_standard_desc" property="evaluationStandardDesc" jdbcType="VARCHAR"/>
+                        <result column="score_standard_unit" property="scoreStandardUnit" jdbcType="VARCHAR"/>
+                        <result column="score_standard_points" property="scoreStandardPoints" jdbcType="INTEGER"/>
+                        <result column="upper_limit" property="upperLimit" jdbcType="INTEGER"/>
+                        <result column="score_type" property="scoreType" jdbcType="INTEGER"/>
+                        <result column="status" property="status" jdbcType="INTEGER"/>
+                        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+                        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+                    </collection>
+                </collection>
+            </collection>
+        </collection>
+
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, project_id,supplier_info_id,result_id, evaluation_item_id, evaluation_item_name, weight, evaluation_content_id,
+    evaluation_content_name,score_standard_unit,score_standard_points evaluation_standard_id, single_score, single_weight, evaluation_standard_name,evaluation_standard_desc,
+    upper_limit, score_type, score, weighted_score, user_id, evaluation_time, status,
+    create_time, update_time
+    </sql>
+    <select id="findRecordByProjectIdAndTime" resultMap="BpoEvaluationResultRecordShowMap"
+            parameterType="com.rz.iot.bpo.model.param.EvaluationResultRecordParam">
+        SELECT
+        record.id,
+        record.project_id,
+        record.result_id,
+        record.evaluation_item_id,
+        record.evaluation_item_name,
+        record.weight,
+        record.evaluation_content_id,
+        record.evaluation_content_name,
+        record.evaluation_standard_id,
+        record.single_score,
+        record.single_weight,
+        record.evaluation_standard_name,
+        record.evaluation_standard_desc,
+        record.score_standard_unit,
+        record.score_standard_points,
+        record.upper_limit,
+        record.score_type,
+        record.score,
+        record.weighted_score,
+        record.user_id,
+        record.evaluation_time,
+        record. STATUS,
+        record.create_time,
+        record.update_time,
+        result.grade,
+        result.calculated,
+        u.username
+        FROM
+        bpo_evaluation_result_record record
+        LEFT JOIN sys_user u ON record.user_id = u.user_id
+        LEFT JOIN bpo_evaluation_result result ON result.id = record.result_id
+        WHERE
+        record.project_id = #{projectId,jdbcType=INTEGER}
+        <if test="ResultRecordDate!=null">
+            and record.evaluation_time = #{ResultRecordDate,jdbcType=INTEGER}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_evaluation_result_record
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="findResultIdByRecordId" resultType="java.lang.Integer">
+        select result_id
+        from bpo_evaluation_result_record
+        where id = #{recordId,jdbcType=INTEGER}
+    </select>
+    <select id="findRecordByResultId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_evaluation_result_record
+        where result_id = #{resultId,jdbcType=INTEGER}
+
+    </select>
+    <select id="findResultIdBYProjectIdAndTime" resultType="java.lang.Integer">
+        select result_id
+        from bpo_evaluation_result_record
+        where project_id = #{projectId,jdbcType=INTEGER}
+          and evaluation_time = #{time,jdbcType=VARCHAR}
+          and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        limit 1
+    </select>
+
+    <select id="findResultIdBYSupplierInfoIdAndTime" resultType="java.lang.Integer">
+        select result_id
+        from bpo_evaluation_result_record
+        where supplier_info_id = #{supplierInfoId,jdbcType=INTEGER}
+          and evaluation_time = #{time,jdbcType=VARCHAR}
+          and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        limit 1
+    </select>
+    <select id="findRecord" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_evaluation_result_record
+        where
+        evaluation_content_id = #{evaluationContentId,jdbcType=INTEGER}
+        and evaluation_standard_id = #{evaluationStandardId,jdbcType=INTEGER}
+        and evaluation_item_id = #{evaluationItemId,jdbcType=INTEGER}
+        and evaluation_time = #{evaluationTime,jdbcType=VARCHAR}
+        and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from bpo_evaluation_result_record
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoEvaluationResultRecord">
+        insert into bpo_evaluation_result_record (id, project_id,supplier_info_id, result_id, evaluation_item_id,
+                                                  evaluation_item_name, weight, evaluation_content_id,
+                                                  evaluation_content_name, score_standard_unit, score_standard_points,
+                                                  evaluation_standard_id,
+                                                  single_score, single_weight, evaluation_standard_name,
+                                                  evaluation_standard_desc,
+                                                  upper_limit, score_type, score,
+                                                  weighted_score, user_id, evaluation_time,
+                                                  status, create_time, update_time)
+        values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER},#{supplierInfoId,jdbcType=INTEGER}, #{resultId,jdbcType=INTEGER},
+                #{evaluationItemId,jdbcType=INTEGER},
+                #{evaluationItemName,jdbcType=VARCHAR}, #{weight,jdbcType=INTEGER},
+                #{evaluationContentId,jdbcType=INTEGER},
+                #{evaluationContentName,jdbcType=VARCHAR}, #{evaluationStandardId,jdbcType=INTEGER},
+                #{singleScore,jdbcType=INTEGER}, #{singleWeight,jdbcType=INTEGER},
+                #{evaluationStandardName,jdbcType=VARCHAR},
+                #{evaluationStandardDesc,jdbcType=VARCHAR},
+                #{scoreStandardUnit,jdbcType=VARCHAR},
+                #{scoreStandardPoints,jdbcType=VARCHAR},
+                #{upperLimit,jdbcType=INTEGER}, #{scoreType,jdbcType=INTEGER}, #{score,jdbcType=INTEGER},
+                #{weightedScore,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, #{evaluationTime,jdbcType=VARCHAR},
+                #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoEvaluationResultRecord">
+        insert into bpo_evaluation_result_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="supplierInfoId != null">
+                supplier_info_id,
+            </if>
+            <if test="resultId != null">
+                result_id,
+            </if>
+            <if test="evaluationItemId != null">
+                evaluation_item_id,
+            </if>
+            <if test="evaluationItemName != null">
+                evaluation_item_name,
+            </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="evaluationContentId != null">
+                evaluation_content_id,
+            </if>
+            <if test="evaluationContentName != null">
+                evaluation_content_name,
+            </if>
+            <if test="evaluationStandardId != null">
+                evaluation_standard_id,
+            </if>
+            <if test="singleScore != null">
+                single_score,
+            </if>
+            <if test="singleWeight != null">
+                single_weight,
+            </if>
+            <if test="evaluationStandardName != null">
+                evaluation_standard_name,
+            </if>
+            <if test="evaluationStandardDesc != null">
+                evaluation_standard_desc,
+            </if>
+            <if test="scoreStandardUnit != null">
+                score_standard_unit,
+            </if>
+            <if test="scoreStandardPoints != null">
+                score_standard_points,
+            </if>
+            <if test="upperLimit != null">
+                upper_limit,
+            </if>
+            <if test="scoreType != null">
+                score_type,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+            <if test="weightedScore != null">
+                weighted_score,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="evaluationTime != null">
+                evaluation_time,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="resultId != null">
+                #{resultId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationItemId != null">
+                #{evaluationItemId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationItemName != null">
+                #{evaluationItemName,jdbcType=VARCHAR},
+            </if>
+            <if test="evaluationStandardDesc != null">
+                #{evaluationStandardDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="scoreStandardUnit != null">
+                #{scoreStandardUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="scoreStandardPoints != null">
+                #{scoreStandardPoints,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                #{weight,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationContentId != null">
+                #{evaluationContentId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationContentName != null">
+                #{evaluationContentName,jdbcType=VARCHAR},
+            </if>
+            <if test="evaluationStandardId != null">
+                #{evaluationStandardId,jdbcType=INTEGER},
+            </if>
+            <if test="singleScore != null">
+                #{singleScore,jdbcType=INTEGER},
+            </if>
+            <if test="singleWeight != null">
+                #{singleWeight,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationStandardName != null">
+                #{evaluationStandardName,jdbcType=VARCHAR},
+            </if>
+            <if test="upperLimit != null">
+                #{upperLimit,jdbcType=INTEGER},
+            </if>
+            <if test="scoreType != null">
+                #{scoreType,jdbcType=INTEGER},
+            </if>
+            <if test="score != null">
+                #{score,jdbcType=INTEGER},
+            </if>
+            <if test="weightedScore != null">
+                #{weightedScore,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationTime != null">
+                #{evaluationTime,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoEvaluationResultRecord">
+        update bpo_evaluation_result_record
+        <set>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="supplierInfoId != null">
+                supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+            </if>
+            <if test="resultId != null">
+                result_id = #{resultId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationItemId != null">
+                evaluation_item_id = #{evaluationItemId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationItemName != null">
+                evaluation_item_name = #{evaluationItemName,jdbcType=VARCHAR},
+            </if>
+            <if test="evaluationStandardDesc != null">
+                evaluation_standard_desc = #{evaluationStandardDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="scoreStandardUnit != null">
+                score_standard_unit = #{scoreStandardUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="scoreStandardPoints != null">
+                score_standard_points = #{scoreStandardPoints,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                weight = #{weight,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationContentId != null">
+                evaluation_content_id = #{evaluationContentId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationContentName != null">
+                evaluation_content_name = #{evaluationContentName,jdbcType=VARCHAR},
+            </if>
+            <if test="evaluationStandardId != null">
+                evaluation_standard_id = #{evaluationStandardId,jdbcType=INTEGER},
+            </if>
+            <if test="singleScore != null">
+                single_score = #{singleScore,jdbcType=INTEGER},
+            </if>
+            <if test="singleWeight != null">
+                single_weight = #{singleWeight,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationStandardName != null">
+                evaluation_standard_name = #{evaluationStandardName,jdbcType=VARCHAR},
+            </if>
+            <if test="upperLimit != null">
+                upper_limit = #{upperLimit,jdbcType=INTEGER},
+            </if>
+            <if test="scoreType != null">
+                score_type = #{scoreType,jdbcType=INTEGER},
+            </if>
+            <if test="score != null">
+                score = #{score,jdbcType=INTEGER},
+            </if>
+            <if test="weightedScore != null">
+                weighted_score = #{weightedScore,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="evaluationTime != null">
+                evaluation_time = #{evaluationTime,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+        and (
+        SELECT result.calculated != 1
+        FROM (
+        SELECT result_id
+        FROM bpo_evaluation_result_record
+        WHERE id = #{id,jdbcType=INTEGER}
+        ) r
+        LEFT JOIN bpo_evaluation_result result ON r.result_id = result.id
+        )
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoEvaluationResultRecord">
+        update bpo_evaluation_result_record
+        set project_id               = #{projectId,jdbcType=INTEGER},
+            supplier_info_id         = #{supplierInfoId,jdbcType=INTEGER},
+            result_id                = #{resultId,jdbcType=INTEGER},
+            evaluation_item_id       = #{evaluationItemId,jdbcType=INTEGER},
+            evaluation_item_name     = #{evaluationItemName,jdbcType=VARCHAR},
+            weight                   = #{weight,jdbcType=INTEGER},
+            evaluation_content_id    = #{evaluationContentId,jdbcType=INTEGER},
+            evaluation_content_name  = #{evaluationContentName,jdbcType=VARCHAR},
+            evaluation_standard_id   = #{evaluationStandardId,jdbcType=INTEGER},
+            single_score             = #{singleScore,jdbcType=INTEGER},
+            single_weight            = #{singleWeight,jdbcType=INTEGER},
+            evaluation_standard_name = #{evaluationStandardName,jdbcType=VARCHAR},
+            evaluation_standard_desc = #{evaluationStandardDesc,jdbcType=VARCHAR},
+            score_standard_unit      = #{scoreStandardUnit,jdbcType=VARCHAR},
+            score_standard_points    = #{scoreStandardPoints,jdbcType=VARCHAR},
+            upper_limit              = #{upperLimit,jdbcType=INTEGER},
+            score_type               = #{scoreType,jdbcType=INTEGER},
+            score                    = #{score,jdbcType=INTEGER},
+            weighted_score           = #{weightedScore,jdbcType=VARCHAR},
+            user_id                  = #{userId,jdbcType=INTEGER},
+            evaluation_time          = #{evaluationTime,jdbcType=VARCHAR},
+            status                   = #{status,jdbcType=INTEGER},
+            create_time              = #{createTime,jdbcType=TIMESTAMP},
+            update_time              = #{updateTime,jdbcType=TIMESTAMP}
+    </update>
+</mapper>

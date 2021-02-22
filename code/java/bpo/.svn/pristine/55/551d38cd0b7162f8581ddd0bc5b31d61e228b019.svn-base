@@ -1,0 +1,574 @@
+<template>
+  <div class="app-container-cc">
+    <CfPanel title="人员审核详情" class="form main" :back-to="backTo">
+      <el-form ref="addModify_from" :model="addModify_from" :rules="rules" label-width="180px" :label-position="label_position">
+        <div class="title">基本信息</div>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="姓名：">
+              {{ addModify_from.bpoBasePerson.personName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="性别：">
+              {{ addModify_status.sex[addModify_from.bpoBasePerson.sex] }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="民族：">
+              {{ addModify_from.bpoBasePerson.nation }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="身份证号码：">
+              {{ addModify_from.bpoBasePerson.idCard }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="年龄：">
+              {{ addModify_from.bpoBasePerson.age }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="出生日期：">
+              {{ addModify_from.bpoBasePerson.birth }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="户籍地址：">
+              {{ addModify_from.bpoBasePerson.idCardAddress }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="工号：">
+              {{ addModify_from.bpoBasePerson.workNo }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系方式：">
+              {{ addModify_from.bpoBasePerson.phone }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="客户工号：">
+              {{ addModify_from.bpoBasePerson.sfWorkNo }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="住址：">
+              {{ addModify_from.bpoBasePerson.address }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              {{ addModify_from.bpoBasePerson.remark }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="上传身份证：">
+              <div v-for="(item, index) in addModify_from.bpoBasePerson.file" :key="index">
+                {{ index + 1 }}、{{ item.fileName }}
+                <el-button size="small" style="font-size:12px;color:#4794F7;padding-left:20px" type="text" @click="download(item)">下载</el-button>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-divider />
+        <div class="title">员工属性</div>
+        <el-row :gutter="130">
+          <el-col :span="12">
+            <el-form-item label="所属公司：">
+              {{ addModify_from.bpoWorkPerson.companyName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属部门：">
+              {{ namev }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="员工类型：">
+              {{ addModify_status.personType[addModify_from.bpoWorkPerson.personType + 1 ] }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="工作岗位：">
+              {{ addModify_from.bpoWorkPerson.station }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="岗位级别：">
+              {{ addModify_status.postLevelList[addModify_from.bpoWorkPerson.stationLevel + 1] }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属项目：">
+              {{ addModify_from.bpoWorkPerson.projectName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态：">
+              {{ addModify_status.onTheGobList[addModify_from.bpoWorkPerson.status] }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="入职时间：">
+              {{ addModify_from.bpoWorkPerson.createTime }}
+            </el-form-item>
+          </el-col>
+          <el-col v-if="addModify_from.bpoWorkPerson.status === 2" :span="12">
+            <el-form-item label="离职时间：">
+              {{ addModify_from.bpoWorkPerson.dimissionTime }}
+            </el-form-item>
+          </el-col>
+          <el-col v-if="addModify_from.bpoWorkPerson.status === 2" :span="12">
+            <el-form-item label="离职类型：">
+              {{ addModify_status.dimissionTypeList[addModify_from.bpoWorkPerson.dimissionType + 1] }}
+            </el-form-item>
+          </el-col>
+          <el-col v-if="addModify_from.bpoWorkPerson.status === 2" :span="12">
+            <el-form-item label="离职原因：">
+              {{ addModify_from.bpoWorkPerson.dimissionReason }}
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-divider />
+        <div class="title">合同信息</div>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="合同类型：">
+              {{ addModify_status.contractTypeList[addModify_from.bpoContractPerson.contractType + 1] }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同名称：">
+              {{ addModify_from.bpoContractPerson.contractName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同编号：">
+              {{ addModify_from.bpoContractPerson.contractCode }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="甲方：">
+              {{ addModify_from.bpoContractPerson.jiaCompanyName }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="缴纳社保：">
+              {{ addModify_from.bpoContractPerson.isSocialSecurity === 1? "是" : "否" }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同期限：">
+              {{ addModify_from.bpoContractPerson.contractLimit === 1? "固定期限" : "无固定期限" }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同开始时间：">
+              {{ addModify_from.bpoContractPerson.startTime }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="合同结束时间：">
+              {{ addModify_from.bpoContractPerson.endTime }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注：">
+              {{ addModify_from.bpoContractPerson.remark }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="上传合同附件：">
+              <div v-for="(item, index) in addModify_from.bpoContractPerson.contractFile" :key="index">
+                {{ index + 1 }}、{{ item.fileName }}
+                <el-button size="small" style="font-size:12px;color:#4794F7;padding-left:20px" type="text" @click="contractFile(item)">下载</el-button>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-divider />
+        <div class="title">薪资信息</div>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="开户行：">
+              {{ addModify_from.bpoWagePerson.bank }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="银行账号：">
+              {{ addModify_from.bpoWagePerson.accountNumber }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="薪资类型：" prop="wageType">
+              {{ addModify_status.wageTypeList[addModify_from.bpoWagePerson.wageType + 1] }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="发薪方式：" prop="status">
+              {{ addModify_from.bpoWagePerson.payType === 1? "日结" : "月结" }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-row>
+              <el-col :span="17">
+                <el-form-item label="薪酬：" prop="wage">
+                  {{ addModify_from.bpoWagePerson.wage }}{{ addModify_from.bpoWagePerson.wageType === 1 ? ' 元/小时' : ' 元' }}
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="发薪渠道：" prop="status">
+              {{ addModify_from.bpoWagePerson.payType === 1? "线上" : "线下" }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="餐补：" prop="mealAllowance">
+              {{ addModify_from.bpoWagePerson.mealAllowance }} 元/天
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="晚餐补助：" prop="nightAllowance">
+              {{ addModify_from.bpoWagePerson.nightAllowance }} 元/天
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="其他补贴：" prop="Name">
+              {{ addModify_from.bpoWagePerson.otherAllowance }} 元/天
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </CfPanel>
+  </div>
+</template>
+
+<script type="text/javascript">
+// 请求方法加载
+import { personCheckDetail, synClientNo, currentUserCom, findAllStation, findProject, checkPerson, detailPerson, uploadFile } from '@/api/personnelManagement/personnelManagement'
+// 整体页面加载
+import CfPanel from '@/components/Panel'
+// 验证规则
+import siteVerification from './siteVerification'
+export default {
+  name: 'PersonnelAuditDetails',
+  components: { CfPanel },
+  data() {
+    return {
+      label_position: 'right', // label以左边排列right
+      addModify_from: { // 初始化增加场地下拉框数据
+        bpoBasePerson: {}, // 基本信息
+        bpoWorkPerson: {}, // 人员属性
+        bpoContractPerson: { // 合同信息
+        },
+        bpoWagePerson: {} // 薪资信息
+      },
+      // 设置省市区格式
+      provincialCityFormat: {
+        label: 'deptName',
+        value: 'deptId',
+        children: 'deptShowList'
+      },
+      // 状态初始化
+      addModify_status: {
+        jobNumber: 1, // 客户工号：
+        dimissionType: 1, // 离职类型：
+        personType: ['自有员工', '外包员工', '临时工'], // 员工类型：
+        dimissionTypeList: ['辞职', '辞退', '开除', '自动'], // 员工类型：
+        station: '1',
+        postLevel: '一线',
+        postLevelList: ['一线', '二线', '三线'],
+        projectId: '',
+        onTheGobList: ['未审核', '在职', '离职'],
+        onTheGob: '1',
+        contractTypeList: ['员工-劳务', '员工-实习协议', '员工-灵活排遣'],
+        contractType: '2',
+        contractLimit: 1,
+        sex: ['其他', '男', '女'],
+        wageTypeList: ['时薪', '日薪', '月薪'],
+        wageType: '1',
+        payTypeList: ['日结', '月结'],
+        payType: '1',
+        payChannelsList: [{ value: '1', label: '线上' }, { value: '2', label: '线下' }],
+        payChannels: '1',
+        isSocialSecurity: '1',
+        sextext: ''
+      },
+      rules: siteVerification, // 设置验证规则
+      value1: '',
+      fileList: { // 上传图片列表
+        file: [], // 身份证
+        contractFile: [] // 合同
+      },
+      uploadPersonFiles: process.env.BASE_API + '/personCheck/uploadPersonFiles', // 人员审核(管理)-上传人员身份附件
+      uploadContractFiles: process.env.BASE_API + '/personCheck/uploadContractFiles', // 人员审核(管理)-上传合同附件
+      dept: [],
+      namev: ''
+    }
+  },
+  created() {
+    // 人员审核-查询未审核详情
+    // this.personCheckDetail(this.$route.query.id)
+    this.detailPerson(this.$route.query.id)
+  },
+  methods: {
+    checkPerson(dataList) {
+      checkPerson({ ...dataList }).then((res) => {
+        this.addModify_from.bpoWorkPerson.projectId = res.data.data
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    detailPerson(id) {
+      detailPerson({ personId: id }).then((res) => {
+        this.addModify_from.bpoBasePerson = res.data.data.bpoBasePerson // 基本信息
+        this.addModify_from.bpoWorkPerson = res.data.data.bpoWorkPerson // 人员属性
+        this.addModify_from.bpoContractPerson = res.data.data.bpoContractPerson
+        this.addModify_from.bpoWagePerson = res.data.data.bpoWagePerson // 薪资信息
+        this.addModify_status.sextext = this.addModify_status.sex[parseInt(res.data.data.bpoBasePerson.sex)]
+        this.namev = res.data.data.bpoWorkPerson.companyName + ' / '
+        if (res.data.data.bpoWorkPerson.deptShows.length > 0) {
+          console.log(res.data.data.bpoWorkPerson.deptShows)
+          this.namev += res.data.data.bpoWorkPerson.deptShows[0].deptName + ' / '
+          if (res.data.data.bpoWorkPerson.deptShows[0].deptShowList.length > 0) {
+            this.namev += res.data.data.bpoWorkPerson.deptShows[0].deptShowList[0].deptName + ' / '
+            if (res.data.data.bpoWorkPerson.deptShows[0].deptShowList[0].deptName) {
+              this.namev += res.data.data.bpoWorkPerson.deptShows[0].deptShowList[0].deptShowList[0].deptName
+            }
+          }
+        }
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 下载
+    download(file) {
+      uploadFile({ url: file.url, fileName: file.name }).then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 下载
+    contractFile(file) {
+      uploadFile({ url: file.url, fileName: file.name }).then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    addModify_field() {
+      console.log(this.addModify_status)
+      console.log()
+      // fileList: { // 上传图片列表
+      //   file: [], // 身份证
+      //   contractFile: [] // 合同
+      // },
+      const file = []
+      this.fileList.file.map((item, i) => {
+        const obj = {}
+        obj.fileName = item.fileName
+        obj.url = item.url
+        file.push(obj)
+      })
+      const contractFile = []
+      this.fileList.file.map((item, i) => {
+        const obj = {}
+        obj.fileName = item.fileName
+        obj.url = item.url
+        contractFile.push(obj)
+      })
+      const dataList = {
+        bpoBasePerson: {
+          personId: this.addModify_from.bpoBasePerson.personId,
+          workNo: this.addModify_from.bpoBasePerson.workNo,
+          sfWorkNo: this.addModify_from.bpoBasePerson.sfWorkNo,
+          phone: this.addModify_from.bpoBasePerson.phone,
+          address: this.addModify_from.bpoBasePerson.address,
+          remark: this.addModify_from.bpoBasePerson.remark,
+          file: file
+        },
+        bpoWorkPerson: {
+          companyId: this.addModify_from.bpoWorkPerson.companyId,
+          companyName: this.addModify_from.bpoWorkPerson.companyName,
+          deptId: this.addModify_from.bpoWorkPerson.deptId,
+          personType: this.addModify_status.personType,
+          station: this.addModify_from.bpoWorkPerson.station[ parseInt(this.addModify_status.station) - 1 ].dictLabel,
+          projectId: this.addModify_status.projectId,
+          onTheGob: this.addModify_status.onTheGob,
+          startTime: this.addModify_status.startdimissionTime,
+          dimissionTime: this.addModify_status.dimissionTime,
+          dimissionType: this.addModify_status.dimissionType,
+          dimissionReason: this.addModify_status.dimissionReason
+        },
+        bpoContractPerson: {
+          contractType: this.addModify_status.contractType,
+          contractName: this.addModify_from.bpoContractPerson.contractName,
+          contractCode: this.addModify_from.bpoContractPerson.contractCode,
+          isSocialSecurity: this.addModify_status.isSocialSecurity,
+          contractLimit: this.addModify_status.contractLimit,
+          startTime: this.addModify_status.startTime,
+          endTime: this.addModify_status.endTime,
+          remark: this.addModify_from.bpoContractPerson.remark,
+          companyId: this.addModify_from.bpoWorkPerson.companyName,
+          contractFile: contractFile
+        },
+        bpoWagePerson: {
+          bank: this.addModify_from.bpoWagePerson.bank,
+          accountNumber: this.addModify_from.bpoWagePerson.accountNumber,
+          wageType: this.addModify_status.wageType,
+          payType: this.addModify_status.payType,
+          wage: this.addModify_from.bpoWagePerson.wage,
+          payChannels: this.addModify_status.payChannels,
+          mealAllowance: this.addModify_from.bpoWagePerson.mealAllowance,
+          nightAllowance: this.addModify_from.bpoWagePerson.nightAllowance,
+          otherAllowance: this.addModify_from.bpoWagePerson.otherAllowance
+        }
+      }
+      this.checkPerson(dataList)
+    },
+    // 人员审核-查询未审核详情 请求
+    personCheckDetail(id) {
+      personCheckDetail({ personId: id }).then((res) => {
+        console.log(res)
+        this.addModify_from.bpoBasePerson = res.data.data.bpoBasePerson // 基本信息
+        this.addModify_from.bpoWorkPerson = res.data.data.bpoWorkPerson // 人员属性
+        // 获取初始化数据
+        this.getInitializationData()
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 同步客户工号请求
+    synClientNo(id) {
+      synClientNo({ personId: id }).then((res) => {
+        this.addModify_from.bpoBasePerson.sfWorkNo = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 同步客户工号
+    synchronization() {
+      this.synClientNo(this.$route.query.id)
+    },
+    // 员工所属
+    query() {
+
+    },
+    // 获取初始化数据
+    getInitializationData() {
+      // 人员审核(管理)-新增/修改获取员工属性(公司、部门)
+      this.currentUserCom()
+      // 人员审核(管理)-人员岗位
+      this.findAllStation()
+      // 人员审核(管理)-查询项目信息
+      this.findProject()
+    },
+    // 人员审核(管理)-人员岗位
+    findAllStation() {
+      findAllStation({ }).then((res) => {
+        console.log(res)
+        this.addModify_from.bpoWorkPerson.station = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 人员审核(管理)-新增/修改获取员工属性(公司、部门)
+    currentUserCom() {
+      currentUserCom({ }).then((res) => {
+        console.log(res)
+        this.addModify_from.bpoWorkPerson.deptName = res.data.data.companyName
+        this.dept = res.data.data.dept
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 人员审核(管理)-查询项目信息
+    findProject() {
+      findProject({ }).then((res) => {
+        this.addModify_from.bpoWorkPerson.projectId = res.data.data
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    backTo() {
+      this.$router.go(-1)
+    }
+  }
+}
+</script>
+<style lang="scss">
+.app-container-cc {
+  .el-table th {
+    background-color: #eee;
+  }
+  .el-select {
+    width: 120%;
+  }
+  .el-cascader{
+     width: 120%;
+  }
+  .title{
+    margin-bottom: 20px;
+    border-left: 3px solid #ff6b00;
+    padding-left: 9px;
+    color: #000;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: bold;
+  }
+  .border_none .el-input__inner{
+      border:none;
+  }
+  .el-input{
+      max-width: 330px;
+  }
+  .el-textarea{
+      max-width: 330px;
+  }
+  .el-date-editor{
+      width: 330px;
+  }
+  .searchForm {
+    .el-form-item__label {
+      padding: 0px;
+      font-size: 12px;
+      color: #000;
+    }
+  }
+}
+</style>

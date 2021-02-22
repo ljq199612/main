@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.SysSimpleSysInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.SysSimpleSysInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="cpu_used" property="cpuUsed" jdbcType="DOUBLE" />
+    <result column="cpu_free" property="cpuFree" jdbcType="DOUBLE" />
+    <result column="ram_used" property="ramUsed" jdbcType="DOUBLE" />
+    <result column="ram_free" property="ramFree" jdbcType="DOUBLE" />
+    <result column="rom_total" property="romTotal" jdbcType="DOUBLE" />
+    <result column="rom_used" property="romUsed" jdbcType="DOUBLE" />
+    <result column="rom_usage" property="romUsage" jdbcType="DOUBLE" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, cpu_used, cpu_free, ram_used, ram_free, rom_total, rom_used, rom_usage, status, 
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_simple_sys_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_simple_sys_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.SysSimpleSysInfo" >
+    insert into sys_simple_sys_info (id, cpu_used, cpu_free, 
+      ram_used, ram_free, rom_total, 
+      rom_used, rom_usage, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{cpuUsed,jdbcType=DOUBLE}, #{cpuFree,jdbcType=DOUBLE}, 
+      #{ramUsed,jdbcType=DOUBLE}, #{ramFree,jdbcType=DOUBLE}, #{romTotal,jdbcType=DOUBLE}, 
+      #{romUsed,jdbcType=DOUBLE}, #{romUsage,jdbcType=DOUBLE}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.SysSimpleSysInfo" >
+    insert into sys_simple_sys_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="cpuUsed != null" >
+        cpu_used,
+      </if>
+      <if test="cpuFree != null" >
+        cpu_free,
+      </if>
+      <if test="ramUsed != null" >
+        ram_used,
+      </if>
+      <if test="ramFree != null" >
+        ram_free,
+      </if>
+      <if test="romTotal != null" >
+        rom_total,
+      </if>
+      <if test="romUsed != null" >
+        rom_used,
+      </if>
+      <if test="romUsage != null" >
+        rom_usage,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="cpuUsed != null" >
+        #{cpuUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="cpuFree != null" >
+        #{cpuFree,jdbcType=DOUBLE},
+      </if>
+      <if test="ramUsed != null" >
+        #{ramUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="ramFree != null" >
+        #{ramFree,jdbcType=DOUBLE},
+      </if>
+      <if test="romTotal != null" >
+        #{romTotal,jdbcType=DOUBLE},
+      </if>
+      <if test="romUsed != null" >
+        #{romUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="romUsage != null" >
+        #{romUsage,jdbcType=DOUBLE},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.SysSimpleSysInfo" >
+    update sys_simple_sys_info
+    <set >
+      <if test="cpuUsed != null" >
+        cpu_used = #{cpuUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="cpuFree != null" >
+        cpu_free = #{cpuFree,jdbcType=DOUBLE},
+      </if>
+      <if test="ramUsed != null" >
+        ram_used = #{ramUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="ramFree != null" >
+        ram_free = #{ramFree,jdbcType=DOUBLE},
+      </if>
+      <if test="romTotal != null" >
+        rom_total = #{romTotal,jdbcType=DOUBLE},
+      </if>
+      <if test="romUsed != null" >
+        rom_used = #{romUsed,jdbcType=DOUBLE},
+      </if>
+      <if test="romUsage != null" >
+        rom_usage = #{romUsage,jdbcType=DOUBLE},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.SysSimpleSysInfo" >
+    update sys_simple_sys_info
+    set cpu_used = #{cpuUsed,jdbcType=DOUBLE},
+      cpu_free = #{cpuFree,jdbcType=DOUBLE},
+      ram_used = #{ramUsed,jdbcType=DOUBLE},
+      ram_free = #{ramFree,jdbcType=DOUBLE},
+      rom_total = #{romTotal,jdbcType=DOUBLE},
+      rom_used = #{romUsed,jdbcType=DOUBLE},
+      rom_usage = #{romUsage,jdbcType=DOUBLE},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findSysInfo" parameterType="com.rz.iot.bpo.model.param.BpoOptLoginLogParam"  resultType="com.rz.iot.bpo.model.show.SysLogShow">
+    Select
+    cpu_used as cpuUsed,
+    cpu_free as cpuFree,
+    ram_used as ramUsed,
+    ram_free as ramFree,
+    rom_usage as romUsed,
+    `status`,
+    date_format(create_time,'%H') as `time`
+    from sys_simple_sys_info
+    where
+    true
+    <if test="startDate != null and startDate != ''">
+      AND date_format(create_time,"%Y-%m-%d") = #{startDate}
+    </if>
+    ORDER by `time`
+  </select>
+</mapper>

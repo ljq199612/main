@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaClassesGenerateMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaClassesGenerate">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIME"/>
+        <result column="end_time" property="endTime" jdbcType="TIME"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIME"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+        <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+        <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+        <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+        <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="class_type" property="classType" jdbcType="TINYINT"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <resultMap id="MinaClassesGeneratePlusMap" type="com.rz.iot.bpo.mina.model.MinaClassesGeneratePlus">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIME"/>
+        <result column="end_time" property="endTime" jdbcType="TIME"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIME"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+        <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+        <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+        <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+        <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="class_type" property="classType" jdbcType="TINYINT"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="TINYINT"/>
+
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="MinaClassGenerateShowMap" type="com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <result column="work_group_name" property="workGroupName" jdbcType="VARCHAR"/>
+        <result column="work_group_id" property="workGroupId" jdbcType="INTEGER"/>
+
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIME"/>
+        <result column="end_time" property="endTime" jdbcType="TIME"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIME"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="is_special" property="isSpecial" jdbcType="INTEGER"/>
+        <result column="special_allowance" property="specialAllowance" jdbcType="VARCHAR"/>
+        <result column="meal_allowance" property="mealAllowance" jdbcType="VARCHAR"/>
+        <result column="night_allowance" property="nightAllowance" jdbcType="VARCHAR"/>
+        <result column="is_allowance" property="isAllowance" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="class_type" property="classType" jdbcType="TINYINT"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        <result column="is_class_group_rel" property="isClassGroupRel" jdbcType="TINYINT"/>
+    </resultMap>
+
+
+    <sql id="Selective_Column_Key">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="batchId != null">
+                batch_id,
+            </if>
+            <if test="className != null">
+                class_name,
+            </if>
+            <if test="classSn != null">
+                class_sn,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="arriveTime != null">
+                arrive_time,
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="isSpecial != null">
+                is_special,
+            </if>
+            <if test="specialAllowance != null">
+                special_allowance,
+            </if>
+            <if test="mealAllowance != null">
+                meal_allowance,
+            </if>
+            <if test="nightAllowance != null">
+                night_allowance,
+            </if>
+            <if test="isAllowance != null">
+                is_allowance,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="peopleNumber != null">
+                people_number,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status,
+            </if>
+            <if test="updateUserId != null">
+                update_user_id,
+            </if>
+            <if test="classType != null">
+                class_type,
+            </if>
+            <if test="contents != null">
+                contents,
+            </if>
+            <if test="isClassGroupRel != null">
+                is_class_group_rel,
+            </if>
+        </trim>
+    </sql>
+    <sql id="Selective_Column_Value">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="batchId != null">
+                #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="className != null">
+                #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="classSn != null">
+                #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIME},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIME},
+            </if>
+            <if test="arriveTime != null">
+                #{arriveTime,jdbcType=TIME},
+            </if>
+            <if test="excludeHour != null">
+                #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="isSpecial != null">
+                #{isSpecial,jdbcType=INTEGER},
+            </if>
+            <if test="specialAllowance != null">
+                #{specialAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="mealAllowance != null">
+                #{mealAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="nightAllowance != null">
+                #{nightAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="isAllowance != null">
+                #{isAllowance,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="updateUserId != null">
+                #{updateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="classType != null">
+                #{classType,jdbcType=TINYINT},
+            </if>
+            <if test="contents != null">
+                #{contents,jdbcType=VARCHAR},
+            </if>
+            <if test="isClassGroupRel != null">
+                #{isClassGroupRel,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </sql>
+    <sql id="Column_Key_For_List">
+        batch_id, class_name, class_sn, start_date, end_date, start_time, end_time, arrive_time,exclude_hour,
+        type, is_special, special_allowance, meal_allowance, night_allowance, is_allowance,
+        status, people_number, project_id, source, schedule_status,
+        update_user_id, class_type, contents, is_class_group_rel
+    </sql>
+    <sql id="Column_Value_For_List">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            #{item.batchId,jdbcType=INTEGER},
+            #{item.className,jdbcType=VARCHAR},
+            #{item.classSn,jdbcType=VARCHAR},
+            #{item.startDate,jdbcType=DATE},
+            #{item.endDate,jdbcType=DATE},
+            #{item.startTime,jdbcType=TIME},
+            #{item.endTime,jdbcType=TIME},
+            #{item.arriveTime,jdbcType=TIME},
+            #{item.excludeHour,jdbcType=INTEGER},
+            #{item.type,jdbcType=INTEGER},
+            #{item.isSpecial,jdbcType=INTEGER},
+            #{item.specialAllowance,jdbcType=VARCHAR},
+            #{item.mealAllowance,jdbcType=VARCHAR},
+            #{item.nightAllowance,jdbcType=VARCHAR},
+            #{item.isAllowance,jdbcType=INTEGER},
+            #{item.status,jdbcType=INTEGER},
+            #{item.peopleNumber,jdbcType=INTEGER},
+            #{item.projectId,jdbcType=INTEGER},
+            #{item.source,jdbcType=INTEGER},
+            #{item.scheduleStatus,jdbcType=TINYINT},
+            #{item.updateUserId,jdbcType=INTEGER},
+            #{item.classType,jdbcType=TINYINT},
+            #{item.contents,jdbcType=VARCHAR},
+            #{item.isClassGroupRel,jdbcType=TINYINT},
+        </trim>
+    </sql>
+    <sql id="Selective_Column_Key_Value">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="batchId != null">
+                batch_id = #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="className != null">
+                class_name = #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="classSn != null">
+                class_sn = #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                arrive_time = #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour = #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="isSpecial != null">
+                is_special = #{isSpecial,jdbcType=INTEGER},
+            </if>
+            <if test="specialAllowance != null">
+                special_allowance = #{specialAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="mealAllowance != null">
+                meal_allowance = #{mealAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="nightAllowance != null">
+                night_allowance = #{nightAllowance,jdbcType=VARCHAR},
+            </if>
+            <if test="isAllowance != null">
+                is_allowance = #{isAllowance,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                people_number = #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status = #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="updateUserId != null">
+                update_user_id = #{updateUserId,jdbcType=INTEGER},
+            </if>
+            <if test="classType != null">
+                class_type = #{classType,jdbcType=TINYINT},
+            </if>
+            <if test="contents != null">
+                contents = #{contents,jdbcType=VARCHAR},
+            </if>
+            <if test="isClassGroupRel != null">
+                is_class_group_rel = #{isClassGroupRel,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="MinaClassGenerateShowMap" parameterType="java.lang.Integer">
+        select *
+        from bpo_classes_generate
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByProjectId" resultMap="MinaClassGenerateShowMap" parameterType="java.lang.Integer">
+        select cg.*,su.username
+        from bpo_classes_generate cg
+        left join sys_user su on cg.update_user_id = su.user_id
+        where project_id = #{projectId,jdbcType=INTEGER}
+        and cg.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    </select>
+
+<!--
+    <select id="findAll" resultMap="MinaClassGenerateShowMap">
+        SELECT
+        A.*,
+        B.project_name as project_name,
+        C.work_group_id as work_group_id,
+        D.group_name as workgroup_name
+        FROM
+        bpo_classes_generate A
+        JOIN bpo_project B
+        ON A.project_id = B.id
+        AND A.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_classes_group_rel C ON C.class_generate_id = A.id
+        LEFT JOIN bpo_work_group D ON D.id = C.work_group_id
+    </select>
+-->
+
+    <select id="findAll" resultMap="MinaClassesGeneratePlusMap">
+          SELECT
+              A.*, B.project_name AS project_name
+          FROM
+              bpo_classes_generate A
+          JOIN
+              bpo_project B ON A.project_id = B.id
+          WHERE
+              A.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    </select>
+
+    <resultMap id="MinaClassesGroupRelMap" type="com.rz.iot.bpo.mina.model.show.MinaClassesGroupRelShow">
+
+        <result column="class_generate_id" property="classGenerateId" jdbcType="INTEGER"/>
+        <result column="work_group_name" property="workGroupName" jdbcType="VARCHAR"/>
+        <result column="work_group_id" property="workGroupId" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+    <select id="selectWorkGroupByClassIds" resultMap="MinaClassesGroupRelMap" parameterType="java.util.List">
+        SELECT
+            A.class_generate_id as class_generate_id,
+            B.group_name as work_group_name,
+            B.id as work_group_id
+        FROM
+            bpo_classes_group_rel A
+        LEFT JOIN
+            bpo_work_group B ON A.work_group_id = B.id
+        WHERE
+            A.class_generate_id IN
+        <foreach collection="list" item="classId" index="index" open="(" close=")" separator=",">
+            #{classId}
+        </foreach>
+
+    </select>
+
+<!--
+    <select id="selectByProjectIds" resultMap="MinaClassGenerateShowMap">
+        select
+        A.* ,
+        B.project_name,
+        C.work_group_id,
+        D.group_name
+        from
+        bpo_classes_generate A
+        join bpo_project B
+        on
+        A.project_id = B.id
+        and A.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        and A.project_id in
+        <foreach collection="list" item="pId" index="index" open="(" close=")" separator=",">
+            #{pId}
+        </foreach>
+        left join bpo_classes_group_rel C on C.class_generate_id = A.id
+        left join bpo_work_group D on D.id = C.work_group_id
+    </select>
+-->
+
+    <select id="selectByProjectIds" resultMap="MinaClassesGeneratePlusMap">
+        select
+            A.* ,
+            B.project_name as project_name
+        from
+            bpo_classes_generate A
+        join bpo_project B
+        on
+                A.project_id = B.id
+        and A.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        and A.project_id
+        in
+            <foreach collection="list" item="pId" index="index" open="(" close=")" separator=",">
+                #{pId}
+            </foreach>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from bpo_classes_generate
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.rz.iot.bpo.mina.model.MinaClassesGenerate">
+        insert into bpo_classes_generate (<include refid="Selective_Column_Key"/>)
+        values (<include refid="Selective_Column_Value"/>)
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into bpo_classes_generate
+        (<include refid="Column_Key_For_List"/>)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (<include refid="Column_Value_For_List"/>)
+        </foreach>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaClassesGenerate">
+        update bpo_classes_generate
+        <set>
+            <include refid="Selective_Column_Key_Value"/>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+</mapper>

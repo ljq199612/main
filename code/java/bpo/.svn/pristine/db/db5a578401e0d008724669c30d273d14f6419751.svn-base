@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoPublicMapper">
+
+    <select id="getProject" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        SELECT project.id as id,project.project_name as name from bpo_project project
+        LEFT JOIN sys_user_module_rel module on module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        AND module.module_id = project.id
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where project.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+    <select id="getTransferStation" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        SELECT transfer.id as id,transfer.name as name from bpo_transfer_station transfer
+        LEFT JOIN bpo_project project ON transfer.id = project.transfer_station_id
+        AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_user_module_rel module on module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        AND module.module_id = project.id
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where transfer.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+    <select id="getCustomer" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        SELECT infos.id as id,company.company_name as name from sys_company company
+        LEFT JOIN bpo_project project ON company.id = project.first_party
+        AND project.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_user_module_rel module on module.module_id = project.id
+        AND module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+        LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+        AND rel.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_customer_infos infos ON infos.org_id = company.id
+        where company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_JF}
+        and company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="dataScope!=null">
+            and ${dataScope}
+        </if>
+    </select>
+    <select id="getSupplier" resultType="com.rz.iot.bpo.model.param.BpoPublicParam">
+        select infos.id as id, company.company_name as name from sys_company company
+        LEFT JOIN bpo_supplier_info infos ON infos.org_id = company.id
+        AND infos.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        WHERE company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_PROVIDER}
+        <if test="userId!=null">
+            and parent_id = (
+            select infos.id from sys_company company
+            LEFT JOIN bpo_supplier_info infos ON infos.org_id = company.id
+            AND infos.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            LEFT JOIN bpo_person person ON person.company_id = company.id
+            AND person.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            LEFT JOIN sys_user users ON users.user_id = person.user_id
+            AND users.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+            where users.user_id = ${userId})
+        </if>
+    </select>
+
+</mapper>

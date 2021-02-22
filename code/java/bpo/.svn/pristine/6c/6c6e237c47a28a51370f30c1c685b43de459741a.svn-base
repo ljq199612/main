@@ -1,0 +1,648 @@
+<template>
+  <div>
+    <div>
+      <CfPanel title="权限管理" class="roleManage">
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+          <el-tab-pane label="数据权限" name="first" />
+          <el-tab-pane label="菜单权限" name="second" />
+        </el-tabs>
+
+        <el-form :inline="true" class="bpoFormInline" label-position="right">
+          <el-form-item v-if="activeName === 'first'" label="所属部门：">
+            <SelectTree
+              v-model="searchParam.deptId"
+              :props="props"
+              :options="options"
+              :value="valueEditId"
+              :accordion="isAccordion"
+              placeholder="请选择所属部门"
+              @getValue="getEditValue($event)"
+            />
+          </el-form-item>
+          <el-form-item label="组织类型：">
+            <el-select v-model="searchParam.orgKey" filterable placeholder="请选择组织类型" class="cover">
+              <el-option v-for="(item,index) in orgOptions" :key="index" :label="item.orgName" :value="item.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="角色类型：">
+            <el-select v-model="searchParam.roleId" filterable placeholder="请选择角色类型" class="cover">
+              <el-option v-for="(item,index) in roleOptions" :key="index" :label="item.roleName" :value="item.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="activeName === 'first'" label="用户名：">
+            <el-input v-model="searchParam.username" placeholder="请输入用户名" />
+          </el-form-item>
+          <el-form-item>
+            <el-button class="bpoBtn" @click="submit">搜索</el-button>
+            <el-button @click="reset">重置</el-button>
+          </el-form-item>
+        </el-form>
+        <el-button v-if="activeName !== 'first'" type="primary" icon="el-icon-plus" @click="addUser">
+          新增菜单权限
+        </el-button>
+        <el-table
+          v-loading="listLoading"
+          :data="userList"
+          class="bpoTable"
+          fit
+          @sort-change="sortChange"
+        >
+          <el-table-column align="center" label="编号" type="index" width="100" />
+          <el-table-column v-if="activeName === 'first'" align="center" label="用户名" min-width="80">
+            <template slot-scope="scope">{{ scope.row.username }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="组织类型" min-width="80">
+            <template slot-scope="scope"><span :style="setOrgNameStyle(scope.row.orgName)">{{ scope.row.orgName }}</span></template>
+          </el-table-column>
+          <el-table-column v-if="activeName === 'first'" align="left" label="组织名称" min-width="80">
+            <template slot-scope="scope"><span>{{ scope.row.companyName }}</span></template>
+          </el-table-column>
+          <el-table-column v-if="activeName === 'first'" align="left" label="所属部门" min-width="80">
+            <template slot-scope="scope"><span>{{ transferPath(scope.row.sysDeptShow) }}</span></template>
+          </el-table-column>
+          <el-table-column align="center" label="角色类型" min-width="80">
+            <template slot-scope="scope">{{ scope.row.roleName }}</template>
+          </el-table-column>
+
+          <el-table-column align="center" label="创建时间" min-width="80">
+            <template slot-scope="scope">{{ scope.row.createTime }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="操作" width="150">
+            <template slot-scope="scope">
+              <el-button v-if="activeName === 'first'" :disabled="specialPermission(scope.row.roleName)" type="text" style="color:#4794F7;" size="mini" @click="handleUpdate(scope.row, 'data', true)">数据权限编辑</el-button>
+              <el-button v-else :disabled="specialPermission(scope.row.roleName)" type="text" style="color:#4794F7;" size="mini" @click="handleUpdate(scope.row, 'menu', true)">菜单权限编辑</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+        <el-dialog
+          :title="dialogTitle"
+          :visible.sync="detailDialogVisible"
+          width="710px"
+        >
+          <el-form
+            label-width="80px"
+            class="edit-permission"
+          >
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="组织类型：">
+                  <el-input v-if="disabled===true" v-model="entity.orgName" :disabled="disabled" />
+                  <el-select v-else v-model="entity.orgKey" filterable placeholder="请选择组织类型" class="cover" @change="orgChange">
+                    <el-option v-for="(item,index) in orgOptions" :key="index" :label="item.orgName" :value="item.orgKey" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="角色类型：">
+                  <el-input v-if="disabled===true" v-model="entity.roleName" :disabled="disabled" />
+                  <el-select v-else v-model="entity.roleId" filterable placeholder="请选择角色类型" class="cover">
+                    <el-option v-for="(item,index) in roleOptionsForMenu" :key="index" :label="item.roleName" :value="item.roleId" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="activeName === 'first'" :span="12">
+                <el-form-item label="用户名：">
+                  <el-input v-model="entity.username" :disabled="disabled" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-form-item
+                v-loading="loadingOwned || loadingNotOwned"
+                label="权限列表："
+              >
+                <div
+                  class="transfer-container"
+                >
+                  <tree-transfer
+                    id="dataTransfer"
+                    :title="titles"
+                    :button_text="buttonTexts"
+                    :from_data="subValue"
+                    :to_data="subData"
+                    pid="parentId"
+                    height="350px"
+                    width="580px"
+                    open-all
+                    @addBtn="removeDataOption"
+                    @removeBtn="addDataOption"
+                  />
+                </div>
+              </el-form-item>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col :span="24">
+                <el-form-item class="bpoButtonGroup pull-right">
+                  <el-button type="primary" @click="onEditSubmit('form')">提交</el-button>
+                  <el-button @click="detailDialogVisible=false">关闭</el-button>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-dialog>
+      </CfPanel>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+// import path from 'path'
+// import { deepClone } from '@/utils'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import treeTransfer from 'el-tree-transfer' // 引入
+import SelectTree from '@/components/treeSelect'
+
+import { getAllByDUserId } from '@/api/systemManage/departmentManage'
+import { getRolesNoPage } from '../../api/role'
+import { findOrgType } from '../../api/orgnization'
+
+import {
+  findAll,
+  findMenuAll,
+  addMenu,
+  delMenu,
+  addData,
+  delData,
+  menuDetail,
+  dataDetail,
+  findUnRelRole
+} from '@/api/permissionCtrl'
+import { deepClone } from '../../utils'
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'RoleManage',
+  components: { CfPanel, Pagination, treeTransfer, SelectTree },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+
+      entity: {},
+      type: 'data',
+      isMenu: false,
+      disabled: false,
+      propAlias: { key: 'menuId', label: 'menuName' },
+      titles: ['拥有权限', '未拥有权限'],
+      buttonTexts: ['删除', '添加'],
+
+      loadingOwned: false,
+      loadingNotOwned: false,
+
+      value: [],
+      ownedMenu: [],
+      unownedMenu: [],
+      dataSource: [],
+
+      currenetValue: [],
+      subValue: [],
+      subData: [],
+
+      total: 0,
+      searchParam: {},
+      userList: [],
+      roleOptions: [],
+      roleMap: {},
+      roleOptionsForMenu: [],
+      orgMap: {},
+      orgOptions: [],
+      detailDialogVisible: false,
+      dialogTitle: '新增数据权限',
+      activeName: 'first',
+
+      isClearable: true, // 可清空（可选）
+      isAccordion: false, // 可收起（可选）
+      valueId: '0', // 初始ID（可选）
+      valueEditId: '',
+      props: { // 配置项（必选）
+        value: 'deptId',
+        label: 'deptName',
+        children: 'depts'
+      },
+      options: []
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'roles',
+      'name'
+    ])
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+
+  },
+  methods: {
+    specialPermission(roleName) { // 不可编辑
+      if (roleName !== '超级管理员' && name !== '主体管理员') {
+        return false
+      } else if (roleName === '超级管理员') {
+        return true
+      } else if (roleName === '主体管理员' && name === '超级管理员') {
+        return false
+      }
+      return true
+    },
+    orgChange(val) {
+      findUnRelRole({ 'orgKey': val }).then(res => {
+        this.roleOptionsForMenu = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    getEditValue(val) {
+      this.searchParam.deptId = val
+    },
+    transferPath(deptShowList) {
+      if (!deptShowList) {
+        return ''
+      }
+      var path = deptShowList.deptName
+
+      if (deptShowList.deptShowList && deptShowList.deptShowList.length > 0) {
+        return path + '/' + this.transferPath(deptShowList.deptShowList[0])
+      }
+      return path
+    },
+    submit() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getKeys(data, primaryKey, keyset) {
+      for (var i = 0; i < data.length; i++) {
+        keyset.set(data[i][primaryKey], data[i])
+        if (data[i].children) {
+          this.getKeys(data[i].children, primaryKey, keyset)
+        }
+      }
+      return keyset
+    },
+    onEditSubmit() {
+      const that = this
+      var keyset = new Map()
+      var currentSet = new Map()
+      var addList = new Map()
+      var primaryKey = 'moduleId'
+      if (this.activeName !== 'first') {
+        primaryKey = 'menuId'
+      }
+      this.getKeys(this.subValue, primaryKey, keyset)
+      this.getKeys(this.currenetValue, primaryKey, currentSet)
+      currentSet.forEach(item => {
+        if (keyset.has(item.id)) {
+          keyset.delete(item.id)
+        } else {
+          addList.set(item.id, item)
+        }
+      })
+
+      var oprationsPromises = []
+      if (this.activeName === 'first') {
+        var addDataParams = []
+        addList.forEach(item => {
+          addDataParams.push({
+            'userId': this.entity.userId,
+            'moduleId': item.moduleId,
+            'moduleType': item.moduleType
+          })
+        })
+        if (addDataParams.length > 0) {
+          oprationsPromises.push(addData(addDataParams))
+          /* addData(addDataParams).then(response => {
+
+          })*/
+        }
+
+        var delDataParams = []
+        keyset.forEach(item => {
+          delDataParams.push({
+            'userId': this.entity.userId,
+            'moduleId': item.moduleId,
+            'moduleType': item.moduleType
+          })
+        })
+        if (delDataParams.length > 0) {
+          oprationsPromises.push(delData(delDataParams))
+          /* delData(delDataParams).then(response => {
+            this.detailDialogVisible = false
+          })*/
+        }
+      } else {
+        var addMenuParams = {
+          'orgId': this.orgMap[this.entity.orgName], // 组织类型id
+          'roleId': this.roleMap[this.entity.roleName], // 角色id
+          'menuIds': []
+        }
+        addMenuParams.menuIds = Array.from(addList.keys())
+        if (addMenuParams.menuIds.length > 0) {
+          oprationsPromises.push(addMenu(addMenuParams))
+        }
+        /* if (addMenuParams.menuIds.length > 0) {
+          addMenu(addMenuParams).then(response => {
+          })
+        }*/
+
+        var delMenuParams = {
+          'orgId': this.orgMap[this.entity.orgName], // 组织类型id
+          'roleId': this.roleMap[this.entity.roleName], // 角色id
+          'menuIds': []
+        }
+        delMenuParams.menuIds = Array.from(keyset.keys())
+        if (delMenuParams.menuIds.length > 0) {
+          oprationsPromises.push(delMenu(delMenuParams))
+          /* delMenu(delMenuParams).then(response => {
+            this.detailDialogVisible = false
+          })*/
+        }
+      }
+      Promise.all(oprationsPromises).then(function(values) {
+        for (var i in values) {
+          if (String(values[i].data.code) !== '20000') {
+            this.error(values[0].data.message)
+          }
+        }
+        that.detailDialogVisible = false
+        that.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '操作成功！',
+          type: 'success'
+        })
+      })
+    },
+    addMenuOption(fromData, toData, obj) {
+      const params = {
+        orgId: this.entity.orgKey,
+        roleId: this.entity.roleId,
+        userId: this.entity.userId
+      }
+      params.menuIds = obj.keys
+      addMenu(params).then(response => {})
+    },
+    removeMenuOption(fromData, toData, obj) {
+      const params = {
+        orgId: this.entity.orgKey,
+        roleId: this.entity.roleId,
+        userId: this.entity.userId
+      }
+      params.menuIds = obj.keys
+      delMenu(params).then(response => {})
+    },
+    addDataOption(fromData, toData, obj) {
+      this.currenetValue = deepClone(fromData)
+    },
+    removeDataOption(fromData, toData, obj) {
+      this.currenetValue = deepClone(fromData)
+    },
+    setOrgNameStyle(orgName) {
+      switch (orgName) {
+        case '客户': return 'color: #EB9F4B;'
+        case 'xx': return 'color: #FF6B00;'
+        case '主体供应商': return 'color: #2356D6;'
+        case '供应商': return 'color: #23CBD6;'
+        case 5: return ''
+      }
+    },
+    handleClick() {
+      this.getList()
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.listLoading = true
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      var operation = findAll
+      if (this.activeName !== 'first') {
+        operation = findMenuAll
+      }
+      operation(this.searchParam).then(res => {
+        this.userList = res.data.data.list
+        this.total = res.data.data.total
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.listLoading = false
+      })
+    },
+    addUser() {
+      this.entity = {}
+      // handleUpdate(row, type)
+      this.disabled = false
+      this.detailDialogVisible = true
+      if (this.activeName === 'first') {
+        this.handleUpdate({}, 'data')
+      } else { this.handleUpdate({}, 'menu') }
+      /* this.$router.push({
+        name: 'dataPermissionInfo',
+        params: { type: 'menu' }
+      })*/
+    },
+    getRemoteOptions() {
+      getRolesNoPage().then(res => {
+        this.roleOptions = res.data.data
+        this.roleOptions.forEach(item => {
+          this.roleMap[item.roleName] = item.id
+        })
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        this.orgOptions.forEach(item => {
+          this.orgMap[item.orgName] = item.id
+        })
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+
+      getAllByDUserId().then(res => {
+        this.options = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    checkData(item, primaryKey, label) {
+      const that = this
+      item.id = item[primaryKey]
+      item.label = item[label]
+      if (item.children && item.children.length > 0) {
+        item.children.forEach(data => {
+          that.checkData(data, primaryKey, label)
+        })
+      }
+    },
+    handleUpdate(row, type, disabled) {
+      this.disabled = true && disabled
+      this.loadingNotOwned = true
+      this.subData = []
+      this.subValue = []
+      this.unownedMenu = []
+      this.ownedMenu = []
+      if (type === 'data') {
+        this.dialogTitle = '修改数据权限'
+        this.propAlias = { key: 'moduleId', label: 'moduleName' }
+        dataDetail(row).then(response => {
+          this.entity = response.data.data
+          console.log(this.entity)
+          response.data.data.unData.forEach(item => {
+            this.checkData(item, 'moduleId', 'moduleName')
+            this.subData.push(item)
+          })
+          response.data.data.data.forEach(item => {
+            this.checkData(item, 'moduleId', 'moduleName')
+            this.subValue.push(item)
+          })
+          this.loadingNotOwned = false
+          this.detailDialogVisible = true
+        })
+      } else {
+        this.propAlias = { key: 'menuId', label: 'menuName' }
+        this.dialogTitle = '修改菜单权限'
+        menuDetail(row).then(response => {
+          this.entity = response.data.data
+          response.data.data.unMenuShow.forEach(item => {
+            this.checkData(item, 'menuId', 'menuName')
+            this.subData.push(item)
+          })
+          response.data.data.menuShow.forEach(item => {
+            this.checkData(item, 'menuId', 'menuName')
+            this.value.push(item[this.propAlias.key])
+            this.subValue.push(item)
+          })
+          this.loadingNotOwned = false
+          this.detailDialogVisible = true
+        })
+      }
+      /* this.$router.push({
+        name: 'dataPermissionInfo',
+        params: { type: type, entity: JSON.stringify(row), disabled: true }
+      })*/
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该用户？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        this.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '删除用户成功！',
+          type: 'success'
+        })
+        this.getList()
+      }).catch(() => {
+      })
+    },
+    onChange(values, type, keys) {
+      const params = {
+        orgId: this.entity.orgKey,
+        roleId: this.entity.roleId,
+        userId: this.entity.userId
+      }
+      let data = deepClone(params)
+      let addFn = addMenu
+      let deleteFn = delMenu
+      if (this.isMenu) {
+        params.menuIds = keys
+      } else {
+        addFn = addData
+        deleteFn = delData
+
+        data = []
+        this.subData.forEach(item => {
+          if (keys.includes(item.moduleId)) {
+            data.push({
+              userId: params.userId,
+              moduleId: item.moduleId,
+              moduleType: item.moduleType
+            })
+          }
+        })
+      }
+      if (type === 'left') {
+        addFn(data).then(response => {})
+      } else {
+        deleteFn(data).then(response => {})
+      }
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .roleManage {
+    .el-button.is-disabled.el-button--text{
+      color:#AAAAAA !important;
+    }
+    .el-table th{
+      background-color: #E8E9F3;
+    }
+    .el-select{
+      width: 100%;
+    }
+    .searchForm{
+      .el-form-item__label{
+        padding: 0px;
+      }
+    }
+    .el-dialog__header{
+      background: #F6F7FB;
+    }
+    .cover{
+      width: 100%;
+    }
+    .half{
+      width: 50%;
+    }
+    .cf-button-group {
+      margin-bottom: 0;
+      text-align: right;
+    }
+    .dialog-cover{
+      width: 300px;
+    }
+    .el-textarea__inner{
+      min-height: 54px !important;
+    }
+  }
+  /deep/ .el-transfer__button{
+    display: block !important;
+    margin: 10px 0px;
+    width: 70px;
+    padding-left: 10px;
+  }
+  /deep/ .el-transfer__button:last-child{
+    padding-left: 20px;
+  }
+</style>

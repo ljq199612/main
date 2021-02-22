@@ -1,0 +1,9 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillTime;
+
+public interface BpoBillTimeMapper {
+    int insert(BpoBillTime record);
+
+    int insertSelective(BpoBillTime record);
+}

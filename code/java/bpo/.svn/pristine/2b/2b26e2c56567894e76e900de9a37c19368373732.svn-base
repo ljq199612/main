@@ -1,0 +1,17 @@
+import { checkPhone } from '@/utils/validate'
+
+export default {
+  jobNumber: [{ required: true, message: '请输入工号' }], // 请输入工号
+  deptId: [{ required: true, message: '请选择所属部门' }], // 请选择所属部门
+  personType: [{ required: true, message: '请选择员工类型' }], // 请选择员工类型
+  projectId: [{ required: true, message: '请选择所属项目' }], // 请选择所属项目
+  status: [{ required: true, message: '请选择状态' }], // 请选择状态
+  phone: [{ required: true, message: '请输入联系方式' }, // 联系电话
+    {
+      required: true,
+      validator: checkPhone,
+      message: '联系电话格式不正确，请输入正确的中国大陆手机号或本地固定电话',
+      trigger: 'blur'
+    }
+  ]
+}

@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoContractInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoContractInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="contract_code" property="contractCode" jdbcType="VARCHAR" />
+    <result column="customer_code" property="customerCode" jdbcType="VARCHAR" />
+    <result column="jia_org_id" property="jiaOrgId" jdbcType="INTEGER" />
+    <result column="jia_uscc" property="jiaUscc" jdbcType="VARCHAR" />
+    <result column="jia_org_name" property="jiaOrgName" jdbcType="VARCHAR" />
+    <result column="jia_dept_id" property="jiaDeptId" jdbcType="INTEGER" />
+    <result column="yi_org_id" property="yiOrgId" jdbcType="INTEGER" />
+    <result column="yi_org_name" property="yiOrgName" jdbcType="VARCHAR" />
+    <result column="yi_uscc" property="yiUscc" jdbcType="VARCHAR" />
+    <result column="cash_deposit" property="cashDeposit" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="sign_time" property="signTime" jdbcType="TIMESTAMP" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="file_path" property="filePath" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="ContractDetailResultMap" type="com.rz.iot.bpo.model.show.BpoContractDetailShow">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="contract_code" property="contractCode" jdbcType="VARCHAR" />
+    <result column="customer_code" property="customerCode" jdbcType="VARCHAR" />
+    <result column="jia_org_id" property="jiaOrgId" jdbcType="INTEGER" />
+    <result column="jia_name" property="jiaName" jdbcType="VARCHAR" />
+    <result column="jia_uscc" property="jiaUscc" jdbcType="VARCHAR" />
+    <result column="jia_org_name" property="jiaOrgName" jdbcType="VARCHAR" />
+    <result column="jia_dept_id" property="jiaDeptId" jdbcType="INTEGER" />
+    <result column="jia_dept_name" property="jiaDeptName" jdbcType="VARCHAR"/>
+    <result column="yi_org_id" property="yiOrgId" jdbcType="INTEGER" />
+<!--    <result column="yi_name" property="yiName" jdbcType="VARCHAR" />-->
+    <result column="yi_org_name" property="yiOrgName" jdbcType="VARCHAR" />
+    <result column="yi_uscc" property="yiUscc" jdbcType="VARCHAR" />
+    <result column="cash_deposit" property="cashDeposit" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="sign_time" property="signTime" jdbcType="TIMESTAMP" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="file_path" property="filePath" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <association property="bpoContractSettlementInfo" javaType="com.rz.iot.bpo.model.BpoContractSettlementInfo">
+      <id column="id" property="id" jdbcType="INTEGER" />
+      <result column="contract_id" property="contractId" jdbcType="INTEGER" />
+      <result column="type" property="type" jdbcType="TINYINT" />
+      <result column="settlement_date" property="settlementDate" jdbcType="TIMESTAMP" />
+      <result column="remark" property="remark" jdbcType="VARCHAR" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+    <association property="bpoContractInvoiceInfo" javaType="com.rz.iot.bpo.model.BpoContractInvoiceInfo">
+      <id column="id" property="id" jdbcType="INTEGER" />
+      <result column="contract_id" property="contractId" jdbcType="INTEGER" />
+      <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+      <result column="artificial_person" property="artificialPerson" jdbcType="VARCHAR" />
+      <result column="tax_id" property="taxId" jdbcType="VARCHAR" />
+      <result column="opening_bank" property="openingBank" jdbcType="VARCHAR" />
+      <result column="opening_bank_account" property="openingBankAccount" jdbcType="VARCHAR" />
+      <result column="tax_rate" property="taxRate" jdbcType="VARCHAR" />
+      <result column="address" property="address" jdbcType="VARCHAR" />
+      <result column="phone" property="phone" jdbcType="VARCHAR" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+  <resultMap id="ContractQueryResultMap" type="com.rz.iot.bpo.model.show.BpoContractQueryShow">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="contract_code" property="contractCode" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="settlementType" property="settlementType" jdbcType="TINYINT" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <collection property="deptList" ofType="com.rz.iot.bpo.model.SysDept">
+      <id column="dept_id" property="deptId" jdbcType="INTEGER" />
+      <result column="dept_code" property="deptCode" jdbcType="VARCHAR" />
+      <result column="dept_name" property="deptName" jdbcType="VARCHAR" />
+      <result column="is_top" property="isTop" jdbcType="INTEGER" />
+      <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+      <result column="descendants" property="descendants" jdbcType="VARCHAR" />
+      <result column="order_num" property="orderNum" jdbcType="INTEGER" />
+      <result column="leader" property="leader" jdbcType="VARCHAR" />
+      <result column="phone" property="phone" jdbcType="VARCHAR" />
+      <result column="email" property="email" jdbcType="VARCHAR" />
+      <result column="status" property="status" jdbcType="INTEGER" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </collection>
+  </resultMap>
+
+  <select id="findAll" resultMap="ContractQueryResultMap">
+    SELECT
+	ci.id,
+	ci.name,
+	sd.dept_id,
+	sd.dept_name,
+	ci.contract_code,
+	bp.project_name,
+	ci.type,
+	csi.type AS settlementType,
+	ci.start_time,
+	ci.end_time
+    FROM bpo_contract_info ci
+	LEFT JOIN bpo_contract_settlement_info csi ON ci.id = csi.contract_id
+	LEFT JOIN bpo_project bp ON ci.project_id = bp.id,
+	sys_dept sd
+    WHERE ci.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <if test="deptIds != null">
+      and ci.jia_dept_id in
+      <foreach item="id" collection="deptIds" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+    </if>
+    <if test="name != null and name != ''">
+      and ci.name like concat('%',#{name},'%')
+    </if>
+    <if test="type != null">
+      and ci.type = #{type}
+    </if>
+    <if test="projectName != null and projectName != ''">
+      and bp.project_name like concat('%',#{projectName},'%')
+    </if>
+    <if test="startTime != null">
+      and ci.start_time > #{startTime}
+    </if>
+    <if test="endTime != null">
+      and ci.end_time &lt; #{endTime}
+    </if>
+	AND find_in_set( ci.jia_dept_id, sd.descendants )
+    ORDER BY length( sd.descendants ) DESC
+  </select>
+
+  <sql id="Base_Column_List">
+    id, name, project_id, contract_code, customer_code, jia_org_id, jia_uscc, jia_org_name, jia_dept_id,
+    yi_org_id, yi_org_name, yi_uscc, cash_deposit, type, sign_time,
+    start_time, end_time, file_path, status, remark, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_contract_info
+    where id = #{id,jdbcType=INTEGER} and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+  <select id="findContractInfoByPartyAIdAndPartyBId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_contract_info
+    where status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    and jia_org_id = #{partyAId}
+    and yi_org_id = #{partyBId}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_contract_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoContractInfo" >
+    insert into bpo_contract_info (id, name, contract_code, customer_code,
+      jia_org_id, jia_uscc, jia_org_name, jia_dept_id, yi_org_id, yi_org_name,
+      yi_uscc, cash_deposit, type, sign_time, start_time, end_time, file_path, status,
+      remark, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{contractCode,jdbcType=VARCHAR},
+      #{customerCode,jdbcType=VARCHAR}, #{jiaOrgId,jdbcType=INTEGER}, #{jiaUscc,jdbcType=VARCHAR},
+      #{jiaOrgName,jdbcType=VARCHAR}, #{jiaDeptId,jdbcType=INTEGER}, #{yiOrgId,jdbcType=INTEGER},
+      #{yiOrgName,jdbcType=VARCHAR}, #{yiUscc,jdbcType=VARCHAR}, #{cashDeposit,jdbcType=VARCHAR},
+      #{type,jdbcType=TINYINT}, #{signTime,jdbcType=TIMESTAMP}, #{startTime,jdbcType=TIMESTAMP},
+      #{endTime,jdbcType=TIMESTAMP}, #{filePath,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoContractInfo" useGeneratedKeys="true" keyProperty="id">
+    insert into bpo_contract_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="contractCode != null" >
+        contract_code,
+      </if>
+      <if test="customerCode != null" >
+        customer_code,
+      </if>
+      <if test="jiaOrgId != null" >
+        jia_org_id,
+      </if>
+      <if test="jiaUscc != null" >
+        jia_uscc,
+      </if>
+      <if test="jiaOrgName != null" >
+        jia_org_name,
+      </if>
+      <if test="jiaDeptId != null" >
+        jia_dept_id,
+      </if>
+      <if test="yiOrgId != null" >
+        yi_org_id,
+      </if>
+      <if test="yiOrgName != null" >
+        yi_org_name,
+      </if>
+      <if test="yiUscc != null" >
+        yi_uscc,
+      </if>
+      <if test="cashDeposit != null" >
+        cash_deposit,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="signTime != null" >
+        sign_time,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="filePath != null" >
+        file_path,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="contractCode != null" >
+        #{contractCode,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCode != null" >
+        #{customerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaOrgId != null" >
+        #{jiaOrgId,jdbcType=INTEGER},
+      </if>
+      <if test="jiaUscc != null" >
+        #{jiaUscc,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaOrgName != null" >
+        #{jiaOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaDeptId != null" >
+        #{jiaDeptId,jdbcType=INTEGER},
+      </if>
+      <if test="yiOrgId != null" >
+        #{yiOrgId,jdbcType=INTEGER},
+      </if>
+      <if test="yiOrgName != null" >
+        #{yiOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="yiUscc != null" >
+        #{yiUscc,jdbcType=VARCHAR},
+      </if>
+      <if test="cashDeposit != null" >
+        #{cashDeposit,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="signTime != null" >
+        #{signTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="filePath != null" >
+        #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoContractInfo" >
+    update bpo_contract_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="contractCode != null" >
+        contract_code = #{contractCode,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCode != null" >
+        customer_code = #{customerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaOrgId != null" >
+        jia_org_id = #{jiaOrgId,jdbcType=INTEGER},
+      </if>
+      <if test="jiaUscc != null" >
+        jia_uscc = #{jiaUscc,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaOrgName != null" >
+        jia_org_name = #{jiaOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaDeptId != null" >
+        jia_dept_id = #{jiaDeptId,jdbcType=INTEGER},
+      </if>
+      <if test="yiOrgId != null" >
+        yi_org_id = #{yiOrgId,jdbcType=INTEGER},
+      </if>
+      <if test="yiOrgName != null" >
+        yi_org_name = #{yiOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="yiUscc != null" >
+        yi_uscc = #{yiUscc,jdbcType=VARCHAR},
+      </if>
+      <if test="cashDeposit != null" >
+        cash_deposit = #{cashDeposit,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="signTime != null" >
+        sign_time = #{signTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="filePath != null" >
+        file_path = #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoContractInfo" >
+    update bpo_contract_info
+    set name = #{name,jdbcType=VARCHAR},
+      contract_code = #{contractCode,jdbcType=VARCHAR},
+      customer_code = #{customerCode,jdbcType=VARCHAR},
+      jia_org_id = #{jiaOrgId,jdbcType=INTEGER},
+      jia_uscc = #{jiaUscc,jdbcType=VARCHAR},
+      jia_org_name = #{jiaOrgName,jdbcType=VARCHAR},
+      jia_dept_id = #{jiaDeptId,jdbcType=INTEGER},
+      yi_org_id = #{yiOrgId,jdbcType=INTEGER},
+      yi_org_name = #{yiOrgName,jdbcType=VARCHAR},
+      yi_uscc = #{yiUscc,jdbcType=VARCHAR},
+      cash_deposit = #{cashDeposit,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      sign_time = #{signTime,jdbcType=TIMESTAMP},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      file_path = #{filePath,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByContractCode" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_contract_info
+    where contract_code = #{contractCode,jdbcType=VARCHAR}
+    and status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="selectDetailById" resultMap="ContractDetailResultMap">
+    SELECT
+        ci.id,
+        ci.name,
+        ci.type,
+        ci.contract_code,
+        ci.customer_code,
+        ci.jia_org_id,
+        ci.jia_org_name,
+        ci.jia_uscc,
+        ci.jia_dept_id,
+        sd.dept_name as jia_dept_name,
+        ci.yi_org_id,
+        ci.yi_org_name,
+        ci.yi_uscc,
+        sc.company_name as jia_name,
+<!--	    sc2.company_name as yi_name,-->
+	    ci.cash_deposit,
+	    ci.sign_time,
+	    ci.start_time,
+	    ci.end_time,
+	    ci.status,
+	    ci.remark,
+	    ci.file_path,
+	    si.id,
+	    si.contract_id,
+        si.type,
+        si.settlement_date,
+        si.remark,
+        ii.id,
+        ii.contract_id,
+        ii.company_name,
+        ii.artificial_person,
+        ii.tax_id,
+        ii.tax_rate,
+        ii.opening_bank,
+        ii.opening_bank_account,
+        ii.address,
+        ii.phone
+    FROM
+        bpo_contract_info ci
+        LEFT JOIN bpo_contract_settlement_info si ON ci.id = si.contract_id
+        LEFT JOIN sys_company sc on ci.jia_org_id = sc.id
+	    LEFT JOIN sys_company sc2 on ci.yi_org_id = sc2.id
+        LEFT JOIN bpo_contract_invoice_info ii ON ci.id = ii.contract_id
+        LEFT JOIN sys_dept sd on ci.jia_dept_id = sd.dept_id
+    WHERE
+	ci.id = #{id,jdbcType=INTEGER}
+	and ci.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+
+  <select id="getBySupplierOrgId" resultType="java.util.Map">
+    select ci.id,ci.name,
+        ci.contract_code,
+        ci.jia_org_id,
+        ci.yi_org_id,
+        sc.company_name as jia_org_name,
+	    sc2.company_name as yi_org_name,
+	    ci.cash_deposit as cashDeposit,
+	    ci.start_time as startTime,
+	    ci.end_time,
+	    ci.status,
+	    ci.remark,
+	    ci.file_path as filePath,
+	    si.type as settlementType
+    from bpo_contract_info ci
+      LEFT JOIN bpo_contract_settlement_info si ON ci.id = si.contract_id
+      LEFT JOIN sys_company sc on ci.jia_org_id = sc.id
+	  LEFT JOIN sys_company sc2 on ci.yi_org_id = sc2.id
+	where ci.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@COMPANY_COMPANY}
+      and ci.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+	  and (ci.jia_org_id in
+        <foreach item="id" collection="companyIds" open="(" close=")" separator=",">
+         #{id}
+        </foreach>
+         or ci.yi_org_id in
+        <foreach item="id" collection="companyIds" open="(" close=")" separator=",">
+          #{id}
+        </foreach>
+          )
+  </select>
+
+  <select id="getbySupplierInfoId" resultMap="BaseResultMap">
+    SELECT
+    contract_info.*
+    FROM
+        bpo_supplier_info supplier_info
+        INNER JOIN bpo_contract_info contract_info ON contract_info.id = supplier_info.contract_id
+        AND contract_info.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    WHERE
+        supplier_info.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND supplier_info.id = #{supplierInfoId}
+  </select>
+</mapper>

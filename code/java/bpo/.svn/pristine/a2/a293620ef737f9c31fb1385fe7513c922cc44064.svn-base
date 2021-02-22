@@ -1,0 +1,86 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.common.utils.bean.BeanUtils;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.WorkflowParam;
+import com.rz.iot.bpo.model.show.workflow.WorkflowConfigShow;
+import com.rz.iot.bpo.model.show.workflow.WorkflowNodeShow;
+import com.rz.iot.bpo.service.WorkflowConfigService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class WorkflowConfigServiceImpl implements WorkflowConfigService {
+
+    @Resource
+    private WorkflowConfigMapper configMapper;
+
+    @Resource
+    private WorkflowNodeMapper nodeMapper;
+
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void add(WorkflowParam workflowParam) {
+        String realName = SecurityUtils.getLoginUser().getUser().getRealName();
+        WorkflowConfig config = new WorkflowConfig();
+        BeanUtils.copyProperties(workflowParam,config);
+        config.setCreateBy(realName);
+        config.setWfCode(String.valueOf(System.currentTimeMillis()));
+        configMapper.insertSelective(config);
+        Integer configId = config.getId();
+
+        List<WorkflowNode> nodeList = workflowParam.getNodeList();
+        if (nodeList == null) {
+            return;
+        }
+        Integer preId = null;
+        Integer nextId = null;
+        //正序遍历
+        for (WorkflowNode node:nodeList) {
+            node.setConfigId(configId);
+            node.setNodeCode(String.valueOf(System.currentTimeMillis()));
+            node.setPreId(preId);
+            nodeMapper.insertSelective(node);
+            preId = node.getId();
+        }
+        //倒叙遍历
+        for (int i = nodeList.size() - 1; i >= 0 ; i--) {
+            WorkflowNode node = nodeList.get(i);
+            node.setNextId(nextId);
+            nodeMapper.updateByPrimaryKeySelective(node);
+            nextId = node.getId();
+        }
+    }
+
+    @Override
+    public List<WorkflowConfigShow> findAll(Map<String, Object> params) {
+        List<WorkflowConfigShow> list = configMapper.findAll(params);
+        return list;
+    }
+
+    @Override
+    public WorkflowConfigShow configDetail(Integer id) {
+        WorkflowConfigShow configShow = configMapper.configDetail(id);
+        if (configShow == null) {
+            throw new RuntimeException("流程不存在！");
+        }
+        List<WorkflowNodeShow> nodeList = nodeMapper.selectShowByConfigId(id);
+        configShow.setNodeList(nodeList);
+        return configShow;
+    }
+
+    @Override
+    public void update(WorkflowParam workflowParam) {
+        WorkflowConfig config = new WorkflowConfig();
+        BeanUtils.copyProperties(workflowParam,config);
+        configMapper.updateByPrimaryKeySelective(config);
+    }
+
+}

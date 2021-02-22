@@ -1,0 +1,56 @@
+import Layout from '@/views/layout/Layout'
+
+const staffManageRouter = {
+  path: '/staff',
+  component: Layout,
+  // redirect: '/staff/xxx',
+  name: 'staffManage',
+  meta: {
+    title: '人员管理',
+    icon: 'staff',
+    childrenFilter: false
+  },
+  children: [
+    {
+      path: 'personnelManagement',
+      component: () => import('@/views/personnelManagement/personnelManagement'),
+      name: 'PersonnelManagement',
+      meta: { title: '人员管理' }
+    },
+    {
+      path: 'personnelReview',
+      component: () => import('@/views/personnelManagement/personnelReview'),
+      name: 'PersonnelReview',
+      meta: { title: '人员审核' }
+    },
+    {
+      path: 'personnelAuditDetails',
+      component: () => import('@/views/personnelManagement/personnelAuditDetails'),
+      name: 'PersonnelAuditDetails',
+      hidden: true,
+      meta: { title: '人员审核详情' }
+    },
+    {
+      path: 'personnelManagementDetails',
+      component: () => import('@/views/personnelManagement/personnelManagementDetails'),
+      name: 'PersonnelManagementDetails',
+      hidden: true,
+      meta: { title: '人员审核详情' }
+    },
+    {
+      path: 'newPersonnelManagement',
+      component: () => import('@/views/personnelManagement/newPersonnelManagement'),
+      name: 'NewPersonnelManagement',
+      hidden: true,
+      meta: { title: '人员管理详情' }
+    },
+    {
+      path: 'personnelManagementModification',
+      component: () => import('@/views/personnelManagement/personnelManagementModification'),
+      name: 'PersonnelManagementModification',
+      hidden: true,
+      meta: { title: '人员管理修改' }
+    }
+  ]
+}
+export default staffManageRouter

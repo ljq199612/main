@@ -1,0 +1,329 @@
+<template>
+  <div class="step-2-form">
+    <el-form
+      ref="step2Form"
+      :rules="step2FormRules"
+      :model="step2FormData"
+      label-width="74px"
+      class="bpoForm"
+    >
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="场地名称：">
+            <el-input class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="项目地址：">
+            <el-input class="half" disabled />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="场地类型：">
+            <el-input class="half" disabled />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <div class="control-btns">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              @click="showAddModuleDialog"
+            >添加工作模块</el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              @click="showAddGroupDialog"
+            >添加工作小组</el-button>
+            <el-button type="primary" icon="el-icon-plus">添加工序</el-button>
+            <el-button type="warning" plain>编辑</el-button>
+            <el-button type="warning" plain>删除</el-button>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <div class="form-item form-mindmap">
+            <mindmap
+              ref="mindMap"
+              v-model="mindData"
+              :height="556"
+              :gps="true"
+              :fit-view="true"
+              :draggable="false"
+              :keyboard="false"
+              :show-node-add="false"
+              :context-menu="false"
+              :node-click="true"
+              :zoomable="true"
+              :show-undo="false"
+              :download="false"
+              style="flex:1"
+            />
+          </div>
+        </el-col>
+      </el-row>
+      <div class="pageControlButtons">
+        <el-button
+          type="primary"
+          size="medium"
+          plain
+          @click="handlerLast"
+        >上一步</el-button>
+        <el-button
+          type="primary"
+          size="medium"
+          @click="handlerNext"
+        >下一步</el-button>
+      </div>
+    </el-form>
+    <!-- 新增模块弹窗 -->
+    <addModuleDialog
+      v-if="addModuleDialogVisible"
+      :add-module-dialog-visible="addModuleDialogVisible"
+      @hideAddModuleDialog="hideAddModuleDialog"
+      @addModule="addModule"
+    />
+    <!-- 新增工作小组弹窗 -->
+    <addGroupDialog
+      :work-nodules-list="workNodulesList"
+      :add-group-dialog-visible="addGroupDialogVisible"
+      @hideAddGroupDialog="hideAddGroupDialog"
+    />
+  </div>
+</template>
+
+<script>
+import mindmap from '@hellowuxin/mindmap'
+import addModuleDialog from './addModuleDialog'
+import addGroupDialog from './addGroupDialog'
+// 新增项目-录入配置信息
+export default {
+  components: {
+    mindmap,
+    addModuleDialog,
+    addGroupDialog
+  },
+  data() {
+    return {
+      step2FormRules: {
+        provinceId: [{ required: true, message: '请选择省', trigger: 'blur' }],
+        cityId: [{ required: true, message: '请选择市', trigger: 'blur' }],
+        districtId: [{ required: true, message: '请选择区', trigger: 'blur' }],
+        transferStationId: [
+          { required: true, message: '请选择中转站', trigger: 'blur' }
+        ]
+      },
+      step2FormData: {
+        transferStationId: '', // 中转站
+        transferStationName: '', // 中转站名
+        transferStationList: [], // 中转站数据
+        provinceId: '', // 省code
+        provinceName: '', // 省
+        provinceData: [], // 省数据
+        cityId: '', // 市code
+        cityName: '', // 市
+        cityData: [], // 市数据
+        districtId: '', // 区code
+        districtName: '', // 区
+        districtData: [] // 区数据
+      },
+      // 新增模块弹窗
+      addModuleDialogVisible: false,
+      // 新增工作小组弹窗
+      addGroupDialogVisible: false,
+      mindData: [
+        {
+          name: '项目名称',
+          children: [
+            // {
+            //   name: '中转作业',
+            //   children: [
+            //     {
+            //       name: '卸装一组',
+            //       children: [
+            //         {
+            //           name: '扫描'
+            //         },
+            //         {
+            //           name: '卸货'
+            //         }
+            //       ]
+            //     },
+            //     {
+            //       name: '卸装二组',
+            //       children: [
+            //         {
+            //           name: '扫描'
+            //         },
+            //         {
+            //           name: '卸货'
+            //         }
+            //       ]
+            //     }
+            //   ]
+            // }
+          ]
+        }
+      ]
+    }
+  },
+  computed: {
+    /**
+     * 工作模块数据
+     */
+    workNodulesList() {
+      const arr = []
+      const workNodules = this.mindData[0]['children']
+      for (let i = 0, len = workNodules.length; i < len; i++) {
+        const item = workNodules[i]
+        arr.push({
+          name: item.name
+        })
+      }
+      return arr
+    }
+  },
+  created() {},
+  mounted() {
+    this.reloadMindMap()
+  },
+  methods: {
+    /**
+     * 显示工作模块弹窗
+     */
+    showAddModuleDialog() {
+      this.addModuleDialogVisible = true
+    },
+    /**
+     * 隐藏工作模块弹窗显示
+     */
+    hideAddModuleDialog() {
+      this.addModuleDialogVisible = false
+    },
+    /**
+     * 显示添加小组弹窗
+     */
+    showAddGroupDialog() {
+      this.addGroupDialogVisible = true
+    },
+    /**
+     * 隐藏添加小组弹窗
+     */
+    hideAddGroupDialog() {
+      this.addGroupDialogVisible = false
+    },
+    /**
+     * 处理新增模块
+     */
+    async addModule(data) {
+      // 模块名查重
+      if (this.checkMindData(data)) {
+        // 添加模块数据
+        this.addMindData(data)
+        // 关闭模块弹窗
+        this.addModuleDialogVisible = false
+        await this.$refs['mindMap'].makeCenter()
+        await this.$refs['mindMap'].fitContent()
+      }
+    },
+    /**
+     * 模块数据查重
+     */
+    checkMindData(data) {
+      let flag = true
+      const modulesData = this.mindData[0]['children'] // 模块数据
+      const dialogModulesDataMap = {}
+      // 添加的数据查重
+      for (let i = 0, len = data.length; i < len; i++) {
+        const item = data[i]
+        if (!dialogModulesDataMap[item.name]) {
+          // 标识已有
+          dialogModulesDataMap[item.name] = true
+        } else {
+          // 重复
+          this.$message.error(`“${item.name}”模块不能重复添加`)
+          flag = false
+          break
+        }
+      }
+      if (!flag) {
+        return flag
+      }
+      // 已有的数据查重
+      const modulesDataMap = {}
+      for (let i = 0, len = data.length; i < len; i++) {
+        const item = data[i]
+        modulesDataMap[item.name] = true
+      }
+      for (let i = 0, len = modulesData.length; i < len; i++) {
+        const item = modulesData[i]
+        if (modulesDataMap[item.name]) {
+          // 添加了已存在模块
+          this.$message.error(`“${item.name}”模块已存在，不能重复添加`)
+          flag = false
+          break
+        }
+      }
+      return flag
+    },
+    /**
+     * 下一步
+     */
+    handlerNext() {},
+    /**
+     * 处理上一步
+     */
+    handlerLast() {
+      this.$emit('handlerLast', {
+        step: 2
+      })
+    },
+    /**
+     * 脑图新增节点数据
+     */
+    addMindData(data) {
+      const mindData = JSON.parse(JSON.stringify(this.mindData))
+      for (let i = 0, len = data.length; i < len; i++) {
+        const item = data[i]
+        if (item.level === 1) {
+          // 一级节点
+          mindData[0]['children'].push({
+            name: item.name,
+            path: item.name // 路径作为唯一标识
+          })
+        }
+      }
+      this.$set(this, 'mindData', mindData)
+    },
+    /**
+     * 重载脑图实例方法，获取点击节点数据
+     */
+    reloadMindMap() {
+      const mindMapInstance = this.$refs['mindMap']
+      const _fObjectClick = mindMapInstance.fObjectClick
+      mindMapInstance.fObjectClick = function(d, i, n) {
+        _fObjectClick(d, i, n)
+        this.clickNode = d
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.step-2-form {
+  .control-btns {
+    padding: 10px 0;
+  }
+  .form-mindmap {
+    display: block;
+    height: auto;
+  }
+  .pageControlButtons {
+    margin-top: 10px;
+  }
+}
+</style>

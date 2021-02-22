@@ -1,0 +1,46 @@
+package com.rz.iot.bpo.mina.controller;
+
+import com.rz.iot.bpo.framework.web.controller.BaseController;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.model.show.MinaAttendanceDetailShow;
+import com.rz.iot.bpo.mina.model.show.MinaAttendanceInfoShow;
+import com.rz.iot.bpo.mina.service.MinaAttendanceInfoService;
+import com.rz.iot.bpo.model.param.BpoAttendanceInfoParam;
+import com.rz.iot.bpo.service.BpoAttendanceInfoService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/mp/attendance")
+public class MinaAttendanceController extends BaseController {
+
+    @Resource
+    private MinaAttendanceInfoService infoService;
+
+    @Resource
+    private BpoAttendanceInfoService attendanceInfoService;
+
+
+    @GetMapping("/findAll")
+    public Result findAll(Map<String,Object> params) {
+        startPage();
+        List<MinaAttendanceInfoShow> list = infoService.findAll(params);
+        return getDataTable(list);
+    }
+
+    @GetMapping("/detail")
+    public Result detail(Integer id) {
+        MinaAttendanceDetailShow detailShow = infoService.getDetail(id);
+        return Result.success(detailShow);
+    }
+
+
+    @PostMapping("/confirm")
+    public Result confirm(@RequestBody BpoAttendanceInfoParam attendanceInfoParam) {
+        attendanceInfoService.confirm(attendanceInfoParam);
+        return Result.success();
+    }
+}

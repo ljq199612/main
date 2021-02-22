@@ -1,0 +1,194 @@
+package com.rz.iot.bpo.mina.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.OperatorType;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.model.param.MinaClassesGenerateParam;
+import com.rz.iot.bpo.mina.model.param.MinaClassesParam;
+import com.rz.iot.bpo.mina.model.param.MinaScheduleRuleParam;
+import com.rz.iot.bpo.mina.model.param.MinaUpdateClassesParam;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+import com.rz.iot.bpo.mina.model.show.MinaClassesShow;
+import com.rz.iot.bpo.mina.service.MinaScheduleService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+
+/**
+ * @Description: 排班管理
+ * @Author: LiuJiaqi
+ * @Create: 2020-07-23
+ **/
+@Api(tags = "排班管理")
+@RequestMapping("/mina/schedule")
+@RestController
+public class MinaScheduleController {
+
+    @Resource
+    MinaScheduleService scheduleService;
+
+    /**
+     * 获取班次信息列表
+     * @return
+     */
+    @ApiOperation("获取班次列表")
+    @PostMapping("/getClassList")
+//    @PreAuthorize("@ss.hasPermi('schedule:getClassList')")
+    @Log(title = "获取班次列表", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<MinaClassesShow> getClassList(@RequestBody MinaClassesParam classesParam) {
+        return scheduleService.getClassList(classesParam);
+    }
+
+    /**
+     * 添加班次信息
+     * @return
+     */
+    @ApiOperation("添加班次信息")
+    @PostMapping("/addClassFromExternal")
+//    @PreAuthorize("@ss.hasPermi('schedule:addClassFromExternal')")
+    @Log(title = "添加班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addClassFromExternal(@RequestBody MinaClassesParam classesParam) {
+        return scheduleService.addClassFromExternal(classesParam);
+    }
+
+    /**
+     * 删除班次信息
+     * @return
+     */
+    @ApiOperation("删除班次信息")
+    @PostMapping("/deleteClassFromExternal")
+//    @PreAuthorize("@ss.hasPermi('schedule:deleteClassFromExternal')")
+    @Log(title = "删除班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result  deleteClassFromExternal(@RequestBody MinaClassesParam minaClassesParam) {
+        return scheduleService.deleteClassFromExternal(minaClassesParam);
+    }
+
+    /**
+     * 修改班次信息
+     * @return
+     */
+    @ApiOperation("修改班次信息")
+    @PostMapping("/updateClassFromExternal")
+//    @PreAuthorize("@ss.hasPermi('schedule:updateClassFromExternal')")
+    @Log(title = "修改班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result updateClassFromExternal(@RequestBody MinaUpdateClassesParam minaClassesParam) {
+        return scheduleService.updateClassFromExternal(minaClassesParam);
+    }
+
+
+    /**
+     * 获取排班信息
+     * @return
+     */
+    @ApiOperation("获取排班列表")
+    @PostMapping("/getClassGenerate")
+ //   @PreAuthorize("@ss.hasPermi('schedule:getClassGenerate')")
+    @Log(title = "获取排班列表", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<MinaClassGenerateShow> getClassGenerate(@RequestBody MinaClassesGenerateParam classesGenerateParam) {
+        return scheduleService.getClassGenerate(classesGenerateParam);
+    }
+
+    /**
+     * 添加班次信息
+     * @return
+     */
+    @ApiOperation("添加排班信息")
+    @PostMapping("/addClassGenerate")
+//    @PreAuthorize("@ss.hasPermi('schedule:addClassGenerate')")
+    @Log(title = "添加排班信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addClassGenerate(@RequestBody MinaClassesGenerateParam classesGenerateParam) {
+        return scheduleService.addClassGenerate(classesGenerateParam);
+    }
+
+    /**
+     * 修改排班信息
+     * @return
+     */
+    @ApiOperation("修改排班班次信息")
+    @PostMapping("/updateClassGenerate")
+//    @PreAuthorize("@ss.hasPermi('schedule:updateClassGenerate')")
+    @Log(title = "修改排班班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result updateClassGenerate(@RequestBody MinaClassesGenerateParam minaClassesGenerateParam) {
+        return scheduleService.updateClassGenerate(minaClassesGenerateParam);
+    }
+
+    /**
+     * 删除班次信息
+     * @return
+     */
+    @ApiOperation("删除排班班次信息")
+    @GetMapping("/deleteClassGenerate")
+//    @PreAuthorize("@ss.hasPermi('schedule:deleteClassGenerate')")
+    @Log(title = "删除排班班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result deleteClassGenerate(@RequestBody Integer scheduleId) {
+        return scheduleService.deleteClassGenerate(scheduleId);
+    }
+
+    /**
+     * 添加排班规则
+     * @return
+     */
+    @ApiOperation("添加排班规则")
+    @PostMapping("/addScheduleRule")
+//    @PreAuthorize("@ss.hasPermi('schedule:addScheduleRule')")
+    @Log(title = "添加排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addScheduleRule(@RequestBody MinaScheduleRuleParam scheduleRuleParam) {
+        return scheduleService.addScheduleRule(scheduleRuleParam);
+    }
+
+
+    /**
+     * 删除排班规则
+     * @return
+     */
+    @ApiOperation("删除排班规则")
+    @GetMapping("/deleteScheduleRule")
+//    @PreAuthorize("@ss.hasPermi('schedule:deleteScheduleRule')")
+    @Log(title = "删除排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result deleteScheduleRule(@RequestBody Integer scheduleRuleId) {
+        return scheduleService.deleteScheduleRule(scheduleRuleId);
+    }
+
+//
+//    /**
+//     * 获取排班信息
+//     * @return
+//     */
+//    @ApiOperation("获取排班规则")
+//    @GetMapping("/getScheduleRule")
+////    @PreAuthorize("@ss.hasPermi('schedule:getScheduleRule')")
+//    @Log(title = "获取排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+//    public Result<BpoScheduleRuleShow> getScheduleRule(Integer projectId) {
+//        return scheduleService.getScheduleRule(projectId);
+//    }
+//    /**
+//     * 获取人员数据
+//     * @return
+//     */
+//    @ApiOperation("获取人员数据")
+//    @GetMapping("/getEmployeeData")
+////    @PreAuthorize("@ss.hasPermi('schedule:getEmployeeData')")
+//    @Log(title = "获取人员数据", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+//    public Result<BpoProjectEmployeeShow> getEmployeeData(Integer projectId) {
+//        return scheduleService.getEmployeeData(projectId);
+//    }
+//
+
+//    /**
+//     * 修改排班规则
+//     * @return
+//     */
+//    @ApiOperation("修改排班规则")
+//    @PostMapping("/updateScheduleRule")
+////    @PreAuthorize("@ss.hasPermi('schedule:updateScheduleRule')")
+//    @Log(title = "修改排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+//    public Result updateScheduleRule(@RequestBody MinaScheduleRuleParam scheduleRuleParam) {
+//        return scheduleService.updateScheduleRule(scheduleRuleParam);
+//    }
+//
+
+}

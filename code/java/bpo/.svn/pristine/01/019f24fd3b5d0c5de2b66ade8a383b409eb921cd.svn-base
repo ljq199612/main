@@ -1,0 +1,19 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoClassesGenerate;
+
+public interface BpoClassesGenerateMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoClassesGenerate record);
+
+    int insertSelective(BpoClassesGenerate record);
+
+    BpoClassesGenerate selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoClassesGenerate record);
+
+    int updateByPrimaryKey(BpoClassesGenerate record);
+
+    MinaClassGenerateShow selectByProjectId(Integer projectId);
+}

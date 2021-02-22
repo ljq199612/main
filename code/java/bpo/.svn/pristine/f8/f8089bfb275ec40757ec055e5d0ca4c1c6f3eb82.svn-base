@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaPersonMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaPerson" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="id_card" property="idCard" jdbcType="VARCHAR" />
+    <result column="nation" property="nation" jdbcType="VARCHAR" />
+    <result column="birth" property="birth" jdbcType="VARCHAR" />
+    <result column="id_card_address" property="idCardAddress" jdbcType="VARCHAR" />
+    <result column="work_no" property="workNo" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="sync_sf" property="syncSf" jdbcType="TINYINT" />
+    <result column="sf_work_no" property="sfWorkNo" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="account_id" property="accountId" jdbcType="INTEGER" />
+    <result column="person_type" property="personType" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="dimission_type" property="dimissionType" jdbcType="INTEGER" />
+    <result column="dimission_reason" property="dimissionReason" jdbcType="VARCHAR" />
+    <result column="station" property="station" jdbcType="VARCHAR" />
+    <result column="station_level" property="stationLevel" jdbcType="INTEGER" />
+    <result column="wage_id" property="wageId" jdbcType="INTEGER" />
+    <result column="dimission_time" property="dimissionTime" jdbcType="TIMESTAMP" />
+    <result column="contract_id" property="contractId" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="dept_id" property="deptId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, person_name, sex, age, id_card, nation, birth, id_card_address, work_no, user_id, 
+    sync_sf, sf_work_no, phone, address, remark, project_id, account_id, person_type, 
+    status, dimission_type, dimission_reason, station, station_level, wage_id, dimission_time, 
+    contract_id, company_id, dept_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_person
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--查询所有人员信息-->
+  <select id="findAll" resultType="com.rz.iot.bpo.mina.model.show.MinaPersonShow">
+    select
+    person.id as id ,person.person_name as personName, person.work_no as workNo,
+    person.id_card as idCard,nations.nation as nation,
+    person.id_card_address as idCardAddress,company.company_name as companyName,
+    person.person_type as personType,person.status as status,project.project_name as projectName,
+    person.phone as phone ,person.address as address,person.sf_work_no as sfWorkNo ,
+    person.birth as birthday,person.sex as sex,person.age as age ,dept.dept_name as deptName
+    from bpo_person person
+    LEFT JOIN sys_dept dept on dept.dept_id = person.dept_id
+    LEFT JOIN sys_company company on company.id = person.company_id
+    LEFT JOIN bpo_project project on project.id = person.project_id
+    LEFT JOIN sys_nation nations on nations.id = person.nation
+		where 1=1
+		<if test="select!=null and select!=''">
+          and person.person_name like concat('%',concat(#{select},'%'))
+        </if>
+        <if test="entity.dataScope!=null and entity.dataScope!=''">
+          and ${entity.dataScope}
+        </if>
+    UNION
+    select
+    person.id as id ,person.person_name as personName, person.work_no as workNo,
+    person.id_card as idCard,nations.nation as nation,
+    person.id_card_address as idCardAddress,company.company_name as companyName,
+    person.person_type as personType,person.status as status,project.project_name as projectName,
+    person.phone as phone ,person.address as address,person.sf_work_no as sfWorkNo ,
+    person.birth as birthday,person.sex as sex,person.age as age ,dept.dept_name as deptName
+    from bpo_person person
+    LEFT JOIN sys_dept dept on dept.dept_id = person.dept_id
+    LEFT JOIN sys_company company on company.id = person.company_id
+    LEFT JOIN bpo_project project on project.id = person.project_id
+    LEFT JOIN sys_nation nations on nations.id = person.nation
+        where 1=1
+        <if test="select!=null and select!=''">
+          and person.work_no like concat('%',concat(#{select},'%'))
+        </if>
+        <if test="entity.dataScope!=null and entity.dataScope!=''">
+          and ${entity.dataScope}
+        </if>
+      </select>
+  <!--查询单个人员信息-->
+  <select id="getDetail" resultType="com.rz.iot.bpo.mina.model.show.MinaPersonShow">
+ select
+	person.id as id ,person.person_name as personName, person.work_no as workNo,
+	person.id_card as idCard,nations.nation as nation,
+	person.id_card_address as idCardAddress,company.company_name as companyName,
+	person.person_type as personType,person.status as status,project.project_name as projectName,
+	person.phone as phone ,person.address as address,person.sf_work_no as sfWorkNo ,
+	person.birth as birthday,person.sex as sex,person.age as age ,dept.dept_name as deptName
+	from bpo_person person
+	LEFT JOIN sys_dept dept on dept.dept_id = person.dept_id
+	LEFT JOIN sys_company company on company.id = person.company_id
+	LEFT JOIN bpo_project project on project.id = person.project_id
+	LEFT JOIN sys_nation nations on nations.id = person.nation
+	where person.id = #{id}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_person
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.MinaPerson" >
+    insert into bpo_person (id, person_name, sex, 
+      age, id_card, nation, 
+      birth, id_card_address, work_no, 
+      user_id, sync_sf, sf_work_no, 
+      phone, address, remark, 
+      project_id, account_id, person_type, 
+      status, dimission_type, dimission_reason, 
+      station, station_level, wage_id, 
+      dimission_time, contract_id, company_id, 
+      dept_id, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{personName,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
+      #{age,jdbcType=INTEGER}, #{idCard,jdbcType=VARCHAR}, #{nation,jdbcType=VARCHAR}, 
+      #{birth,jdbcType=VARCHAR}, #{idCardAddress,jdbcType=VARCHAR}, #{workNo,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=INTEGER}, #{syncSf,jdbcType=TINYINT}, #{sfWorkNo,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{projectId,jdbcType=INTEGER}, #{accountId,jdbcType=INTEGER}, #{personType,jdbcType=TINYINT}, 
+      #{status,jdbcType=INTEGER}, #{dimissionType,jdbcType=INTEGER}, #{dimissionReason,jdbcType=VARCHAR}, 
+      #{station,jdbcType=VARCHAR}, #{stationLevel,jdbcType=INTEGER}, #{wageId,jdbcType=INTEGER}, 
+      #{dimissionTime,jdbcType=TIMESTAMP}, #{contractId,jdbcType=INTEGER}, #{companyId,jdbcType=INTEGER}, 
+      #{deptId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.mina.model.MinaPerson" >
+    insert into bpo_person
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="personName != null" >
+        person_name,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="idCard != null" >
+        id_card,
+      </if>
+      <if test="nation != null" >
+        nation,
+      </if>
+      <if test="birth != null" >
+        birth,
+      </if>
+      <if test="idCardAddress != null" >
+        id_card_address,
+      </if>
+      <if test="workNo != null" >
+        work_no,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="syncSf != null" >
+        sync_sf,
+      </if>
+      <if test="sfWorkNo != null" >
+        sf_work_no,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="accountId != null" >
+        account_id,
+      </if>
+      <if test="personType != null" >
+        person_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="dimissionType != null" >
+        dimission_type,
+      </if>
+      <if test="dimissionReason != null" >
+        dimission_reason,
+      </if>
+      <if test="station != null" >
+        station,
+      </if>
+      <if test="stationLevel != null" >
+        station_level,
+      </if>
+      <if test="wageId != null" >
+        wage_id,
+      </if>
+      <if test="dimissionTime != null" >
+        dimission_time,
+      </if>
+      <if test="contractId != null" >
+        contract_id,
+      </if>
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="deptId != null" >
+        dept_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="personName != null" >
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null" >
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="nation != null" >
+        #{nation,jdbcType=VARCHAR},
+      </if>
+      <if test="birth != null" >
+        #{birth,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardAddress != null" >
+        #{idCardAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="workNo != null" >
+        #{workNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="syncSf != null" >
+        #{syncSf,jdbcType=TINYINT},
+      </if>
+      <if test="sfWorkNo != null" >
+        #{sfWorkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="accountId != null" >
+        #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="personType != null" >
+        #{personType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionType != null" >
+        #{dimissionType,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionReason != null" >
+        #{dimissionReason,jdbcType=VARCHAR},
+      </if>
+      <if test="station != null" >
+        #{station,jdbcType=VARCHAR},
+      </if>
+      <if test="stationLevel != null" >
+        #{stationLevel,jdbcType=INTEGER},
+      </if>
+      <if test="wageId != null" >
+        #{wageId,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionTime != null" >
+        #{dimissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="contractId != null" >
+        #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="deptId != null" >
+        #{deptId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.mina.model.MinaPerson" >
+    update bpo_person
+    <set >
+      <if test="personName != null" >
+        person_name = #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null" >
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="nation != null" >
+        nation = #{nation,jdbcType=VARCHAR},
+      </if>
+      <if test="birth != null" >
+        birth = #{birth,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardAddress != null" >
+        id_card_address = #{idCardAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="workNo != null" >
+        work_no = #{workNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="syncSf != null" >
+        sync_sf = #{syncSf,jdbcType=TINYINT},
+      </if>
+      <if test="sfWorkNo != null" >
+        sf_work_no = #{sfWorkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="accountId != null" >
+        account_id = #{accountId,jdbcType=INTEGER},
+      </if>
+      <if test="personType != null" >
+        person_type = #{personType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionType != null" >
+        dimission_type = #{dimissionType,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionReason != null" >
+        dimission_reason = #{dimissionReason,jdbcType=VARCHAR},
+      </if>
+      <if test="station != null" >
+        station = #{station,jdbcType=VARCHAR},
+      </if>
+      <if test="stationLevel != null" >
+        station_level = #{stationLevel,jdbcType=INTEGER},
+      </if>
+      <if test="wageId != null" >
+        wage_id = #{wageId,jdbcType=INTEGER},
+      </if>
+      <if test="dimissionTime != null" >
+        dimission_time = #{dimissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="contractId != null" >
+        contract_id = #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="deptId != null" >
+        dept_id = #{deptId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaPerson" >
+    update bpo_person
+    set person_name = #{personName,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      nation = #{nation,jdbcType=VARCHAR},
+      birth = #{birth,jdbcType=VARCHAR},
+      id_card_address = #{idCardAddress,jdbcType=VARCHAR},
+      work_no = #{workNo,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      sync_sf = #{syncSf,jdbcType=TINYINT},
+      sf_work_no = #{sfWorkNo,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=INTEGER},
+      account_id = #{accountId,jdbcType=INTEGER},
+      person_type = #{personType,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
+      dimission_type = #{dimissionType,jdbcType=INTEGER},
+      dimission_reason = #{dimissionReason,jdbcType=VARCHAR},
+      station = #{station,jdbcType=VARCHAR},
+      station_level = #{stationLevel,jdbcType=INTEGER},
+      wage_id = #{wageId,jdbcType=INTEGER},
+      dimission_time = #{dimissionTime,jdbcType=TIMESTAMP},
+      contract_id = #{contractId,jdbcType=INTEGER},
+      company_id = #{companyId,jdbcType=INTEGER},
+      dept_id = #{deptId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

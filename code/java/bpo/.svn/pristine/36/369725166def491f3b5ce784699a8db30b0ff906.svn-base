@@ -1,0 +1,60 @@
+package com.rz.iot.bpo.mina.model.show;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rz.iot.bpo.mina.model.MinaPerson;
+import com.rz.iot.bpo.mina.model.MinaScheduleToEmployee;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.sql.Time;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Description: 排班到个人 视图
+ * @Author: Liu Jiaqi
+ * @Create: 2020-07-29
+ */
+
+@Data
+public class MinaScheduleToEmployeeShow extends MinaClassGenerateShow {
+
+    // 排班到个人的关联表 id
+    private Integer ScheduleToEmployeeId;
+
+    //班次id
+    private Integer scheduleId;
+
+    //员工id
+    private Integer userId;
+
+    //工序id
+    private Integer processId;
+
+    //产品id
+    private Integer productId;
+
+    //工作小组id
+    private Integer groupId;
+
+    //最近修改人
+    private Integer updateUserId;
+
+
+    // 已安排的人员数量
+    Integer employeeNum;
+
+    // 已安排, 未安排
+    boolean isScheduled;
+
+    // 排班的信息
+    List<MinaClassGenerateShow> minaClassGenerateShowList;
+
+    // 人员列表
+    List<MinaPerson> minaPersonList;
+
+
+
+
+}

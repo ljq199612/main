@@ -1,0 +1,350 @@
+<template>
+  <div>
+    <div class="DeptManage">
+      <CfPanel title="部门管理">
+        <el-form :inline="true" class="bpoFormInline">
+          <el-row>
+            <el-form-item label="部门名称：">
+              <el-input v-model="searchParam.name" placeholder="请输入部门名称" />
+              <!--<SelectTree
+                v-model="searchParam.name"
+                :props="props"
+                :options="options"
+                :value="valueId"
+                :clearable="isClearable"
+                :accordion="isAccordion"
+                @getValue="getValue($event)"
+              />-->
+            </el-form-item>
+            <el-form-item label="部门状态：">
+              <el-select v-model="searchParam.status" filterable placeholder="请选择状态" class="cover">
+                <el-option v-for="(item,index) in stateOptions" :key="index" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button class="bpoBtn" @click="getList">搜索</el-button>
+              <el-button @click="reset">重置</el-button>
+            </el-form-item>
+          </el-row>
+        </el-form>
+
+        <el-button type="primary" icon="el-icon-plus" @click="addDept">
+          新增
+        </el-button>
+        <el-table
+          :data="deptList"
+          style="width: 100%;margin-bottom: 20px;"
+          row-key="deptId"
+          class="bpoTable"
+          default-expand-all
+          :tree-props="{children: 'depts', hasChildren: true}"
+        >
+          <el-table-column
+            prop="deptName"
+            label="部门名称"
+            min-width="200"
+          />
+          <el-table-column
+            prop="status"
+            label="状态"
+            min-width="80"
+          >
+            <template slot-scope="scope">
+              {{ statusMap[scope.row.status] }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="createName"
+            label="创建人"
+            align="center"
+            min-width="80"
+          />
+          <el-table-column
+            prop="createTime"
+            label="创建时间"
+            align="center"
+            min-width="80"
+          />
+          <el-table-column
+            prop="operation"
+            label="操作"
+            align="center"
+            width="250"
+          >
+            <template slot-scope="scope">
+              <el-button type="text" style="color:#4794F7" size="mini" @click="handleAdd(scope.row)">新增</el-button>
+              <el-button :disabled="scope.row.control!='1'" type="text" style="color:#19D185" size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+              <el-button :disabled="scope.row.control!='1'" size="mini" type="text" style="color:#F52222" @click="handleDelete(scope.row,'deleted')">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </CfPanel>
+      <el-dialog
+        class="bpoDialog"
+        :title="dialogTitle"
+        :visible.sync="detailDialogVisible"
+        @close="closeDetailDialog"
+      >
+        <el-form ref="entity" label-width="90px" :model="entity" :rules="rules">
+          <el-form-item label="上级部门：" prop="parentId">
+            <SelectTree
+              v-model="entity.parentId"
+              :props="props"
+              :options="options"
+              :value="valueEditId"
+              :accordion="isAccordion"
+              placeholder="请选择上级部门"
+              @getValue="getEditValue($event)"
+            />
+          </el-form-item>
+          <el-form-item label="部门名称：" prop="deptName">
+            <el-input v-model="entity.deptName" placeholder="请输入部门名称" />
+          </el-form-item>
+          <el-form-item label="负责人：" prop="leader">
+            <el-input v-model="entity.leader" placeholder="请输入负责人" />
+          </el-form-item>
+          <el-form-item label="联系电话：" prop="phone">
+            <el-input v-model="entity.phone" placeholder="请输入联系电话" />
+          </el-form-item>
+          <el-form-item label="邮箱：" prop="email">
+            <el-input v-model="entity.email" placeholder="请输入邮箱" />
+          </el-form-item>
+          <el-form-item label="状态：">
+            <el-radio-group v-model="entity.status" fill="#FF6B00">
+              <el-radio :label="1">启用</el-radio>
+              <el-radio :label="2">禁用</el-radio>
+            </el-radio-group>
+
+          </el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="24" class="bpoButtonGroup pull-right">
+              <el-button type="primary" @click="onEditSubmit('entity')">提交</el-button>
+              <el-button @click="closeDetailDialog">关闭</el-button>
+            </el-col>
+          </el-row>
+        </el-form>
+      </el-dialog>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+import SelectTree from '@/components/treeSelect'
+// eslint-disable-next-line no-unused-vars
+import { getAllDept, addDept, updateDept, deleteDept, getDeptByDeptId, getCondition, getAllByDUserId } from '@/api/systemManage/departmentManage'
+// eslint-disable-next-line no-unused-vars
+import { findCanControl } from '@/api/contract'
+import Vue from 'vue'
+
+export default {
+  name: 'DeptManage',
+  components: { CfPanel, SelectTree },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      entity: { },
+      total: 0,
+      searchParam: {},
+      deptList: [],
+      currentRow: {},
+      orgOptions: [{ value: '0', label: '超级管理员' }, { value: '1', label: '甲方' }, { value: '2', label: '乙方' }, { value: '3', label: '供应商' }],
+      stateOptions: [{ value: '1', label: '启用' }, { value: '2', label: '禁用' }],
+      detailDialogVisible: false,
+      dialogTitle: '新增部门',
+      rules: {
+        deptName: [{ required: true, message: '请填写部门名称', trigger: 'blur' }],
+        parentId: [{ required: true, message: '请选择上级部门', trigger: 'blur' }]
+      },
+
+      isClearable: true, // 可清空（可选）
+      isAccordion: false, // 可收起（可选）
+      valueId: '0', // 初始ID（可选）
+      valueEditId: '',
+      props: { // 配置项（必选）
+        value: 'deptId',
+        label: 'deptName',
+        children: 'depts'
+      },
+      options: [],
+      statusMap: { '1': '启用', '2': '停用' }
+    }
+  },
+  computed: {
+
+  },
+  watch: {
+    'valueEditId': function() {
+      const that = this
+      setTimeout(function() {
+        that.$refs['entity'].validate()
+      }, 100)
+    }
+  },
+  created() {
+    this.getList()
+    this.getRemoteOptions()
+  },
+  mounted() {
+
+  },
+  methods: {
+    getValue(value) {
+      // 合同归属取值
+      this.valueId = value
+      this.searchParam.deptId = value
+    },
+    getEditValue(value) {
+      this.valueEditId = value
+      // 合同归属取值
+      Vue.set(this.entity, 'parentId', value)
+      // this.entity.parentId = value
+    },
+    submit() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    onEditSubmit() {
+      this.$refs['entity'].validate(valid => {
+        if (valid) {
+          var opration = addDept
+          if (this.entity.deptId) {
+            opration = updateDept
+          }
+          opration(this.entity).then(res => {
+            if (String(res.data.code) === '20000') {
+              this.$notify({
+                title: '成功',
+                duration: '2000',
+                message: '修改成功！',
+                type: 'success'
+              })
+              this.detailDialogVisible = false
+              this.getList()
+            } else {
+              this.error(res.data.message || '操作失败')
+            }
+            // eslint-disable-next-line handle-callback-err
+          }).catch(err => {
+            this.error('操作失败')
+          })
+        }
+      })
+    },
+    error(message) {
+      this.$notify({
+        title: '失败',
+        duration: '2000',
+        message: message + '！',
+        type: 'warning'
+      })
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getCondition(this.searchParam).then(res => {
+        var deptList = []
+        var result = res.data.data
+        for (var i in result) {
+          deptList = deptList.concat(res.data.data[i])
+        }
+        this.deptList = deptList
+        this.listLoading = false
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+        this.listLoading = false
+      })
+    },
+    addDept() {
+      this.dialogTitle = '新增部门'
+      this.valueEditId = ''
+      this.entity = { status: 1 }
+      this.detailDialogVisible = true
+    },
+    getRemoteOptions() {
+      // findCanControl
+      getAllByDUserId().then(res => {
+        this.options = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    search() {
+    },
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleUpdate(row) {
+      this.dialogTitle = '修改部门'
+      getDeptByDeptId().then((res) => {
+        this.entity = res.data.data
+        this.detailDialogVisible = true
+      }).catch(() => {
+      })
+    },
+    handleAdd(row) {
+      this.dialogTitle = '新增部门'
+      this.entity = {}
+      this.valueEditId = row.deptId
+      console.log(row.deptId)
+      this.entity.parentId = row.deptId
+      this.detailDialogVisible = true
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该部门？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        deleteDept({ id: row.deptId }).then(res => {
+          this.$notify({
+            title: '成功',
+            duration: '2000',
+            message: '删除部门成功！',
+            type: 'success'
+          })
+          this.getList()
+        })
+      }).catch(() => {
+      })
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .DeptManage {
+    .el-button.is-disabled.el-button--text{
+      color:#AAAAAA !important;
+    }
+    .el-select{
+      width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,283 @@
+<template>
+  <div>
+    <el-form :inline="true" class="bpoFormInline">
+      <el-form-item label-width="90px" label="开始日期：">
+        <el-date-picker
+          v-model="queryForm.startDate"
+          type="date"
+          placeholder="选择开始日期"
+          @change="submit"
+        />
+      </el-form-item>
+      <el-form-item label-width="90px" label="截至日期：">
+        <el-date-picker
+          v-model="queryForm.endDate"
+          type="date"
+          placeholder="选择截止日期"
+          @change="submit"
+        />
+      </el-form-item>
+      <el-form-item label-width="90px" label="用户类型：">
+        <el-select v-model="queryForm.type" placeholder="请选择用户类型" @change="submit">
+          <el-option v-for="(item,index) in userOptions" :key="index" :label="item.roleName" :value="item.roleKey" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <el-button type="primary" icon="icon-export" style="margin:15px 0 10px" @click="exportExcel">
+      导出
+    </el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="tableList"
+      class="bpoTable"
+      fit
+    >
+      <el-table-column align="center" label="序号" width="80">
+        <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="系统模块" min-width="80" prop="title" />
+      <el-table-column align="left" label="操作类型" min-width="80">
+        <template slot-scope="scope">{{ scope.row.businessType|filterBusinessType }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="操作人员" min-width="80" prop="operName" />
+      <el-table-column align="left" label="终端类型" min-width="80" prop="operatorType">
+        <template slot-scope="scope">{{ scope.row.operatorType|filterOperatorType }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="ip" min-width="80" prop="operIp" />
+      <el-table-column align="left" label="登录地点" min-width="80" prop="operLocation" />
+      <el-table-column align="left" label="日期" min-width="80" prop="operTime" />
+      <el-table-column align="left" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button type="text" @click="viewDetail(scope.row)">详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 详情弹框 -->
+    <el-dialog
+      title="操作日志详情"
+      custom-class="dialog-medium"
+      :close-on-click-modal="false"
+      :visible.sync="dialogFormVisible"
+      @close="closeDialog"
+    >
+      <ul v-loading="detailLoading" class="form-detail-list">
+        <li>
+          <span class="detail-label">操作模块：</span>
+          <span class="detail-value">{{ detailData.title }}</span>
+        </li>
+        <li>
+          <span class="detail-label">登录地点：</span>
+          <span class="detail-value">{{ detailData.operIp }}</span>
+        </li>
+        <li>
+          <span class="detail-label">请求方式：</span>
+          <span class="detail-value">{{ detailData.requestMethod }}</span>
+        </li>
+        <li>
+          <span class="detail-label">操作时间：</span>
+          <span class="detail-value">{{ detailData.operTime }}</span>
+        </li>
+        <li class="col-100">
+          <span class="detail-label">操作状态：</span>
+          <span class="detail-value">{{ detailData.status|filterOpeStatus }}</span>
+        </li>
+        <li class="col-100">
+          <span class="detail-label">请求地址：</span>
+          <pre class="detail-value">{{ detailData.operUrl }}</pre>
+        </li>
+        <li class="col-100">
+          <span class="detail-label">请求参数：</span>
+          <pre class="detail-value">{{ detailData.operParam }}</pre>
+        </li>
+        <li class="col-100">
+          <span class="detail-label">返回参数：</span>
+          <pre class="detail-value">{{ detailData.jsonResult }}</pre>
+        </li>
+      </ul>
+      <div slot="footer" class="dialog-footer" style="margin-left: -14px;">
+        <el-button type="warning" plain @click="closeDialog">关闭</el-button>
+      </div>
+    </el-dialog>
+    <pagination v-show="total>0" :total="total" lang-type="zh" :page.sync="page.pageNum" :limit.sync="page.pageSize" @pagination="getList" />
+  </div>
+</template>
+<script>
+import { findUserRole, exportOpeLog, findAllOpt, findOptDetail } from '@/api/logMgt'
+import Pagination from '@/components/Pagination'
+
+const businessTypeMap = {
+  0: '其他',
+  1: '新增',
+  2: '修改',
+  3: '删除'
+}
+const opeTypeMap = {
+  0: '其他',
+  1: 'web用户',
+  2: '小程序用户'
+}
+export default {
+  name: 'OperateLog',
+  components: {
+    Pagination
+  },
+  filters: {
+    formateTime(time) {
+      if (time) {
+        return time.substring(0, 10)
+      }
+      return ''
+    },
+    filterBusinessType(type) {
+      return type ? businessTypeMap[type] : ''
+    },
+    filterOperatorType(type) {
+      return type ? opeTypeMap[type] : ''
+    },
+    filterOpeStatus(type) {
+      return type === 1 ? '正常' : '异常'
+    }
+  },
+  data() {
+    return {
+      queryForm: {
+        startDate: '',
+        endDate: '',
+        type: ''
+      },
+      userOptions: [],
+      listLoading: false,
+      page: {
+        pageNum: 1,
+        pageSize: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      tableList: [{ id: 1 }],
+      total: 0,
+      detailLoading: false,
+      detailData: {},
+      dialogFormVisible: false
+    }
+  },
+  created() {
+    this.getUserTypes()
+    this.getList()
+  },
+  methods: {
+    getUserTypes() {
+      findUserRole().then((res) => {
+        this.userOptions = res.data.data
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    getList() {
+      this.listLoading = true
+      findAllOpt({
+        pageNum: this.page.pageNum,
+        pageSize: this.page.pageSize,
+        ...this.queryForm
+      }).then((res) => {
+        this.listLoading = false
+        const data = res.data.data
+        this.tableList = data.list || []
+        this.total = data.total
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    reset() {
+      this.page.pageNum = 1
+      this.queryForm.dictName = ''
+      this.queryForm.dictType = ''
+      this.queryForm.status = null
+      this.getList()
+    },
+    submit() {
+      this.page.pageNum = 1
+      this.getList()
+    },
+    viewDetail(row) {
+      this.dialogFormVisible = true
+      this.getDetail(row.operId)
+    },
+    getDetail(operId) {
+      this.detailLoading = true
+      findOptDetail({
+        operId
+      }).then((res) => {
+        this.detailLoading = false
+        this.detailData = res.data.data
+      }).catch((err) => {
+        this.detailLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    closeDialog() {
+      this.dialogFormVisible = false
+    },
+    exportExcel() {
+      window.open(exportOpeLog)
+    }
+  }
+}
+</script>
+<style lang="scss">
+.form-detail-list{
+  overflow-y: auto;
+  padding: 0;
+  font-size: 0;
+  max-height: 500px;
+  li{
+    position: relative;
+    font-size: 14px;
+    display: inline-block;
+    width: 50%;
+    line-height: 16px;
+    margin-bottom: 12px;
+    &.col-100{
+      width: 100%;
+    }
+    pre{
+      margin: 0;
+      font-size: 12px;
+      line-height: 16px;
+    }
+  }
+  .detail-label,
+  .detail-value{
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .detail-label{
+    position: absolute;
+    top: 3px;
+    left: 0;
+    color: #656565;
+  }
+  .detail-value{
+    margin-left: 70px;
+    color: #000;
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+}
+</style>

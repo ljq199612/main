@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoEvaluationStandardMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoEvaluationStandard" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="evaluation_content_id" property="evaluationContentId" jdbcType="INTEGER" />
+    <result column="single_weight" property="singleWeight" jdbcType="INTEGER" />
+    <result column="evaluation_standard_name" property="evaluationStandardName" jdbcType="VARCHAR" />
+    <result column="evaluation_standard_desc" property="evaluationStandardDesc" jdbcType="VARCHAR" />
+    <result column="score_standard_unit" property="scoreStandardUnit" jdbcType="VARCHAR"/>
+    <result column="score_standard_points" property="scoreStandardPoints" jdbcType="INTEGER"/>
+    <result column="upper_limit" property="upperLimit" jdbcType="INTEGER" />
+    <result column="score_type" property="scoreType" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, evaluation_content_id, is_choose, single_weight, evaluation_standard_name,evaluation_standard_desc,
+    upper_limit, score_type, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_evaluation_standard
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="findByContentId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from bpo_evaluation_standard
+    where evaluation_content_id = #{contentId,jdbcType=INTEGER}
+    AND status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_evaluation_standard
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoEvaluationStandard" >
+    insert into bpo_evaluation_standard (id, evaluation_content_id,
+      single_weight, evaluation_standard_name,score_standard_unit,score_standard_points,evaluation_standard_desc, upper_limit,
+      score_type, status, create_time,
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{evaluationContentId,jdbcType=INTEGER},
+      #{singleWeight,jdbcType=INTEGER},
+            #{evaluationStandardName,jdbcType=VARCHAR},
+            #{evaluationStandardDesc,jdbcType=VARCHAR},
+            #{scoreStandardUnit,jdbcType=VARCHAR},
+            #{scoreStandardPoints,jdbcType=VARCHAR},
+            #{upperLimit,jdbcType=INTEGER},
+      #{scoreType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoEvaluationStandard" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into bpo_evaluation_standard
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="evaluationContentId != null" >
+        evaluation_content_id,
+      </if>
+      <if test="singleWeight != null" >
+        single_weight,
+      </if>
+      <if test="evaluationStandardName != null" >
+        evaluation_standard_name,
+      </if>
+      <if test="evaluationStandardDesc != null" >
+        evaluation_standard_desc,
+      </if>
+      <if test="scoreStandardUnit != null">
+        score_standard_unit,
+      </if>
+      <if test="scoreStandardPoints != null">
+        score_standard_points,
+      </if>
+      <if test="upperLimit != null" >
+        upper_limit,
+      </if>
+      <if test="scoreType != null" >
+        score_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="evaluationContentId != null" >
+        #{evaluationContentId,jdbcType=INTEGER},
+      </if>
+      <if test="singleWeight != null" >
+        #{singleWeight,jdbcType=INTEGER},
+      </if>
+      <if test="evaluationStandardName != null" >
+        #{evaluationStandardName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluationStandardDesc != null" >
+        #{evaluationStandardDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="scoreStandardUnit != null">
+        #{scoreStandardUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="scoreStandardPoints != null">
+        #{scoreStandardPoints,jdbcType=VARCHAR},
+      </if>
+      <if test="upperLimit != null" >
+        #{upperLimit,jdbcType=INTEGER},
+      </if>
+      <if test="scoreType != null" >
+        #{scoreType,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoEvaluationStandard" >
+    update bpo_evaluation_standard
+    <set >
+      <if test="evaluationContentId != null" >
+        evaluation_content_id = #{evaluationContentId,jdbcType=INTEGER},
+      </if>
+      <if test="singleWeight != null" >
+        single_weight = #{singleWeight,jdbcType=INTEGER},
+      </if>
+      <if test="evaluationStandardName != null" >
+        evaluation_standard_name = #{evaluationStandardName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluationStandardDesc != null" >
+        evaluation_standard_desc = #{evaluationStandardDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="scoreStandardUnit != null">
+        score_standard_unit = #{scoreStandardUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="scoreStandardPoints != null">
+        score_standard_points = #{scoreStandardPoints,jdbcType=VARCHAR},
+      </if>
+      <if test="upperLimit != null" >
+        upper_limit = #{upperLimit,jdbcType=INTEGER},
+      </if>
+      <if test="scoreType != null" >
+        score_type = #{scoreType,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoEvaluationStandard" >
+    update bpo_evaluation_standard
+    set evaluation_content_id = #{evaluationContentId,jdbcType=INTEGER},
+      single_weight = #{singleWeight,jdbcType=INTEGER},
+      evaluation_standard_name = #{evaluationStandardName,jdbcType=VARCHAR},
+        evaluation_standard_desc = #{evaluationStandardDesc,jdbcType=VARCHAR},
+        score_standard_unit = #{scoreStandardUnit,jdbcType=VARCHAR},
+        score_standard_points = #{scoreStandardPoints,jdbcType=VARCHAR},
+      upper_limit = #{upperLimit,jdbcType=INTEGER},
+      score_type = #{scoreType,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

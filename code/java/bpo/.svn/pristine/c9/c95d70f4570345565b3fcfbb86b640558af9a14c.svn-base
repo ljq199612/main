@@ -1,0 +1,16 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.model.param.BpoPublicParam;
+
+public interface BpoPublicMapper {
+    
+    BpoPublicParam getProject(BaseEntity entity);
+
+    BpoPublicParam getTransferStation(BaseEntity entity);
+
+    BpoPublicParam getCustomer(BaseEntity entity);
+
+    BpoPublicParam getSupplier(BaseEntity entity);
+}
+

@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoBillSupplierMonthMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoBillSupplierMonth" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="bill_cycle" property="billCycle" jdbcType="VARCHAR" />
+    <result column="payer_id" property="payerId" jdbcType="INTEGER" />
+    <result column="payee_id" property="payeeId" jdbcType="INTEGER" />
+    <result column="is_agency_salary" property="isAgencySalary" jdbcType="BIT" />
+    <result column="agency_salary" property="agencySalary" jdbcType="DECIMAL" />
+    <result column="fee_rule_type" property="feeRuleType" jdbcType="TINYINT" />
+    <result column="total_output" property="totalOutput" jdbcType="INTEGER" />
+    <result column="total_hours" property="totalHours" jdbcType="REAL" />
+    <result column="total_people" property="totalPeople" jdbcType="INTEGER" />
+    <result column="supplier_salary" property="supplierSalary" jdbcType="DECIMAL" />
+    <result column="bill_amount" property="billAmount" jdbcType="DECIMAL" />
+    <result column="total_deduction" property="totalDeduction" jdbcType="DECIMAL" />
+    <result column="real_bill_amount" property="realBillAmount" jdbcType="DECIMAL" />
+    <result column="reconciliation_status" property="reconciliationStatus" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, bill_cycle, payer_id, payee_id, is_agency_salary,
+    agency_salary, fee_rule_type, total_output, total_hours, total_people, supplier_salary, 
+    bill_amount, total_deduction, real_bill_amount, reconciliation_status, status, create_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_bill_supplier_month
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_bill_supplier_month
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoBillSupplierMonth" >
+    insert into bpo_bill_supplier_month (id, project_id,
+      bill_cycle, payer_id, payee_id, 
+      is_agency_salary, agency_salary, fee_rule_type, 
+      total_output, total_hours, total_people, 
+      supplier_salary, bill_amount, total_deduction, 
+      real_bill_amount, reconciliation_status, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER},
+      #{billCycle,jdbcType=VARCHAR}, #{payerId,jdbcType=INTEGER}, #{payeeId,jdbcType=INTEGER}, 
+      #{isAgencySalary,jdbcType=BIT}, #{agencySalary,jdbcType=DECIMAL}, #{feeRuleType,jdbcType=TINYINT}, 
+      #{totalOutput,jdbcType=INTEGER}, #{totalHours,jdbcType=REAL}, #{totalPeople,jdbcType=INTEGER}, 
+      #{supplierSalary,jdbcType=DECIMAL}, #{billAmount,jdbcType=DECIMAL}, #{totalDeduction,jdbcType=DECIMAL}, 
+      #{realBillAmount,jdbcType=DECIMAL}, #{reconciliationStatus,jdbcType=TINYINT}, #{status,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoBillSupplierMonth" >
+    insert into bpo_bill_supplier_month
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="billCycle != null" >
+        bill_cycle,
+      </if>
+      <if test="payerId != null" >
+        payer_id,
+      </if>
+      <if test="payeeId != null" >
+        payee_id,
+      </if>
+      <if test="isAgencySalary != null" >
+        is_agency_salary,
+      </if>
+      <if test="agencySalary != null" >
+        agency_salary,
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type,
+      </if>
+      <if test="totalOutput != null" >
+        total_output,
+      </if>
+      <if test="totalHours != null" >
+        total_hours,
+      </if>
+      <if test="totalPeople != null" >
+        total_people,
+      </if>
+      <if test="supplierSalary != null" >
+        supplier_salary,
+      </if>
+      <if test="billAmount != null" >
+        bill_amount,
+      </if>
+      <if test="totalDeduction != null" >
+        total_deduction,
+      </if>
+      <if test="realBillAmount != null" >
+        real_bill_amount,
+      </if>
+      <if test="reconciliationStatus != null" >
+        reconciliation_status,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="billCycle != null" >
+        #{billCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="payerId != null" >
+        #{payerId,jdbcType=INTEGER},
+      </if>
+      <if test="payeeId != null" >
+        #{payeeId,jdbcType=INTEGER},
+      </if>
+      <if test="isAgencySalary != null" >
+        #{isAgencySalary,jdbcType=BIT},
+      </if>
+      <if test="agencySalary != null" >
+        #{agencySalary,jdbcType=DECIMAL},
+      </if>
+      <if test="feeRuleType != null" >
+        #{feeRuleType,jdbcType=TINYINT},
+      </if>
+      <if test="totalOutput != null" >
+        #{totalOutput,jdbcType=INTEGER},
+      </if>
+      <if test="totalHours != null" >
+        #{totalHours,jdbcType=REAL},
+      </if>
+      <if test="totalPeople != null" >
+        #{totalPeople,jdbcType=INTEGER},
+      </if>
+      <if test="supplierSalary != null" >
+        #{supplierSalary,jdbcType=DECIMAL},
+      </if>
+      <if test="billAmount != null" >
+        #{billAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalDeduction != null" >
+        #{totalDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realBillAmount != null" >
+        #{realBillAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="reconciliationStatus != null" >
+        #{reconciliationStatus,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoBillSupplierMonth" >
+    update bpo_bill_supplier_month
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="billCycle != null" >
+        bill_cycle = #{billCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="payerId != null" >
+        payer_id = #{payerId,jdbcType=INTEGER},
+      </if>
+      <if test="payeeId != null" >
+        payee_id = #{payeeId,jdbcType=INTEGER},
+      </if>
+      <if test="isAgencySalary != null" >
+        is_agency_salary = #{isAgencySalary,jdbcType=BIT},
+      </if>
+      <if test="agencySalary != null" >
+        agency_salary = #{agencySalary,jdbcType=DECIMAL},
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type = #{feeRuleType,jdbcType=TINYINT},
+      </if>
+      <if test="totalOutput != null" >
+        total_output = #{totalOutput,jdbcType=INTEGER},
+      </if>
+      <if test="totalHours != null" >
+        total_hours = #{totalHours,jdbcType=REAL},
+      </if>
+      <if test="totalPeople != null" >
+        total_people = #{totalPeople,jdbcType=INTEGER},
+      </if>
+      <if test="supplierSalary != null" >
+        supplier_salary = #{supplierSalary,jdbcType=DECIMAL},
+      </if>
+      <if test="billAmount != null" >
+        bill_amount = #{billAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalDeduction != null" >
+        total_deduction = #{totalDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realBillAmount != null" >
+        real_bill_amount = #{realBillAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="reconciliationStatus != null" >
+        reconciliation_status = #{reconciliationStatus,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoBillSupplierMonth" >
+    update bpo_bill_supplier_month
+    set project_id = #{projectId,jdbcType=INTEGER},
+      bill_cycle = #{billCycle,jdbcType=VARCHAR},
+      payer_id = #{payerId,jdbcType=INTEGER},
+      payee_id = #{payeeId,jdbcType=INTEGER},
+      is_agency_salary = #{isAgencySalary,jdbcType=BIT},
+      agency_salary = #{agencySalary,jdbcType=DECIMAL},
+      fee_rule_type = #{feeRuleType,jdbcType=TINYINT},
+      total_output = #{totalOutput,jdbcType=INTEGER},
+      total_hours = #{totalHours,jdbcType=REAL},
+      total_people = #{totalPeople,jdbcType=INTEGER},
+      supplier_salary = #{supplierSalary,jdbcType=DECIMAL},
+      bill_amount = #{billAmount,jdbcType=DECIMAL},
+      total_deduction = #{totalDeduction,jdbcType=DECIMAL},
+      real_bill_amount = #{realBillAmount,jdbcType=DECIMAL},
+      reconciliation_status = #{reconciliationStatus,jdbcType=TINYINT},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateReconciliationStatus">
+    update bpo_bill_supplier_month
+    <set>
+      <if test="status!=null">
+        reconciliation_status = #{status}
+      </if>
+    </set>
+    where bill_cycle like concat(#{billCycle},'%')
+  </update>
+
+  <select id="selectAllMonthAccount" resultType="com.rz.iot.bpo.model.show.bpoBill.BpoBillMonthShow">
+    SELECT
+    supplier_month.id AS id,
+    transfer.name AS transferStationName,
+    project.project_name AS projectName,
+    company1.company_name AS payerName,
+    company2.company_name AS payeeName,
+    supplier_month.bill_cycle AS billCycle,
+    supplier_month.fee_rule_type AS feeRuleType,
+    supplier_month.is_agency_salary AS isAgencySalary,
+    supplier_month.agency_salary AS agencySalary,
+    supplier_month.total_output AS totalOutput,
+    supplier_month.total_hours AS totalHours,
+    supplier_month.supplier_salary AS supplierSalary,
+    supplier_month.total_people AS totalPeople,
+    supplier_month.bill_amount AS billAmount,
+    supplier_month.total_deduction AS totalDeduction,
+    supplier_month.real_bill_amount AS relBillMoney,
+    supplier_month.reconciliation_status AS reconciliationStatus
+    FROM
+    bpo_bill_supplier_month supplier_month
+    LEFT JOIN bpo_project project ON project.id = supplier_month.project_id
+    LEFT JOIN bpo_transfer_station transfer ON transfer.id = project.transfer_station_id
+    LEFT JOIN sys_company company1 ON company1.id = supplier_month.payer_id
+    LEFT JOIN sys_company company2 ON company2.id = supplier_month.payee_id
+    where supplier_month.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <if test="entity.dataScope != null">
+      and ${entity.dataScope}
+    </if>
+    <if test="param.date != null and param.date != ''">
+      and supplier_month.bill_cycle = #{param.date}
+    </if>
+    <if test="param.projectId != null">
+      and project.project_id = #{param.projectId}
+    </if>
+    <if test="param.transferStationId != null">
+      and transfer.id = #{param.transferStationId}
+    </if>
+    <if test="param.payerId != null">
+      and company1.id = #{param.payerId}
+    </if>
+    <if test="param.payeeId != null">
+      and company2.id = #{param.payeeId}
+    </if>
+  </select>
+
+  <select id="selectMonthBill" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bpo_bill_supplier_month
+    where project_id = #{projectId,jdbcType=INTEGER}
+    and bill_cycle = #{date,jdbcType=TIMESTAMP}
+    and payer_id = #{payerId,jdbcType=INTEGER}
+    and payee_id = #{payeeId,jdbcType=INTEGER}
+  </select>
+    <select id="selectSupplierIdByCompanyId" resultType="com.rz.iot.bpo.model.show.bpoBill.BpoBillSupplierShow">
+      select  supplier.id as payeeId,info.id as payeeInfoId ,company.company_name as payeeName,info.parent_id as payeeParentId
+      from bpo_supplier supplier
+      LEFT JOIN bpo_supplier_info info ON info.org_id = supplier.id
+      LEFT JOIN sys_company company ON company.id = supplier.company_id
+      where supplier.company_id = #{payeeId} and info.project_id = #{projectId}
+      and supplier.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    </select>
+  <select id="selectReconciliationByKey" resultType="com.rz.iot.bpo.model.show.bpoBill.BpoBillReconciliationShow">
+    select
+    months.id as id,
+    company2.company_name as payerName,transfer.`name` as transferStationName,
+    project.project_name as projectName,months.bill_cycle as billCycle,
+    months.total_hours as totalHours,months.bill_amount as billAmount,
+    months.total_deduction as totalDeduction,months.reconciliation_status as reconciliationStatus
+    from bpo_bill_supplier_month months
+    LEFT JOIN bpo_project project ON project.id = months.project_id
+    LEFT JOIN bpo_transfer_station transfer ON transfer.id = project.transfer_station_id
+    LEFT JOIN sys_company company ON company.id = months.payee_id
+    LEFT JOIN sys_company company2 ON company2.id = months.payer_id
+    where months.id = #{monthId}
+  </select>
+</mapper>

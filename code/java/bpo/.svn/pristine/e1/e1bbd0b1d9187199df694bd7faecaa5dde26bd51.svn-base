@@ -1,0 +1,351 @@
+<template>
+  <div>
+    <cf-panel :title="pageTitle" :back-to="backTo">
+      <el-form
+        ref="form"
+        :model="form"
+        :rules="rules"
+        label-width="180px"
+        class="bpoForm"
+        :disabled="readonly"
+      >
+        <el-row :gutter="20" />
+        <fieldset v-if="form.orgId == 1">
+          <legend class="bpo-legend">客户基本信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="客户名称：">
+                <span :title="form.companyName" class="bpoDetailText"> {{ form.companyName }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="客户编码：">
+                <span :title="form.companyCode" class="bpoDetailText"> {{ form.companyCode }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="客户简称：">
+                <span :title="form.nickName" class="bpoDetailText"> {{ form.nickName }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="客户类型：">
+                {{ clientTypeOptions[form.clientType] }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="联系人：">
+                {{ form.contacts }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系方式：">
+                {{ form.phone }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+        <fieldset v-if="form.orgId == 2">
+          <legend class="bpo-legend">供应商基本信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="供应商名称：">
+                {{ form.companyName }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="供应商编码：">
+                {{ form.companyCode }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="供应商简称：">
+                {{ form.nickName }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系人：">
+                {{ form.contacts }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+
+            <el-col :span="12">
+              <el-form-item label="联系方式：">
+                {{ form.phone }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+        <fieldset v-if="form.orgId == 3">
+          <legend class="bpo-legend">主体供应商信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="主体供应商名称：">
+                <span :title="form.companyName" class="bpoDetailText"> {{ form.companyName }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="主体供应商编码：">
+                {{ form.companyCode }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="主体供应商简称：">
+                {{ form.nickName }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="所属行业：">
+                {{ belongBusinessOptions[form.belongBusiness] }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="法人：">
+                {{ form.legalMan }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="社会信用统一代码：">
+                <span :title="form.creditCode" class="bpoDetailText"> {{ form.creditCode }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="联系人：">
+                {{ form.contacts }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系方式：">
+                {{ form.phone }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="成立时间：">
+                {{ form.foundTime }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="公司规模：">
+                {{ scaleOptions[form.scale] }}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="注册资本：">
+                {{ form.registerFund }}
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="经营范围：">
+                <span :title="form.manageScope" class="bpoDetailText"> {{ form.manageScope }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20" style="margin-bottom: 5px;" />
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="详细地址：">
+                <span :title="form.address" class="bpoDetailText"> {{ form.address }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12"><el-form-item label="是否启用：">
+              <span>{{ statusMap[form.status] }}</span>
+            </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="备注：">
+                <span :title="form.remark" class="bpoDetailText"> {{ form.remark }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="营业执照：">
+                <el-upload
+                  class="half"
+                  :action="uploadOrgURL"
+                  multiple
+                  :file-list="fileList"
+                >
+                  <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+                  <div slot="file" slot-scope="{file}" class="half" style="white-space: nowrap;">
+                    <span @click="handleDownload(file)">{{ file.name }}</span>
+                  </div>
+                </el-upload>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+
+      </el-form>
+    </cf-panel>
+  </div>
+</template>
+<script>
+import CfPanel from '@/components/Panel'
+import Rules from '../orgRules'
+import { insertItem, updateItem, findOrgType, getOrgDetail, downloadFileUrl, findBelongBusiness } from '@/api/orgnization'
+export default {
+  components: {
+    CfPanel
+  },
+  data() {
+    return {
+      primaryKey: this.$route.params.primaryKey,
+      entity: this.$route.params.entity,
+      readonly: this.$route.params.readonly,
+      pageTitle: '新增组织',
+      loading: null,
+      imgAddUrl: process.env.BASE_API + '/OrgManager/avatarUpload',
+      form: {
+        status: 1
+      },
+      statusMap: { '1': '启用', '2': '停用' },
+      orgOptions: [{ value: '0', label: '超级管理员' }, { value: '1', label: '甲方' }, { value: '2', label: '乙方' }, { value: '3', label: '供应商' }],
+      clientTypeOptions: { '1': '速运', '2': '快运', '3': '冷运', '4': '仓库' },
+      scaleOptions: { '1': '0-20', '2': '20-99', '3': '100-499', '4': '500-999', '5': '1000-9999', '6': '10000以上' },
+      belongBusinessOptions: {},
+      rules: Rules,
+
+      fileList: [],
+      uploadOrgURL: process.env.BASE_API + '/sysCompany/uploadFileUrl'
+
+    }
+  },
+  watch: {
+  },
+  created() {
+    this.findBelongBusiness()
+    this.getOrgType()
+  },
+  mounted() {
+    this.loadData()
+  },
+  methods: {
+    findBelongBusiness() {
+      findBelongBusiness().then(res => {
+        res.data.data.forEach(item => {
+          this.belongBusinessOptions[item.key] = item.value
+        })
+      })
+    },
+    handleDownload(file) {
+      downloadFileUrl({
+        url: file.url,
+        fileName: file.name
+      })
+    },
+    loadData() {
+      if (this.primaryKey) {
+        this.pageTitle = '组织详情'
+        this.listLoading = true
+        getOrgDetail().then(res => {
+          this.listLoading = false
+          this.form = res.data.data
+          this.fileList = this.form.businessUrl.map(item => ({
+            'name': item.fileName,
+            'url': item.fileUrl
+          }))
+        }).catch(() => {
+          this.listLoading = false
+          console.log('用户详情获取失败')
+        })
+      }
+    },
+    getOrgType() {
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    onEditSubmit() {
+      this.$refs['form'].validate(valid => {
+        if (valid) {
+          var opration = insertItem
+          if (this.primaryKey) {
+            opration = updateItem
+          }
+          opration(this.form).then(res => {
+            if (res.data.code === 20000) {
+              this.$notify({
+                title: '成功',
+                duration: '2000',
+                message: '操作成功！',
+                type: 'success'
+              })
+              this.backTo()
+            } else {
+              this.$notify({
+                title: '失败',
+                duration: '2000',
+                message: res.data.message,
+                type: 'error'
+              })
+            }
+            // eslint-disable-next-line handle-callback-err
+          }).catch(err => {
+            this.error()
+          })
+        } else {
+          this.$notify({
+            title: '失败',
+            duration: '2000',
+            message: '填写信息有误，请优化后再提交!',
+            type: 'warning'
+          })
+        }
+      })
+    },
+    backTo() {
+      this.$router.go(-1)
+    }
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .el-form-item{
+    margin-bottom: 0px;
+  }
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    min-width: 0;
+  }
+  fieldset{
+    legend{
+      border-top: none !important;
+      padding-top: 0px;
+    }
+  }
+  /deep/.el-upload-list{
+    margin-top: -35px;
+  }
+  .bpoDetailText{
+    word-break: break-word;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    display: block;
+  }
+</style>

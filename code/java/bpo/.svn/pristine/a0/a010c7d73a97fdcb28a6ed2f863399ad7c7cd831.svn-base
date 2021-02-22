@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaClassesFromExternalMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaClassesFromExternal">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+        <result column="class_name" property="className" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+        <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+        <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+        <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="class_type" property="classType" jdbcType="TINYINT"/>
+        <result column="contents" property="contents" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="MinaClassesShowMap" type="com.rz.iot.bpo.mina.model.show.MinaClassesShow">
+        <id column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <collection property="minaClassesFromExternals" ofType="com.rz.iot.bpo.mina.model.MinaClassesFromExternal">
+            <result column="id" property="id" jdbcType="INTEGER"/>
+            <result column="class_sn" property="classSn" jdbcType="VARCHAR"/>
+            <result column="class_name" property="className" jdbcType="VARCHAR"/>
+            <result column="start_date" property="startDate" jdbcType="DATE"/>
+            <result column="end_date" property="endDate" jdbcType="DATE"/>
+            <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+            <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+            <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP"/>
+            <result column="exclude_hour" property="excludeHour" jdbcType="INTEGER"/>
+            <result column="people_number" property="peopleNumber" jdbcType="INTEGER"/>
+            <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+            <result column="source" property="source" jdbcType="INTEGER"/>
+            <result column="schedule_status" property="scheduleStatus" jdbcType="TINYINT"/>
+            <result column="batch_id" property="batchId" jdbcType="INTEGER"/>
+            <result column="status" property="status" jdbcType="INTEGER"/>
+            <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+            <result column="class_type" property="classType" jdbcType="TINYINT"/>
+            <result column="contents" property="contents" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, class_sn, class_name, start_date, end_date, start_time, end_time, arrive_time,exclude_hour,
+        people_number, project_id, source, schedule_status, batch_id, status, create_time,
+        update_time, class_type, contents
+    </sql>
+
+    <sql id="Selective_Colume_List">
+        <trim prefix="" suffix="" suffixOverrides=",">
+
+            <if test="classSn != null">
+                class_sn,
+            </if>
+            <if test="className != null">
+                class_name,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="arriveTime != null">
+                arrive_time,
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour,
+            </if>
+            <if test="peopleNumber != null">
+                people_number,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status,
+            </if>
+            <if test="batchId != null">
+                batch_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="classType != null">
+                class_type,
+            </if>
+            <if test="contents != null">
+                contents,
+            </if>
+        </trim>
+    </sql>
+    <sql id="Selective_Colume_List_Value">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="classSn != null">
+                #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="className != null">
+                #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="batchId != null">
+                #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="classType != null">
+                #{classType,jdbcType=TINYINT},
+            </if>
+            <if test="contents != null">
+                #{contents,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </sql>
+    <sql id="Selective_Colume_List_Key_Value">
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="classSn != null">
+                class_sn = #{classSn,jdbcType=VARCHAR},
+            </if>
+            <if test="className != null">
+                class_name = #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=DATE},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="arriveTime != null">
+                arrive_time = #{arriveTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="excludeHour != null">
+                exclude_hour = #{excludeHour,jdbcType=INTEGER},
+            </if>
+            <if test="peopleNumber != null">
+                people_number = #{peopleNumber,jdbcType=INTEGER},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=INTEGER},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=INTEGER},
+            </if>
+            <if test="scheduleStatus != null">
+                schedule_status = #{scheduleStatus,jdbcType=TINYINT},
+            </if>
+            <if test="batchId != null">
+                batch_id = #{batchId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="classType != null">
+                class_type = #{classType,jdbcType=TINYINT},
+            </if>
+            <if test="contents != null">
+                contents = #{contents,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_classes_from_external
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByProjectId" resultMap="MinaClassesShowMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_classes_from_external
+        where project_id = #{projectId,jdbcType=INTEGER}
+        and status != ${@com.rz.iot.bpo.common.constant.DictDataConstants@DELETE_STATUS}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from bpo_classes_from_external
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.MinaClassesFromExternal">
+        insert into bpo_classes_from_external (<include refid="Selective_Colume_List"/>)
+        values (<include refid="Selective_Colume_List_Value"/>)
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaClassesFromExternal">
+        update bpo_classes_from_external
+        <set>
+            <include refid="Selective_Colume_List_Key_Value"/>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,57 @@
+import request from '@/utils/request'
+import qs from 'qs'
+export function uploadPic(data) {
+  return request({
+    url: '/sysUser/uploadPic',
+    method: 'post',
+    data
+  })
+}
+
+export function getUserList(params) {
+  return request({
+    url: '/sysUser/findAll',
+    method: 'post',
+    params: params
+  })
+}
+
+export function getUser(data) {
+  return request({
+    url: '/sysUser/detail',
+    method: 'post',
+    data: qs.stringify(data)
+  })
+}
+
+export function deleteUser(params) {
+  return request({
+    url: '/sysUser/delete',
+    method: 'get',
+    params
+  })
+}
+
+export function addUser(data) {
+  return request({
+    url: '/sysUser/insert',
+    method: 'post',
+    data
+  })
+}
+
+export function UpdateUser(data) {
+  return request({
+    url: '/sysUser/update',
+    method: 'post',
+    data
+  })
+}
+
+export function resetPassword(params) {
+  return request({
+    url: '/sysUser/resetPwd',
+    method: 'post',
+    params: params
+  })
+}

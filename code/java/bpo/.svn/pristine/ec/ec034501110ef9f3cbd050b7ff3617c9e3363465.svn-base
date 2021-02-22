@@ -1,0 +1,37 @@
+<template>
+  <div>
+    <CfPanel title="">
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="供应商管理" name="first">
+          <SupplierManage />
+        </el-tab-pane>
+        <el-tab-pane label="供应商考核" name="second">
+          <SupplierAssessment />
+        </el-tab-pane>
+      </el-tabs>
+    </CfPanel>
+  </div>
+</template>
+<script>
+import SupplierManage from './supplierList'
+import CfPanel from '@/components/Panel'
+import SupplierAssessment from '@/views/supplierManage/supplierAssessmentMgt/supplierAssessment'
+
+export default {
+  name: 'SupplierTabs',
+  components: { SupplierManage, CfPanel, SupplierAssessment },
+  data() {
+    return {
+      activeName: 'first'
+    }
+  },
+  methods: {
+    handleClick() {
+
+    }
+  }
+}
+</script>
+<style type="scss">
+
+</style>

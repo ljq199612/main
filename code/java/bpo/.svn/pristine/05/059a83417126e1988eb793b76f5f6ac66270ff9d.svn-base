@@ -1,0 +1,35 @@
+import Layout from '@/views/layout/Layout'
+import projectManageList from '@/views/projectManage/projectManageList'
+import projectManageDetail from '@/views/projectManage/projectManageDetail'
+import createProject from '@/views/projectManage/createProject'
+
+const projectManageRouter = {
+  path: '/project',
+  component: Layout,
+  // redirect: '/project/xxx',
+  name: 'projectManage',
+  meta: {
+    title: '项目管理',
+    icon: 'project',
+    childrenFilter: false
+  },
+  children: [
+    {
+      path: 'projectManageList',
+      component: projectManageList,
+      name: 'projectManageList',
+      meta: { title: '项目管理' }
+    },
+    {
+      path: 'projectManageDetail',
+      component: projectManageDetail,
+      name: 'projectManageDetail'
+    },
+    {
+      path: 'createProject',
+      component: createProject,
+      name: 'createProject'
+    }
+  ]
+}
+export default projectManageRouter

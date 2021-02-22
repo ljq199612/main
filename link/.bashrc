@@ -25,11 +25,16 @@
 #export PILOTPORT=/dev/pilot
 #export PILOTRATE=115200
 
+
 test -s ~/.alias && . ~/.alias || true
 
-export TESSDATA_PREFIX="/usr/share/tessdata"
-export PATH=$PATH:$TESSDATA_PREFIX
+stty -ixon
+xhost +
 
+
+
+
+###
 export PATH=/home/ljq/.local/bin:$PATH
 
 export JAVA_HOME=/home/ljq/opt/jdk8
@@ -37,9 +42,25 @@ export JRE_HOME=$JAVA_HOME/jre
 export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
 export PATH=$JAVA_HOME/bin:$PATH
 
-stty -ixon
-xhost +
 
+# oracle 客户端
+export ORACLE_HOME=/home/ljq/opt/oracle-client/18/
+export TNS_ADMIN=$ORACLE_HOME/network/admin
+export NLS_LANG=AMERICAN_AMERICA.ZHS16GBK
+export NLS_LANG=AMERICAN_AMERICA.AL32UTF8
+export LD_LIBRARY_PATH=$ORACLE_HOME
+export PATH=$ORACLE_HOME:$PATH
+
+
+# zookeeper
+export ZK_HOME=/home/ljq/opt/apache-zookeeper
+export PATH=$ZK_HOME/bin:$PATH
+alias  zookeeper-server='zkServer.sh'
+
+# nacos-service
+# 系统会生成 derby.log 文件和 logs/ work/ 目录，下面这样折腾，这几个文件会在 nacos 目录下创建
+alias  nacos-service.start='cd /home/ljq/opt/nacos/ && sh ./bin/startup.sh  -m standalone && cd'
+alias  nacos-service.stop='sh /home/ljq/opt/nacos/bin/shutdown.sh'
 
 # 
 alias cdd_='cd ~/public/gitRepo/io/Volume'

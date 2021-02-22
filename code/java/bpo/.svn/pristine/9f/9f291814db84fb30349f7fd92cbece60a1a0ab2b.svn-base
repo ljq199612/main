@@ -1,0 +1,385 @@
+<template>
+  <div>
+    <cf-panel :title="pageTitle" :back-to="backTo" class="orgInfo">
+      <el-form
+        ref="form"
+        :model="form"
+        :rules="rules"
+        label-width="180px"
+        class="bpoForm"
+        :disabled="readonly"
+      >
+        <el-row :gutter="20" />
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="组织类型：">
+              <el-select v-model="form.orgType" class="half" @change="orgOptionChange">
+                <el-option v-for="(item, index) in orgOptions" :key="index" :value="item.id" :label="item.orgName" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否启用：" prop="status">
+              <el-radio-group v-model="form.status">
+                <el-radio :label="1">启用</el-radio>
+                <el-radio :label="2">禁用</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <fieldset v-if="form.orgType == 1">
+          <legend class="bpo-legend">客户基本信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="客户名称：" prop="companyName">
+                <el-input v-model="form.companyName" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="客户编码：" prop="companyCode">
+                <el-input v-model="form.companyCode" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="客户简称：">
+                <el-input v-model="form.nickName" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="客户类型：" prop="clientType">
+                <el-select v-model="form.clientType" class="half">
+                  <el-option v-for="(item, index) in clientTypeOptions" :key="index" :value="item.value" :label="item.label" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="联系人：" prop="contacts">
+                <el-input v-model="form.contacts" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系方式：" prop="phone">
+                <el-input v-model="form.phone" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+        <fieldset v-if="form.orgType == 2">
+          <legend class="bpo-legend">供应商基本信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="供应商名称：" prop="companyName">
+                <el-input v-model="form.companyName" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="供应商编码：" prop="companyCode">
+                <el-input v-model="form.companyCode" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="供应商简称：">
+                <el-input v-model="form.nickName" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系人：" prop="contacts">
+                <el-input v-model="form.contacts" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+
+            <el-col :span="12">
+              <el-form-item label="联系方式：" prop="phone">
+                <el-input v-model="form.phone" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+        <fieldset v-if="form.orgType == 3">
+          <legend class="bpo-legend">主体供应商信息</legend>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="主体供应商名称：" prop="companyName">
+                <el-input v-model="form.companyName" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="主体供应商编码：" prop="companyCode">
+                <el-input v-model="form.companyCode" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="主体供应商简称：">
+                <el-input v-model="form.nickName" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="所属行业：" prop="belongBusiness">
+                <el-select v-model="form.belongBusiness" class="half">
+                  <el-option v-for="(item, index) in belongBusinessOptions" :key="index" :value="item.key" :label="item.value" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="法人：" prop="legalMan">
+                <el-input v-model="form.legalMan" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="社会信用统一代码：" prop="creditCode">
+                <el-input v-model="form.creditCode" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="联系人：" prop="contacts">
+                <el-input v-model="form.contacts" maxlength="200" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="联系方式：" prop="phone">
+                <el-input v-model="form.phone" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="成立时间：">
+                <el-date-picker v-model="form.foundTime" format="yyyy-MM-dd" value-format="yyyy-MM-dd HH:mm:ss" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="公司规模：">
+                <el-select v-model="form.scale" class="half">
+                  <el-option v-for="(item, index) in scaleOptions" :key="index" :value="item.value" :label="item.label" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="注册资本：">
+                <el-input v-model="form.registerFund" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="经营范围：">
+                <el-input v-model="form.manageScope" maxlength="200" class="half" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20" style="margin-bottom: 5px;" />
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="详细地址：">
+                <el-input v-model="form.address" class="half" style="width: calc(85% + 27px);" />
+              </el-form-item>
+            </el-col>
+
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="备注：">
+                <el-input v-model="form.remark" type="textarea" class="half" :rows="5" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="营业执照：">
+                <el-upload
+                  class="half"
+                  :action="uploadOrgURL"
+                  :on-preview="handlePreview"
+                  :on-remove="handleRemove"
+                  :before-remove="beforeRemove"
+                  multiple
+                  :on-success="handleSuccess"
+                  :on-exceed="handleExceed"
+                  :file-list="fileList"
+                >
+                  <el-button icon="el-icon-paperclip" type="text" style="color:#333333;">添加附件</el-button>
+                  <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+                  <!--<div slot="file" slot-scope="{file}" class="half" style="white-space: nowrap;">
+                    <span @click="handleDownload(file)">{{ file.name }}</span>
+                    <span class="el-upload-list__item-actions">
+                      <el-button type="text" style="color: #F52222;" @click="handleDownload(file)">删除</el-button>
+                    </span>
+                  </div>-->
+                </el-upload>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </fieldset>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item class="bpoButtonGroup">
+              <el-button type="primary" size="medium" @click="submit('form')">提交</el-button>
+              <el-button size="medium" @click="backTo">关闭</el-button>
+            </el-form-item>
+          </el-col>
+
+        </el-row>
+      </el-form>
+    </cf-panel>
+  </div>
+</template>
+<script>
+import CfPanel from '@/components/Panel'
+import Rules from '../orgRules'
+import { insertItem, updateItem, findOrgType, findBelongBusiness, getOrgDetail, deleteFileUrl } from '@/api/orgnization'
+import Vue from 'vue'
+
+export default {
+  components: {
+    CfPanel
+  },
+  data() {
+    return {
+      primaryKey: this.$route.params.primaryKey,
+      entity: this.$route.params.entity,
+      readonly: this.$route.params.readonly,
+      pageTitle: '新增组织',
+      loading: null,
+      form: {
+        status: 1
+      },
+      orgOptions: [],
+      belongBusinessOptions: [],
+      clientTypeOptions: [{ value: '1', label: '速运' }, { value: '2', label: '快运' }, { value: '3', label: '冷运' }, { value: '4', label: '仓库' }],
+      scaleOptions: [{ value: '1', label: '0-20' }, { value: '2', label: '20-99' }, { value: '3', label: '100-499' }, { value: '4', label: '500-999' }, { value: '5', label: '1000-9999' }, { value: '6', label: '10000以上' }],
+      rules: Rules,
+
+      uploadOrgURL: process.env.BASE_API + '/sysCompany/uploadFileUrl',
+      fileList: []
+    }
+  },
+  watch: {
+  },
+  created() {
+    this.getOrgType()
+    this.findBelongBusiness()
+  },
+  mounted() {
+    this.loadData()
+  },
+  methods: {
+    orgOptionChange(val) {
+      Vue.set(this.form, 'orgId', val)
+      this.$refs['form'].clearValidate()
+    },
+    findBelongBusiness() {
+      findBelongBusiness().then(res => {
+        this.belongBusinessOptions = res.data.data
+      })
+    },
+    handleSuccess(response, file, fileList) {
+      this.fileList = fileList
+      this.form.businessUrl = fileList.map(item => (item.response.data[0]))
+    },
+    handleExceed() {},
+    handlePreview() {},
+    handleRemove(file) {
+      deleteFileUrl({ 'url': file.url })
+    },
+    beforeRemove() {},
+    loadData() {
+      if (this.primaryKey) {
+        this.pageTitle = '组织详情'
+        this.listLoading = true
+        getOrgDetail().then(res => {
+          this.listLoading = false
+          this.form = res.data.data
+          this.fileList = this.form.businessUrl.map(item => ({
+            'name': item.fileName,
+            'url': item.fileUrl
+          }))
+        }).catch(() => {
+          this.listLoading = false
+          console.log('用户详情获取失败')
+        })
+      }
+    },
+    getOrgType() {
+      findOrgType().then(res => {
+        this.orgOptions = res.data.data
+        this.form.orgType = 1
+        // eslint-disable-next-line handle-callback-err
+      }).catch(err => {
+      })
+    },
+    submit() {
+      this.$refs['form'].validate(valid => {
+        if (valid) {
+          var opration = insertItem
+          if (this.primaryKey) {
+            opration = updateItem
+          }
+          opration(this.form).then(res => {
+            if (res.data.code === 20000) {
+              this.$notify({
+                title: '成功',
+                duration: '2000',
+                message: '操作成功！',
+                type: 'success'
+              })
+              this.backTo()
+            } else {
+              this.$notify({
+                title: '失败',
+                duration: '2000',
+                message: res.data.message,
+                type: 'error'
+              })
+            }
+            // eslint-disable-next-line handle-callback-err
+          }).catch(err => {
+            this.error()
+          })
+        } else {
+          this.$notify({
+            title: '失败',
+            duration: '2000',
+            message: '填写信息有误，请优化后再提交!',
+            type: 'warning'
+          })
+        }
+      })
+    },
+    backTo() {
+      this.$router.push({
+        name: 'orgList'
+      })
+    }
+  }
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .orgInfo{
+    fieldset {
+      padding: 0;
+      margin: 0;
+      border: 0;
+      min-width: 0;
+    }
+    fieldset:first-child{
+      legend{
+        border-top: none;
+        padding-top: 0px;
+      }
+    }
+  }
+
+</style>

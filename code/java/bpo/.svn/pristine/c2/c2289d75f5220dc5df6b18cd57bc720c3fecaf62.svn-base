@@ -1,0 +1,24 @@
+package com.rz.iot.bpo.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.BpoPublicParam;
+
+public interface BpoPublicService {
+
+    Result<BpoPublicParam> getProject(BaseEntity entity);
+
+    Result<BpoPublicParam> getTransferStation(BaseEntity entity);
+
+    Result<BpoPublicParam> getCustomer(BaseEntity entity);
+
+    Result<BpoPublicParam> getSupplier(BaseEntity entity);
+
+    Result<BpoPublicParam> getProjectDown(BaseEntity entity);
+
+    Result<BpoPublicParam> getTransferStationDown(BaseEntity entity);
+
+    Result<BpoPublicParam> getCustomerDown(BaseEntity entity);
+
+    Result<BpoPublicParam> getSupplierDown(BaseEntity entity);
+}

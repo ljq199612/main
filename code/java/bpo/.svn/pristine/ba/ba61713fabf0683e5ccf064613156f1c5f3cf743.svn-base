@@ -1,0 +1,54 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.BpoBillSupplierDayMapper;
+import com.rz.iot.bpo.mapper.BpoBillTimeMapper;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillDayShow;
+import com.rz.iot.bpo.service.BpoBillReceivableService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * @program: bpo-preview
+ * @description: 财务管理 应收
+ * @author: YangShun
+ * @create: 2020-07-29 11:19
+ **/
+@Service
+public class BpoBillReceivableServiceImpl implements BpoBillReceivableService {
+
+    @Resource
+    private BpoBillSupplierDayMapper supplierDayMapper;
+
+    @Resource
+    private BpoBillTimeMapper billTimeMapper;
+
+    @Override
+    public Result findAllMonth(BaseEntity entity,BillSelectParam param) {
+        return null;
+    }
+
+    @Override
+    public Result finaAllDay(BaseEntity entity,BillSelectParam param) {
+        List<BpoBillDayShow> bpoBillDayShows = supplierDayMapper.selectAllDayAccount (entity,param);
+        Result<List<BpoBillDayShow>> result = new Result<> (ResultConstants.REQUEST_SUCCESS);
+        result.setData (bpoBillDayShows);
+        return result;
+    }
+
+    /**
+     * 根据供应商id和时间，获取此供应商下的员工账单记录
+     * @param id
+     * @param time
+     * @return
+     */
+    @Override
+    public Result findDetailDays(Integer id,String time) {
+        return null;
+    }
+}

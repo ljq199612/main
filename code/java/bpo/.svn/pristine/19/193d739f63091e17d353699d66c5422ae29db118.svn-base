@@ -1,0 +1,93 @@
+export default {
+  data() {
+    return {
+      dialogVisible: false,
+      formRules: {
+        index: { required: true, message: '请选择规则名称', trigger: 'blur' },
+        modelId: { required: true, message: '请选择工作工作模块', trigger: 'blur' },
+        groupId: { required: true, message: '请选择工作小组', trigger: 'blur' },
+        processId: { required: true, message: '请选择工序', trigger: 'blur' }
+      }
+    }
+  },
+  props: {
+    ruleNameList: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    list: {
+      type: Array,
+      default() {
+        return []
+      }
+    }
+  },
+  computed: {
+    ruleNameOptions() {
+      return this.ruleNameList
+    },
+    table() {
+      const { index } = this.dialogForm
+      if (index === '') {
+        return []
+      }
+      return this.list[index].table
+    },
+    modelOptions() {
+      return this.createArr(this.table, 'modelId', 'modelName')
+    },
+    groupOptions() {
+      return this.createArr(this.table, 'groupId', 'groupName')
+    },
+    processOptions() {
+      return this.createArr(this.table, 'processId', 'processName')
+    },
+    productOptions() {
+      return this.createArr(this.table, 'productId', 'productName')
+    }
+  },
+  methods: {
+    createArr(table, id, name) {
+      const arr = []
+      const keyMap = {}
+      table.forEach((item) => {
+        if (!keyMap[item[id]]) {
+          keyMap[item[id]] = item[id]
+          arr.push({
+            [name]: item[name],
+            [id]: item[id]
+          })
+        }
+      })
+      return arr
+    },
+    confirmAddForm() {
+      this.$refs.dialogForm.validate((valid) => {
+        if (valid) {
+          this.$emit('comfirm', {
+            ...this.dialogForm
+          })
+          setTimeout(() => {
+            this.clearAddForm()
+          })
+        }
+      })
+    },
+    cancelAddForm() {
+      this.clearAddForm()
+    },
+    // 重置新增表单
+    clearAddForm() {
+      this.dialogVisible = false
+      Object.keys(this.dialogForm).forEach(key => {
+        this.$set(this.dialogForm, key, '')
+      })
+      this.$refs.dialogForm.resetFields()
+    },
+    show() {
+      this.dialogVisible = true
+    }
+  }
+}

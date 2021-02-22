@@ -1,0 +1,30 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillTime;
+import com.rz.iot.bpo.model.param.BillSelectPersonParam;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillTimeShow;
+import com.rz.iot.bpo.model.show.BpoBillPayablePersonShow;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface BpoBillTimeMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoBillTime record);
+
+    int insertSelective(BpoBillTime record);
+
+    BpoBillTime selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoBillTime record);
+
+    int updateByPrimaryKey(BpoBillTime record);
+
+    int getPeopleCount(@Param("date") String date, @Param("projectId") Integer projectId, @Param("payeeId") Integer peyeeId);
+
+    //根据供应商id和时间，获取此供应商下的员工账单记录
+    List<BpoBillTimeShow> selectByIdAndTime(Integer companyId,Integer projectId,String time);
+
+    List<BpoBillPayablePersonShow> findAllBillPerson(BillSelectPersonParam select);
+}

@@ -1,0 +1,104 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.mapper.BpoOutputDetailEmployeeMapper;
+import com.rz.iot.bpo.mapper.BpoOutputDetailMapper;
+import com.rz.iot.bpo.mapper.BpoOutputMapper;
+import com.rz.iot.bpo.model.BpoOutput;
+import com.rz.iot.bpo.model.BpoOutputDetail;
+import com.rz.iot.bpo.model.BpoOutputDetailEmployee;
+import com.rz.iot.bpo.model.param.BpoOutputEmployeeParam;
+import com.rz.iot.bpo.model.param.BpoOutputParam;
+import com.rz.iot.bpo.model.show.BpoOutput.BpoOutputDetailEmployeeShow;
+import com.rz.iot.bpo.model.show.BpoOutput.BpoOutputDetailShow;
+import com.rz.iot.bpo.model.show.BpoOutput.BpoOutputShow;
+import com.rz.iot.bpo.model.show.ProjectConfigListShow;
+import com.rz.iot.bpo.service.BpoOutputService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class BpoOutputServiceImpl implements BpoOutputService {
+
+    @Resource
+    private BpoOutputMapper outputMapper;
+
+    @Resource
+    private BpoOutputDetailMapper outputDetailMapper;
+
+    @Resource
+    private BpoOutputDetailEmployeeMapper outputDetailEmployeeMapper;
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void add(BpoOutputParam outputParam) {
+        int outputId = addOutput(outputParam);
+        addOutputDetail(outputParam,outputId);
+    }
+
+    @Override
+    public List<BpoOutputShow> getOutputList(Map<String, Object> params) {
+        List<BpoOutputShow> outputShow = outputMapper.getOutputList(params);
+        return outputShow;
+    }
+
+    @Override
+    public List<BpoOutputDetailShow> getOutputDetail(Integer id) {
+        List<BpoOutputDetailShow> outputDetailShow = outputDetailMapper.selectDetailByOutputId(id);
+        return outputDetailShow;
+    }
+
+    @Override
+    public void toEmployeeOutput(List<BpoOutputEmployeeParam> outputEmployeeParamList) {
+        for (BpoOutputEmployeeParam param : outputEmployeeParamList) {
+            for (BpoOutputDetailEmployee outputDetailEmployee: param.getOutputDetailEmployeeList()) {
+                BpoOutputDetailEmployee record = new BpoOutputDetailEmployee();
+                record.setOutputDetailId(param.getOutputDetailId());
+                record.setPersonId(outputDetailEmployee.getPersonId());
+                record.setOutput(outputDetailEmployee.getOutput());
+                record.setPrice(outputDetailEmployee.getPrice());
+                record.setTotalProductiveHours(outputDetailEmployee.getTotalProductiveHours());
+                outputDetailEmployeeMapper.insertSelective(record);
+            }
+        }
+    }
+
+    @Override
+    public List<BpoOutputDetailEmployeeShow> getEmployeeDetailList(Map<String, Object> params) {
+        List<BpoOutputDetailEmployeeShow> list = outputDetailEmployeeMapper.getEmployeeDetailList(params);
+        return list;
+    }
+
+    private int addOutput(BpoOutputParam outputParam) {
+        BpoOutput output = new BpoOutput();
+        output.setTransferStationId(outputParam.getTransferStationId());
+        output.setProjectId(outputParam.getProjectId());
+        output.setType(outputParam.getType());
+        if (outputParam.getType().equals(DictDataConstants.OUTPUT_SUPPLIER)) {
+            output.setSupplierId(outputParam.getSupplierId());
+        }
+        output.setPeriodStartTime(outputParam.getPeriodStartTime());
+        output.setPeriodEndTime(outputParam.getPeriodEndTime());
+        outputMapper.insertSelective(output);
+        return output.getId();
+    }
+
+    private void addOutputDetail(BpoOutputParam outputParam,Integer outputId) {
+        for (ProjectConfigListShow configShow : outputParam.getConfigListShows()) {
+            BpoOutputDetail outputDetail = new BpoOutputDetail();
+            outputDetail.setOutputId(outputId);
+            outputDetail.setWorkModelId(configShow.getWorkModelId());
+            outputDetail.setWorkGroupId(configShow.getWorkGroupId());
+            outputDetail.setProcessId(configShow.getProcessId());
+            outputDetail.setProductId(configShow.getProductId());
+            outputDetail.setProductPriceId(configShow.getProductPriceId());
+            outputDetail.setOutput(configShow.getOutput());
+            outputDetailMapper.insertSelective(outputDetail);
+        }
+
+    }
+}

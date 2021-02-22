@@ -1,0 +1,34 @@
+package com.rz.iot.bpo.mina.service;
+
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.model.MinaAbnormal;
+import com.rz.iot.bpo.mina.model.show.MinaAbnormalShow;
+import com.rz.iot.bpo.model.BpoPerson;
+import com.rz.iot.bpo.model.BpoProject;
+import com.rz.iot.bpo.model.BpoTransferStation;
+import com.rz.iot.bpo.model.SysCompany;
+
+import java.util.List;
+
+/**
+ * @program: bpo-preview
+ * @description: 异常上报
+ * @author: YangShun
+ * @create: 2020-07-22 11:15
+ **/
+public interface MinaAbnormalService {
+    List<MinaAbnormalShow> findAll(BaseEntity entity);
+
+    Result<MinaAbnormal> getDetail(Integer id);
+
+    Result<List<BpoProject>> getProject(BaseEntity entity);
+
+    Result<List<BpoTransferStation>> getTransfer(BaseEntity entity);
+
+    Result<List<SysCompany>> getSupplier(BaseEntity entity);
+
+    Result insertAbnormal(MinaAbnormal abnormal);
+
+    Result<List<BpoPerson>> getPerson(Integer projectId);
+}

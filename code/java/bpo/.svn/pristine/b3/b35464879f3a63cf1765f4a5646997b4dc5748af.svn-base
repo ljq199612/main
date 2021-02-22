@@ -1,0 +1,129 @@
+import request from '@/utils/request'
+
+// 供应商-计费规则（列表）
+export function ruleList(data) {
+  return request({
+    url: '/supplier/ruleList',
+    method: 'post',
+    data
+  })
+}
+
+// 供应商-计费规则-详情-计件
+export function ruleDetail(data) {
+  return request({
+    url: '/supplier/ruleDetail',
+    method: 'post',
+    data
+  })
+}
+// 新增计费规则
+export function addFeeRule(data) {
+  return request({
+    url: '/supplier/addFeeRule',
+    method: 'post',
+    data
+  })
+}
+// 获取新增供应商计费规则前置数据
+export function getInfoForAddFeeRule(query) {
+  return request({
+    url: '/supplier/getInfoForAddFeeRule',
+    method: 'get',
+    params: query
+  })
+}
+// 新增计费规则
+export function deleteProductPrice(data) {
+  return request({
+    url: '/supplier/deleteProductPrice',
+    method: 'post',
+    data
+  })
+}
+
+// 供应商考核模块
+// 条件查询（支持模糊查询）
+export function queryList(query) {
+  return request({
+    url: '/supplierEvaluation/getResultList',
+    method: 'get',
+    params: query
+  })
+}
+
+// 场地
+export function findAllInDepByLoginUserId() {
+  return request({
+    url: '/transferStation/findAllInDepByLoginUserId ',
+    method: 'get'
+  })
+}
+
+// 供应商列表
+export function getSupplierList(params) {
+  return request({
+    url: '/supplier/list',
+    method: 'get',
+    params: params
+  })
+}
+
+// 查询供应商下合同
+export function getBySupplierOrgId(params) {
+  return request({
+    url: '/contractInfo/getBySupplierOrgId',
+    method: 'get',
+    params: params
+  })
+}
+
+// 下载合同附件
+export function downloadContract(params) {
+  return request({
+    url: '/contractInfo/downloadFile',
+    method: 'get',
+    params: params
+  })
+}
+
+// 获取项目考核标准
+export function getAssessmentDetail(params) {
+  return request({
+    url: '/supplierEvaluation/getDetail',
+    method: 'get',
+    params: params
+  })
+}
+// 获取项目考核标准等级
+export function getLevel(params) {
+  return request({
+    url: '/supplierEvaluation/getLevel',
+    method: 'get',
+    params: params
+  })
+}
+// 获取考核项
+export function getEvaluationDetail(params) {
+  return request({
+    url: '/supplierEvaluation/getEvaluationDetail',
+    method: 'get',
+    params: params
+  })
+}
+// 获取考核结果
+export function getResult(params) {
+  return request({
+    url: '/supplierEvaluation/getResult',
+    method: 'get',
+    params: params
+  })
+}
+// 获取供应商与项目合同
+export function getbySupplierInfoId(params) {
+  return request({
+    url: '/contractInfo/getbySupplierInfoId',
+    method: 'get',
+    params: params
+  })
+}

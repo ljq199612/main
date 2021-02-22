@@ -1,0 +1,100 @@
+import request from '@/utils/request'
+
+// 获取全部的省
+export function getAllProvince(query) {
+  return request({
+    url: '/province/getAllProvince',
+    method: 'get',
+    params: query
+  })
+}
+// 根据省code获取市
+export function getCity(query) {
+  return request({
+    url: '/province/getCity',
+    method: 'get',
+    params: query
+  })
+}
+// 根据省code获取市列表
+export function getDistrict(query) {
+  return request({
+    url: '/province/getDistrict',
+    method: 'get',
+    params: query
+  })
+}
+
+// 获取全部的关联省
+export function getRelProvinces(query) {
+  return request({
+    url: '/province/getRelProvinces',
+    method: 'get',
+    params: query
+  })
+}
+// 根据省code获取关联市
+export function getRelCityByPCode(query) {
+  return request({
+    url: '/province/getRelCityByPCode',
+    method: 'get',
+    params: query
+  })
+}
+// 根据省code获取关联市列表
+export function getRelDisByCCode(query) {
+  return request({
+    url: '/province/getRelDisByCCode',
+    method: 'get',
+    params: query
+  })
+}
+// 获取场地类型列表
+export function findStationType(query) {
+  return request({
+    url: '/transferStation/findStationType',
+    method: 'get',
+    params: query
+  })
+}
+// 查询所有场地-分页
+export function findAll(query) {
+  return request({
+    url: '/transferStation/findAll',
+    method: 'get',
+    params: query
+  })
+}
+// 删除场地
+export function deleteField(query) {
+  return request({
+    url: '/transferStation/delete',
+    method: 'get',
+    params: query
+  })
+}
+// 新增场地
+export function insert(query) {
+  return request({
+    url: '/transferStation/insert',
+    method: 'get',
+    params: query
+  })
+}
+// 场地详情
+export function findDetail(query) {
+  return request({
+    url: '/transferStation/findDetail',
+    method: 'get',
+    params: query
+  })
+}
+// 更新场地
+export function update(query) {
+  return request({
+    url: '/transferStation/update',
+    method: 'get',
+    params: query
+  })
+}
+

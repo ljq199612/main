@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaSupplierMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoSupplierInfo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="org_id" property="orgId" jdbcType="INTEGER"/>
+        <result column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="contract_id" property="contractId" jdbcType="INTEGER"/>
+        <result column="parent_id" property="parentId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_agency_salary" property="isAgencySalary" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, org_id, project_id, contract_id, parent_id, status, is_agency_salary, create_time,
+    update_time
+    </sql>
+
+    <resultMap id="listMap" type="com.rz.iot.bpo.mina.model.show.MinaSupplierListShow">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+        <result column="company_code" property="companyCode" jdbcType="VARCHAR" />
+        <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+        <result column="org_type" property="orgType" jdbcType="INTEGER" />
+
+        <result column="project_id" property="projectId" jdbcType="INTEGER" />
+        <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+        <result column="fee_rule_type" property="feeRuleType" />
+        <result column="transfer_station_id" property="transferStationId" jdbcType="INTEGER" />
+        <result column="transfer_station_name" property="transferStationName" jdbcType="VARCHAR" />
+        <result column="transfer_station_name" property="transferStationName" jdbcType="VARCHAR" />
+        <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER" />
+
+        <result column="start_time" property="contractStartTime" />
+        <result column="end_time" property="contractEndTime" />
+
+        <association property="bpoSupplier" javaType="com.rz.iot.bpo.model.BpoSupplier">
+            <id column="supplier_id" property="id" jdbcType="INTEGER" />
+            <result column="company_id" property="companyId" jdbcType="INTEGER" />
+            <result column="company_create_time" property="companyCreateTime" jdbcType="TIMESTAMP" />
+            <result column="company_size" property="companySize" jdbcType="VARCHAR" />
+            <result column="industry" property="industry" jdbcType="VARCHAR" />
+            <result column="supplier_dept_id" property="supplierDeptId" jdbcType="INTEGER" />
+        </association>
+        <collection property="sysCompanyFile" ofType="com.rz.iot.bpo.model.SysCompanyFile">
+            <result column="file_id" property="id" jdbcType="INTEGER" />
+            <result column="company_id" property="companyId" jdbcType="INTEGER" />
+            <result column="file_url" property="fileUrl" jdbcType="VARCHAR" />
+            <result column="user_id" property="userId" jdbcType="INTEGER" />
+            <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <select id="list" resultMap="listMap">
+        SELECT
+        company.*,
+        supplier.id AS supplier_id,
+        supplier.company_create_time,
+        supplier.company_size,
+        contract.start_time,
+        contract.end_time,
+        supplier.industry,
+        supplier.supplier_dept_id,
+        supplier_info.id AS supplier_info_id,
+        project.id AS project_id,
+        project.project_name ,
+        project.project_sn,
+        project.fee_rule_type,
+        transfer_station.id AS transfer_station_id,
+        transfer_station.`name` AS transfer_station_name,
+        file.id AS file_id,
+        file.file_url,
+        file.user_id,
+        file.file_name
+        FROM
+        sys_company company
+        LEFT JOIN sys_dept_sub_rel dept_sub_rel ON dept_sub_rel.sub_id = company.id
+        AND dept_sub_rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_SUPPLIER}
+        AND dept_sub_rel.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_supplier supplier ON supplier.company_id = company.id
+        AND supplier.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_supplier_info supplier_info ON supplier_info.org_id = company.id
+        AND supplier_info.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_project project ON project.id = supplier_info.project_id
+        AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_transfer_station transfer_station ON transfer_station.id = project.transfer_station_id
+        AND transfer_station.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_company_file file ON file.company_id = company.id
+        AND file.`status`=${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_contract_info contract on contract.id = supplier_info.contract_id
+        AND contract.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        WHERE
+        company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_PROVIDER}
+        <if test="info !=null and info !=''">
+            <if test="info.companyName!=null and info.companyName !=''">
+                AND company.company_name like concat('%',#{info.companyName},'%')
+            </if>
+            <if test="info.projectName!=null and info.projectName !=''">
+                AND project.project_name like concat('%',#{info.projectName},'%')
+            </if>
+            <if test="info.transferStationName !=null and info.transferStationName !=''">
+                AND transfer_station.name  like concat('%',#{info.transferStationName},'%')
+            </if>
+            <if test="info.bpoSupplier !=null and info.bpoSupplier !=''">
+                <if test="info.bpoSupplier.supplierDeptId!=null and info.bpoSupplier.supplierDeptId !=''">
+                    AND supplier.supplier_dept_id = #{info.bpoSupplier.supplierDeptId}
+                </if>
+            </if>
+        </if>
+    </select>
+
+    <resultMap id="MinaSupplierSimpleListMap" type="com.rz.iot.bpo.mina.model.show.MinaSupplierSimpleList">
+        <id column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <result column="company_id" property="companyId" jdbcType="INTEGER"/>
+        <result column="company_name" property="companyName" jdbcType="VARCHAR"/>
+        <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER"/>
+        <result column="contract_id" property="contractId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getSupplierListByPorjectId" resultMap="MinaSupplierSimpleListMap">
+        SELECT
+        supplier_info.project_id,
+        project.project_name,
+        company.id AS company_id,
+        company.company_name,
+        supplier_info.id AS supplier_info_id,
+        supplier_info.contract_id
+        FROM
+        bpo_supplier_info supplier_info
+        LEFT JOIN bpo_project project ON project.id = supplier_info.project_id
+        AND project.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        INNER JOIN sys_company company ON company.id = supplier_info.org_id
+        AND company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_PROVIDER}
+        WHERE
+        supplier_info.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND project.id = #{projectId}
+    </select>
+
+    <resultMap id="detailMap" type="com.rz.iot.bpo.model.show.SupplierDetailShow">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+        <result column="company_code" property="companyCode" jdbcType="VARCHAR" />
+        <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+        <result column="org_type" property="orgType" jdbcType="INTEGER" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+
+        <result column="company_create_time" property="companyCreateTime" jdbcType="TIMESTAMP" />
+        <result column="company_size" property="companySize" jdbcType="VARCHAR" />
+        <result column="industry" property="industry" jdbcType="VARCHAR" />
+        <result column="supplier_dept_id" property="supplierDeptId" jdbcType="INTEGER" />
+        <result column="credit_code" property="creditCode"/>
+        <result column="address" property="address"/>
+
+        <result column="jia_uscc" property="jiaCreditCode"/>
+        <result column="yi_uscc" property="yiCreditCode"/>
+
+        <collection property="filePath" ofType="com.rz.iot.bpo.model.SysCompanyFile">
+            <result column="file_url" property="fileUrl" jdbcType="VARCHAR" />
+            <result column="user_id" property="userId" jdbcType="INTEGER" />
+            <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+        </collection>
+
+<!--        private String jiaCreditCode;-->
+
+<!--        @ApiModelProperty(value = "乙方统一社会信用代码", example = "HY-ZM")-->
+<!--        private String yiCreditCode;-->
+
+        <collection property="MinaContractInfoList" ofType="com.rz.iot.bpo.mina.model.MinaContractInfo">
+            <result column="is_agency_salary" property="agencySalary"/>
+            <result column="project_name" property="projectName"/>
+            <result column="name" property="tranStation"/>
+            <result column="fee_rule_type" property="ruleType"/>
+            <result column="start_time" property="startTime"/>
+            <result column="end_time" property="endTime"/>
+
+        </collection>
+
+    </resultMap>
+
+    <select id="detail" resultMap="detailMap">
+        SELECT
+        company.*,
+        supplier.*,
+        file.* ,
+        supplier_info.is_agency_salary,
+        project.project_name,
+        transStation.`name`,
+        project.fee_rule_type,
+        contract_info.start_time,
+        contract_info.end_time,
+        contract_info.jia_uscc,
+        contract_info.yi_uscc,
+        supplier.address as address,
+        supplier.credit_code as credit_code
+        FROM
+        sys_company company
+        LEFT JOIN bpo_supplier supplier ON supplier.company_id = company.id
+        AND supplier.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_supplier_info supplier_info on supplier_info.org_id = company.id
+        LEFT JOIN bpo_project project ON project.id = supplier_info.project_id
+        LEFT JOIN bpo_transfer_station transStation on transStation.id = project.transfer_station_id
+        LEFT JOIN bpo_contract_info contract_info on contract_info.id = supplier_info.contract_id
+        LEFT JOIN sys_company_file file ON file.company_id = company.id
+        AND file.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        WHERE
+        company.`status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        AND company.org_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_ORG_PROVIDER}
+        AND company.id = #{id}
+
+    </select>
+
+    <resultMap id="BpoSupplierListRelatedShowMap" type="com.rz.iot.bpo.model.show.BpoSupplierListRelatedShow">
+        <id column="project_id" property="projectId" jdbcType="INTEGER"/>
+        <collection property="firstLevelSupplierParamList" ofType="com.rz.iot.bpo.model.show.FirstLevelSupplierShow">
+            <result column="first_id" property="id" jdbcType="INTEGER"/>
+            <result column="first_company_name" property="companyName" jdbcType="VARCHAR"/>
+            <result column="first_company_code" property="companyCode" jdbcType="VARCHAR"/>
+            <result column="first_contacts" property="contacts" jdbcType="VARCHAR"/>
+            <result column="first_phone" property="phone" jdbcType="VARCHAR"/>
+            <result column="first_org_type" property="orgType" jdbcType="VARCHAR"/>
+            <result column="first_status" property="status" jdbcType="INTEGER"/>
+            <result column="first_create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="first_update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+            <result column="first_contract_id" property="contractId" jdbcType="INTEGER"/>
+            <result column="first_contract_name" property="contractName" jdbcType="VARCHAR"/>
+            <collection property="secondLevelSupplierShows" ofType="com.rz.iot.bpo.model.show.SecondLevelSupplierShow">
+                <result column="second_id" property="id" jdbcType="INTEGER"/>
+                <result column="second_company_name" property="companyName" jdbcType="VARCHAR"/>
+                <result column="second_company_code" property="companyCode" jdbcType="VARCHAR"/>
+                <result column="second_contacts" property="contacts" jdbcType="VARCHAR"/>
+                <result column="second_org_type" property="orgType" jdbcType="VARCHAR"/>
+                <result column="second_status" property="status" jdbcType="INTEGER"/>
+                <result column="second_create_time" property="createTime" jdbcType="TIMESTAMP"/>
+                <result column="second_update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+                <result column="second_contract_id" property="contractId" jdbcType="INTEGER"/>
+                <result column="second_contract_name" property="contractName" jdbcType="VARCHAR"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="findSupplierByProjectId" resultMap="BpoSupplierListRelatedShowMap">
+        SELECT supplier.project_id,
+        c1.id           first_id,
+        c1.company_name first_company_name,
+        c1.company_code first_company_code,
+        c1.contacts     first_contacts,
+        c1.phone        first_phone,
+        c1.org_type     first_org_type,
+        c1.`status`     first_status,
+        c1.create_time  first_create_time,
+        c1.update_time  first_update_time,
+        ci1.id          first_contract_id,
+        ci1.name        first_contract_name,
+        c2.id           second_id,
+        c2.company_name second_company_name,
+        c2.company_code second_company_code,
+        c2.contacts     second_contacts,
+        c2.phone        second_phone,
+        c2.org_type     second_org_type,
+        c2.`status`     second_status,
+        c2.create_time  second_create_time,
+        c2.update_time  second_update_time,
+        c2.id           second_id,
+        c2.company_name second_company_name,
+        c2.company_code second_company_code,
+        c2.contacts     second_contacts,
+        c2.phone        second_phone,
+        c2.org_type     second_org_type,
+        c2.`status`     second_status,
+        c2.create_time  second_create_time,
+        c2.update_time  second_update_time,
+        ci2.id          second_contract_id,
+        ci2.name        second_contract_name
+        FROM (
+        SELECT s1.project_id,
+        s2.org_id      first_org_id,
+        s2.contract_id first_contract_id,
+        s3.org_id      second_org_id,
+        s3.contract_id second_contract_id
+        FROM (
+        SELECT project_id,
+        org_id
+        FROM bpo_supplier_info
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+        AND org_id = #{orgId,jdbcType=INTEGER}
+        AND `status` = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        ) s1
+        LEFT JOIN bpo_supplier_info s2 ON s1.org_id = s2.parent_id
+        AND s2.project_id = s1.project_id
+        LEFT JOIN bpo_supplier_info s3 ON s2.org_id = s3.parent_id
+        AND s2.project_id = s1.project_id
+        ) supplier
+        LEFT JOIN sys_company c1 ON supplier.first_org_id = c1.id
+        AND c1.STATUS = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN sys_company c2 ON supplier.second_org_id = c2.id
+        AND c2.STATUS = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_contract_info ci1 ON supplier.first_contract_id = ci1.id
+        AND ci1.STATUS = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        LEFT JOIN bpo_contract_info ci2 ON supplier.second_contract_id = ci2.id
+        AND ci2.STATUS = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        where c1.id > 0
+    </select>
+
+</mapper>

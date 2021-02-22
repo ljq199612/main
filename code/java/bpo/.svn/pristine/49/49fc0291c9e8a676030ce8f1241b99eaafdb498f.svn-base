@@ -1,0 +1,166 @@
+package com.rz.iot.bpo.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class BpoBillPersonMonthDetail {
+    private Integer id;
+
+    private Integer monthBillId;
+
+    private BigDecimal hourlyWage;
+
+    private BigDecimal foodSubsidy;
+
+    private BigDecimal nightSubsidy;
+
+    private BigDecimal otherSubsidy;
+
+    private BigDecimal deduction;
+
+    private BigDecimal businessDeduction;
+
+    private BigDecimal socialSecurity;
+
+    private BigDecimal accumulationFund;
+
+    private BigDecimal personalIncomeTax;
+
+    private BigDecimal otherIncome;
+
+    private BigDecimal otherDeduction;
+
+    private Integer status;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getMonthBillId() {
+        return monthBillId;
+    }
+
+    public void setMonthBillId(Integer monthBillId) {
+        this.monthBillId = monthBillId;
+    }
+
+    public BigDecimal getHourlyWage() {
+        return hourlyWage;
+    }
+
+    public void setHourlyWage(BigDecimal hourlyWage) {
+        this.hourlyWage = hourlyWage;
+    }
+
+    public BigDecimal getFoodSubsidy() {
+        return foodSubsidy;
+    }
+
+    public void setFoodSubsidy(BigDecimal foodSubsidy) {
+        this.foodSubsidy = foodSubsidy;
+    }
+
+    public BigDecimal getNightSubsidy() {
+        return nightSubsidy;
+    }
+
+    public void setNightSubsidy(BigDecimal nightSubsidy) {
+        this.nightSubsidy = nightSubsidy;
+    }
+
+    public BigDecimal getOtherSubsidy() {
+        return otherSubsidy;
+    }
+
+    public void setOtherSubsidy(BigDecimal otherSubsidy) {
+        this.otherSubsidy = otherSubsidy;
+    }
+
+    public BigDecimal getDeduction() {
+        return deduction;
+    }
+
+    public void setDeduction(BigDecimal deduction) {
+        this.deduction = deduction;
+    }
+
+    public BigDecimal getBusinessDeduction() {
+        return businessDeduction;
+    }
+
+    public void setBusinessDeduction(BigDecimal businessDeduction) {
+        this.businessDeduction = businessDeduction;
+    }
+
+    public BigDecimal getSocialSecurity() {
+        return socialSecurity;
+    }
+
+    public void setSocialSecurity(BigDecimal socialSecurity) {
+        this.socialSecurity = socialSecurity;
+    }
+
+    public BigDecimal getAccumulationFund() {
+        return accumulationFund;
+    }
+
+    public void setAccumulationFund(BigDecimal accumulationFund) {
+        this.accumulationFund = accumulationFund;
+    }
+
+    public BigDecimal getPersonalIncomeTax() {
+        return personalIncomeTax;
+    }
+
+    public void setPersonalIncomeTax(BigDecimal personalIncomeTax) {
+        this.personalIncomeTax = personalIncomeTax;
+    }
+
+    public BigDecimal getOtherIncome() {
+        return otherIncome;
+    }
+
+    public void setOtherIncome(BigDecimal otherIncome) {
+        this.otherIncome = otherIncome;
+    }
+
+    public BigDecimal getOtherDeduction() {
+        return otherDeduction;
+    }
+
+    public void setOtherDeduction(BigDecimal otherDeduction) {
+        this.otherDeduction = otherDeduction;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+}

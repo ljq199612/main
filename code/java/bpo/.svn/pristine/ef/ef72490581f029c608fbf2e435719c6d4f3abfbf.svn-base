@@ -1,0 +1,17 @@
+package com.rz.iot.bpo.mapper;
+
+import com.rz.iot.bpo.model.BpoBillSupplierMonthDetail;
+
+public interface BpoBillSupplierMonthDetailMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(BpoBillSupplierMonthDetail record);
+
+    int insertSelective(BpoBillSupplierMonthDetail record);
+
+    BpoBillSupplierMonthDetail selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(BpoBillSupplierMonthDetail record);
+
+    int updateByPrimaryKey(BpoBillSupplierMonthDetail record);
+}

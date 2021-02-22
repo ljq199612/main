@@ -1,0 +1,379 @@
+<template>
+  <CfPanel v-loading="listLoading" :title="pageTitle" :back-to="backTo" class="addclient-container main">
+    <div class="page-body-title page-body-title_first">客户信息</div>
+    <el-form
+      ref="addForm"
+      class="bpoForm"
+      :model="addForm"
+      label-width="180px"
+      :rules="addFormRules"
+    >
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="客户名称" prop="name">
+            <el-input v-model="addForm.name" placeholder="请输入客户名称" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="客户编码" prop="code">
+            <el-input v-model="addForm.code" placeholder="请输入客户编码" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="客户简称" prop="abbreviations">
+            <el-input v-model="addForm.abbreviations" placeholder="请输入客户简称" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="客户类型" prop="type">
+            <el-select v-model="addForm.type" placeholder="请选择客户类型" class="half">
+              <el-option v-for="(item,index) in typeOptions" :key="index" :label="item.dictLabel" :value="item.dictValue" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="联系人" prop="linkMan">
+            <el-input v-model="addForm.linkMan" placeholder="请输入联系人" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="联系方式" prop="linkManPhone">
+            <el-input v-model.number="addForm.linkManPhone" maxlength="18" placeholder="请输入联系方式" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="详细地址" prop="detailAddress">
+            <el-input v-model="addForm.detailAddress" placeholder="请输入详细地址" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="签约公司" prop="cusCompany">
+            <el-input v-model="addForm.cusCompany" placeholder="请输入联系方式" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="统一社会信用代码" prop="creditCode">
+            <el-input v-model="addForm.creditCode" placeholder="请输入统一社会信用代码" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="法人代表" prop="legalName">
+            <el-input v-model="addForm.legalName" placeholder="请输入法人代表" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="集团公司" prop="belogGroupName">
+            <el-input v-model="addForm.belogGroupName" placeholder="请输入集团公司" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="大区" prop="region">
+            <el-input v-model="addForm.region" placeholder="请输入大区" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="业务区" prop="businessArea">
+            <el-input v-model="addForm.businessArea" placeholder="请输入业务区" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item class="col-100" label="备注">
+            <el-input v-model="addForm.remark" maxlength="500" placeholder="请输入备注信息" type="textarea" :rows="3" class="half" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+
+    <div class="page-body-title">公司信息</div>
+    <el-form
+      ref="companyForm"
+      class="bpoForm"
+      :model="companyForm"
+      label-width="180px"
+      :rules="addFormRules"
+    >
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="客户归属" prop="deptId">
+            <TreeSelect
+              v-model="companyForm.deptId"
+              :props="props"
+              :options="depOptions"
+              :value="valueEditId"
+              :accordion="isAccordion"
+              class="half"
+              placeholder="请选择客户归属"
+              @getValue="getEditValue($event)"
+            />
+            <!-- <el-select v-model="companyForm.deptId" placeholder="请选择客户归属" class="half">
+              <el-option v-for="(item,index) in depOptions" :key="index" :label="item.deptName" :value="item.deptId" />
+            </el-select> -->
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="业务负责人" prop="chargeMan">
+            <el-input v-model="companyForm.chargeMan" placeholder="请输入业务负责人" class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="联系方式" prop="chargeManPhone">
+            <el-input v-model.number="companyForm.chargeManPhone" maxlength="18" placeholder="请输入联系方式" class="half" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-form-item class="bpoButtonGroup">
+        <el-button type="primary" size="medium" @click="submit">提交</el-button>
+        <el-button size="medium" @click="backTo">关闭</el-button>
+      </el-form-item>
+    </el-form>
+  </CfPanel>
+</template>
+<script>
+import { addCustomer, updateCustomer, findCanControl, /* getDetailById, */ findCustomerTypes, getCustomerById } from '@/api/clientMgt'
+import CfPanel from '@/components/Panel'
+import TreeSelect from '@/components/treeSelect'
+
+export default {
+  name: 'AddClient',
+  components: {
+    CfPanel,
+    TreeSelect
+  },
+  data() {
+    return {
+      listLoading: false,
+      editMode: +this.$route.query.type, // 1是新增，2是更新
+      // 详情搜索条件
+      queryForm: {
+        id: this.$route.query.id,
+        projectId: this.$route.query.projectId
+      },
+      addForm: {
+        name: '',
+        code: '',
+        abbreviations: '',
+        type: '',
+        linkMan: '',
+        linkManPhone: '',
+        detailAddress: '',
+        cusCompany: '',
+        creditCode: '',
+        legalName: '',
+        belogGroupName: '',
+        region: '',
+        businessArea: '',
+        remark: ''
+      },
+      companyForm: {
+        deptId: null, // 客户归属
+        chargeMan: '', // 业务负责人
+        chargeManPhone: ''
+      },
+      contractForm: {
+        'project.projectName': '',
+        'transferStation.name': ''
+      }, // 详情数据
+      addFormRules: {
+        name: { required: true, message: '请输入客户名称', trigger: 'blur' },
+        code: { required: true, message: '请输入客户编码', trigger: 'blur' },
+        type: { required: true, message: '请输入客户类型', trigger: 'blur' },
+        linkMan: { required: true, message: '请输入联系人', trigger: 'blur' },
+        cusCompany: { required: true, message: '请输入签约公司', trigger: 'blur' },
+        creditCode: { required: true, message: '请输入统一社会信用代码', trigger: 'blur' },
+
+        deptId: { required: true, message: '请选择客户归属部门', trigger: 'blur' }
+      },
+      typeOptions: [], // 客户类型
+      props: { // 配置项（必选）
+        value: 'deptId',
+        label: 'deptName',
+        children: 'depts'
+      },
+      valueEditId: '',
+      isAccordion: false, // 可收起（可选）
+      depOptions: [] // 客户归属部门
+    }
+  },
+  computed: {
+    pageTitle() {
+      return this.editMode === 1 ? '新增客户' : '修改客户'
+    }
+  },
+  created() {
+    this.findCanControl()
+    this.getTypeOptions()
+    if (this.editMode === 2) {
+      this.getCustomerById()
+    }
+  },
+  methods: {
+    backTo() {
+      this.$router.go(-1)
+    },
+    // 获取选择客户
+    getEditValue(val) {
+      console.log(val, 'val')
+      this.companyForm.deptId = val
+    },
+    findCanControl() {
+      findCanControl({}).then((res) => {
+        this.depOptions = res.data.data || []
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    getTypeOptions() {
+      findCustomerTypes({}).then((res) => {
+        this.typeOptions = res.data.data || []
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 通过键值复制对象
+    copyByKey(target, origin) {
+      const temp = {}
+      Object.keys(target).forEach((key) => {
+        if (Reflect.has(origin, key)) {
+          temp[key] = origin[key]
+        } else {
+          temp[key] = target[key]
+        }
+      })
+      return temp
+    },
+    // 获取客户详情
+    getCustomerById() {
+      this.listLoading = true
+      getCustomerById(this.queryForm).then((res) => {
+        this.listLoading = false
+        const detailData = res.data.data || {}
+        this.addForm = this.copyByKey(this.addForm, detailData)
+        this.companyForm = this.copyByKey(this.companyForm, detailData)
+        // 特殊处理字段
+        this.addForm.name = detailData.company.companyName
+        this.addForm.code = detailData.company.companyCode
+        this.addForm.abbreviations = detailData.company.nickName
+        this.addForm.linkMan = detailData.company.contacts
+        this.addForm.linkManPhone = detailData.company.phone
+
+        this.contractForm['project.projectName'] = detailData.project.projectName
+        this.contractForm['transferStation.name'] = detailData.transferStation.name
+      }).catch((err) => {
+        this.listLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    submit() {
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          this.validateCompanyForm()
+        }
+      })
+    },
+    validateCompanyForm() {
+      this.$refs.companyForm.validate((valid) => {
+        if (valid) {
+          // 新增
+          if (this.editMode === 1) {
+            this.addCustomer()
+          } else {
+            // 更新
+            this.updateCustomer()
+          }
+        }
+      })
+    },
+    addCustomer() {
+      const loading = this.$loading({
+        lock: true,
+        text: '提交中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      addCustomer({
+        ...this.addForm,
+        ...this.companyForm
+      }).then((res) => {
+        this.$message({
+          type: 'success',
+          message: res.message || '提交成功'
+        })
+        setTimeout(() => {
+          this.backTo()
+          loading.close()
+        }, 1000)
+      }).catch((err) => {
+        loading.close()
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    // 更新客户信息
+    updateCustomer() {
+      const loading = this.$loading({
+        lock: true,
+        text: '提交中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      updateCustomer({
+        orgId: this.queryForm.id,
+        ...this.addForm,
+        ...this.companyForm
+      }).then((res) => {
+        this.$message({
+          type: 'success',
+          message: res.message || '提交成功'
+        })
+        setTimeout(() => {
+          this.backTo()
+          loading.close()
+        }, 1000)
+      }).catch((err) => {
+        loading.close()
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    }
+  }
+}
+</script>
+<style lang="scss">
+.addclient-container{
+  .addclient-form{
+    .el-form{
+      font-size: 0;
+    }
+    .el-form-item{
+      width: 49%;
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 0;
+      .el-textarea,
+      .el-input{
+        width: 360px;
+      }
+      &.col-100{
+        display: block;
+      }
+    }
+  }
+  .body-footer{
+    margin-top: 26px;
+    padding-bottom: 20px;
+  }
+}
+</style>

@@ -1,0 +1,148 @@
+import request from '@/utils/request'
+// 查询所有未审核人员
+export function findAll(query) {
+  return request({
+    url: '/personCheck/findAll',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核-查询未审核详情
+export function personCheckDetail(query) {
+  return request({
+    url: '/personCheck/personCheckDetail',
+    method: 'get',
+    params: query
+  })
+}
+// 查询所有民族
+export function findAllNation(query) {
+  return request({
+    url: '/personCheck/findAllNation',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核(管理)-查看身份证
+export function lookIdCard(query) {
+  return request({
+    url: '/bpoPerson/lookIdCard',
+    method: 'post',
+    params: query
+  })
+}
+// 人员审核-同步客户编号
+export function synClientNo(query) {
+  return request({
+    url: '/personCheck/synClientNo',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核(管理)-新增/修改获取员工属性(公司、部门)
+export function currentUserCom(query) {
+  return request({
+    url: '/bpoPerson/currentUserCom',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核(管理)-人员岗位
+export function findAllStation(query) {
+  return request({
+    url: '/personCheck/findAllStation',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核(管理)-查询项目信息
+export function findProject(query) {
+  return request({
+    url: '/personCheck/findProject',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核(管理)-删除合同附件
+export function deleteContractFile(query) {
+  return request({
+    url: '/personCheck/deleteContractFile',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核(管理)-删除人员身份附件
+export function deletePersonFile(query) {
+  return request({
+    url: '/personCheck/deletePersonFile',
+    method: 'get',
+    params: query
+  })
+}
+// 人员审核-审核
+export function checkPerson(data) {
+  return request({
+    url: '/personCheck/checkPerson',
+    method: 'post',
+    data
+  })
+}
+// 人员审核-审核
+export function findAllPerson(query) {
+  return request({
+    url: '/bpoPerson/findAllPerson',
+    method: 'get',
+    params: query
+  })
+}
+// 人员管理-查询人员详情
+export function detailPerson(query) {
+  return request({
+    url: '/bpoPerson/detailPerson',
+    method: 'post',
+    params: query
+  })
+}
+// 人员管理-查询人员详情
+export function addPerson(data) {
+  return request({
+    url: '/bpoPerson/addPerson',
+    method: 'post',
+    data
+  })
+}
+// 人员管理-查询人员详情
+export function updatePerson(data) {
+  return request({
+    url: '/bpoPerson/updatePerson',
+    method: 'post',
+    data
+  })
+}
+// 人员管理-导入
+export function importPerson(query) {
+  return request({
+    url: '/bpoPerson/importPerson',
+    method: 'post',
+    params: query
+  })
+}
+// 人员管理-导出模板
+export const exportPersonModel = `${process.env.BASE_API}/bpoPerson/exportPersonModel`
+// export const uploadFile = `${process.env.BASE_API}/bpoPerson/uploadFile?X-Token=${getToken()}`
+export function uploadFile(query) {
+  return request({
+    url: '/bpoPerson/uploadFile',
+    method: 'get',
+    params: query
+  })
+}
+// 人员管理-导出
+export function exportPerson(query) {
+  return request({
+    url: '/bpoPerson/exportPerson',
+    method: 'get',
+    params: query
+  })
+}
+

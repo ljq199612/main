@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaProjectMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaProject">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <result column="project_sn" property="projectSn" jdbcType="VARCHAR"/>
+        <result column="contract_id" property="contractId" jdbcType="INTEGER"/>
+        <result column="transfer_station_id" property="transferStationId" jdbcType="INTEGER"/>
+        <result column="first_party" property="firstParty" jdbcType="INTEGER"/>
+        <result column="fee_rule_type" property="feeRuleType" jdbcType="INTEGER"/>
+        <result column="second_party" property="secondParty" jdbcType="INTEGER"/>
+        <result column="first_party_link" property="firstPartyLink" jdbcType="VARCHAR"/>
+        <result column="first_party_mobile" property="firstPartyMobile" jdbcType="VARCHAR"/>
+        <result column="second_party_link" property="secondPartyLink" jdbcType="VARCHAR"/>
+        <result column="second_party_mobile" property="secondPartyMobile" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="parent_organization" property="parentOrganization" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="BpoProjectDetailListShowMap"
+               type="com.rz.iot.bpo.model.show.BpoProjectDetailListShow">
+        <id column="id" property="projectId" jdbcType="INTEGER"/>
+        <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+        <result column="nick_name" property="companyNickName" jdbcType="VARCHAR"/>
+        <result column="company_name" property="companyName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, project_name, project_sn, contract_id, transfer_station_id, first_party, fee_rule_type,
+    second_party, first_party_link, first_party_mobile, second_party_link, second_party_mobile,
+    start_date, end_date, remark, status, parent_organization, create_time, update_time
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_project
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.mina.model.MinaProject" useGeneratedKeys="true" keyColumn="id"
+            keyProperty="id">
+        insert into bpo_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="projectName != null">
+                project_name,
+            </if>
+            <if test="projectSn != null">
+                project_sn,
+            </if>
+            <if test="contractId != null">
+                contract_id,
+            </if>
+            <if test="transferStationId != null">
+                transfer_station_id,
+            </if>
+            <if test="firstParty != null">
+                first_party,
+            </if>
+            <if test="feeRuleType != null">
+                fee_rule_type,
+            </if>
+            <if test="secondParty != null">
+                second_party,
+            </if>
+            <if test="firstPartyLink != null">
+                first_party_link,
+            </if>
+            <if test="firstPartyMobile != null">
+                first_party_mobile,
+            </if>
+            <if test="secondPartyLink != null">
+                second_party_link,
+            </if>
+            <if test="secondPartyMobile != null">
+                second_party_mobile,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="parentOrganization != null">
+                parent_organization,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="projectName != null">
+                #{projectName,jdbcType=VARCHAR},
+            </if>
+            <if test="projectSn != null">
+                #{projectSn,jdbcType=VARCHAR},
+            </if>
+            <if test="contractId != null">
+                #{contractId,jdbcType=INTEGER},
+            </if>
+            <if test="transferStationId != null">
+                #{transferStationId,jdbcType=INTEGER},
+            </if>
+            <if test="firstParty != null">
+                #{firstParty,jdbcType=INTEGER},
+            </if>
+            <if test="feeRuleType != null">
+                #{feeRuleType,jdbcType=INTEGER},
+            </if>
+            <if test="secondParty != null">
+                #{secondParty,jdbcType=INTEGER},
+            </if>
+            <if test="firstPartyLink != null">
+                #{firstPartyLink,jdbcType=VARCHAR},
+            </if>
+            <if test="firstPartyMobile != null">
+                #{firstPartyMobile,jdbcType=VARCHAR},
+            </if>
+            <if test="secondPartyLink != null">
+                #{secondPartyLink,jdbcType=VARCHAR},
+            </if>
+            <if test="secondPartyMobile != null">
+                #{secondPartyMobile,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=DATE},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="parentOrganization != null">
+                #{parentOrganization,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+
+
+</mapper>

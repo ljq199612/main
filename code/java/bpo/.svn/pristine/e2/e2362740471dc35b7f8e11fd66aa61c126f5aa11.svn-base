@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoOutputMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoOutput" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="transfer_station_id" property="transferStationId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="period_start_time" property="periodStartTime" jdbcType="TIMESTAMP" />
+    <result column="period_end_time" property="periodEndTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="BpoOutputShow" type="com.rz.iot.bpo.model.show.BpoOutput.BpoOutputShow" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="transfer_station_id" property="transferStationId" jdbcType="INTEGER" />
+    <result column="transfer_station_name" property="transferStationName" jdbcType="VARCHAR"/>
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR"/>
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR"/>
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="period_start_time" property="periodStartTime" jdbcType="TIMESTAMP" />
+    <result column="period_end_time" property="periodEndTime" jdbcType="TIMESTAMP" />
+    <result column="output" property="output" jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, transfer_station_id, project_id, supplier_id, type, period_start_time, period_end_time, 
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_output
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_output
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoOutput" >
+    insert into bpo_output (id, transfer_station_id, project_id, 
+      supplier_id, type, period_start_time, 
+      period_end_time, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{transferStationId,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, 
+      #{supplierId,jdbcType=INTEGER}, #{type,jdbcType=TINYINT}, #{periodStartTime,jdbcType=TIMESTAMP}, 
+      #{periodEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoOutput" useGeneratedKeys="true" keyProperty="id">
+    insert into bpo_output
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="transferStationId != null" >
+        transfer_station_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="periodStartTime != null" >
+        period_start_time,
+      </if>
+      <if test="periodEndTime != null" >
+        period_end_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="transferStationId != null" >
+        #{transferStationId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="periodStartTime != null" >
+        #{periodStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="periodEndTime != null" >
+        #{periodEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoOutput" >
+    update bpo_output
+    <set >
+      <if test="transferStationId != null" >
+        transfer_station_id = #{transferStationId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="periodStartTime != null" >
+        period_start_time = #{periodStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="periodEndTime != null" >
+        period_end_time = #{periodEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoOutput" >
+    update bpo_output
+    set transfer_station_id = #{transferStationId,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      type = #{type,jdbcType=TINYINT},
+      period_start_time = #{periodStartTime,jdbcType=TIMESTAMP},
+      period_end_time = #{periodEndTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getOutputList" resultMap="BpoOutputShow">
+    SELECT
+	bo.*,
+	bts.name as transfer_station_name,
+	bp.project_name,
+	sc.company_name as supplier_name,
+	(SELECT sum(output) FROM bpo_output_detail WHERE output_id = bo.id) AS output
+    FROM
+	bpo_output bo
+	LEFT JOIN bpo_transfer_station bts ON bo.transfer_station_id = bts.id
+	LEFT JOIN bpo_project bp ON bo.project_id = bp.id
+	LEFT JOIN sys_company sc ON bo.supplier_id = sc.id
+    WHERE
+    1 = 1
+    <if test="transferStationId != null and transferStationId != ''">
+      AND bts.id = #{transferStationId}
+    </if>
+    <if test="projectId != null and projectId != ''">
+      AND bp.id = #{projectId}
+    </if>
+    <if test="type != null and type != ''">
+      AND bo.type = #{type}
+    </if>
+  </select>
+</mapper>

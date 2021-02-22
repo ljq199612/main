@@ -1,0 +1,161 @@
+<style rel="stylesheet/scss" lang="scss">
+@import './register.scss';
+</style>
+
+<template>
+  <div class="login">
+    <header class="hidden-md-and-up">
+      <div class="brand">
+        <a href="/" class="logo">
+          <img src="../../assets/logo.png">
+        </a>
+        <!-- <h1>智慧灯光管理平台</h1>-->
+      </div>
+    </header>
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <i class="el-icon-news" />
+        <span>欢迎注册</span>
+      </div>
+      <el-form ref="registerForm" class="login-form" auto-complete="on" :model="RegisterForm" :rules="RegisterRules" label-position="left" @keyup.enter.native="handleRegister">
+        <el-form-item prop="username">
+          <span class="svg-container svg-container_login">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-input v-model="RegisterForm.username" name="username" type="text" auto-complete="on" placeholder="请输入用户名" clearable />
+        </el-form-item>
+
+        <el-form-item prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input v-model="RegisterForm.password" name="password" :type="passwordType" auto-complete="on" placeholder="请输入密码" clearable />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon v-if="open" icon-class="eye-open" />
+            <svg-icon v-else icon-class="eye" />
+          </span>
+        </el-form-item>
+
+        <el-form-item prop="email">
+          <span class="svg-container svg-container_login">
+            <svg-icon icon-class="email" />
+          </span>
+          <el-input v-model="RegisterForm.email" name="email" type="text" auto-complete="on" placeholder="请输入邮箱" clearable />
+        </el-form-item>
+
+        <el-form-item prop="captcha" class="captcha" style="margin-bottom: 0">
+          <el-input v-model="RegisterForm.captcha" name="captcha" auto-complete="off" placeholder="请输入验证码" maxlength="4" clearable />
+          <span>
+            <img :src="url" width="80" height="30" @click="random">
+          </span>
+        </el-form-item>
+        <el-row>
+          <el-col>
+            <el-button type="text" @click="toLogin">立即登录</el-button>
+          </el-col>
+        </el-row>
+        <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleRegister">注 册</el-button>
+      </el-form>
+    </el-card>
+    <div style="position: absolute; bottom: 45px; right: 700px;">{{ copyright }}
+    </div>
+  </div>
+</template>
+
+<script>
+import { validatePassword, validateCaptcha, checkEmail } from '@/utils/validate'
+import { register, createCaptcha } from '@/api/login'
+export default {
+  name: 'Register',
+  data() {
+    return {
+      url: '',
+      RegisterForm: {
+        username: '',
+        password: '',
+        captcha: '',
+        email: ''
+      },
+      RegisterRules: {
+        username: [
+          { required: true, trigger: 'blur', message: '请输入用户名' }
+        ],
+        password: [
+          { required: true, trigger: 'blur', validator: validatePassword }
+        ],
+        captcha: [
+          { required: true, trigger: 'blur', validator: validateCaptcha }
+        ],
+        email: [
+          { required: true, trigger: 'blur', validator: checkEmail }
+        ]
+      },
+      passwordType: 'password',
+      loading: false,
+      open: false,
+      showDialog: false,
+      copyright: '版权所有 深圳市睿智物联科技有限公司1999-2018&copy;粤ICP备18107627号-2'
+    }
+  },
+  created() {
+    this.createCaptcha()
+  },
+  methods: {
+    // 获取验证码
+    createCaptcha() {
+      createCaptcha({}).then((res) => {
+        this.url = res.data.data.captcha
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    showPwd() {
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
+        this.open = true
+      } else {
+        this.passwordType = 'password'
+        this.open = false
+      }
+    },
+    random() {
+      this.createCaptcha()
+    },
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          // 注册
+          register(
+            {
+              username: this.RegisterForm.username,
+              password: this.RegisterForm.password,
+              captcha: this.RegisterForm.captcha,
+              email: this.RegisterForm.email
+            }).then(res => {
+            this.loading = false
+            this.$message({
+              message: '注册成功，请联系管理员激活账户后登录！',
+              type: 'success',
+              duration: 5 * 1000
+            })
+            this.toLogin()
+          }).catch(res => {
+            this.loading = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    toLogin() {
+      this.$router.push({ path: '/login' })
+    }
+  }
+}
+</script>
+

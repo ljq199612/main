@@ -1,0 +1,144 @@
+import request from '@/utils/request'
+
+/**
+ * 获取项目管理列表
+ * @param {*} data
+ */
+export function getProjectDetailList() {
+  return request({
+    url: '/project/getProjectDetailList',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取甲方列表数据
+ */
+export function getdetailAll(params) {
+  return request({
+    url: '/project/detailAll',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取甲方列表数据
+ */
+export function getPartyAData() {
+  return request({
+    url: '/project/getPartyAList',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取合同列表
+ */
+export function getContractList() {
+  return request({
+    url: '/project/getContractList',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取当前用户所在组织
+ */
+export function getUserCompany() {
+  return request({
+    url: '/project/getUserCompany',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取项目编号创建项目时
+ */
+export function getProjectSnToCreate(data) {
+  return request({
+    url: '/project/getProjectSnToCreate',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 录入项目基础信息
+ * @param {Object} data
+ */
+export function addProjectBasicInformation(data) {
+  return request({
+    url: '/project/addProjectBasicInformation',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取供应商列表
+ */
+export function getSupplierList() {
+  return request({
+    url: '/project/getSupplierList',
+    method: 'get'
+  })
+}
+
+/**
+ * 通过区id获取中转场数据
+ * @param {*} data
+ */
+export function getTransferStationByDistrictId(params) {
+  return request({
+    url: '/project/getTransferStationByDistrictId',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取所有省数据
+ */
+export function getAllProvince() {
+  return request({
+    url: '/province/getAllProvince',
+    method: 'get'
+  })
+}
+
+/**
+ * 根据code获取市数据
+ * @param {*} params
+ */
+export function getCity(params) {
+  return request({
+    url: '/province/getCity',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 根据市code获取区数据
+ * @param {*}} params
+ */
+export function getDistrict(params) {
+  return request({
+    url: '/province/getDistrict',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 录入配置信息
+ * @param {*} data
+ */
+export function addProjectConfig(data) {
+  return request({
+    url: '/project/addProjectConfig',
+    method: 'post',
+    data
+  })
+}

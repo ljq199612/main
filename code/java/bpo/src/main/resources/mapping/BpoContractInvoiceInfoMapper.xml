@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoContractInvoiceInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoContractInvoiceInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="contract_id" property="contractId" jdbcType="INTEGER" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="artificial_person" property="artificialPerson" jdbcType="VARCHAR" />
+    <result column="tax_id" property="taxId" jdbcType="VARCHAR" />
+    <result column="opening_bank" property="openingBank" jdbcType="VARCHAR" />
+    <result column="opening_bank_account" property="openingBankAccount" jdbcType="VARCHAR" />
+    <result column="tax_rate" property="taxRate" jdbcType="VARCHAR"/>
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, contract_id, company_name, artificial_person,
+    tax_id, opening_bank, opening_bank_account, tax_rate, address,
+    phone, create_time, update_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_contract_invoice_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_contract_invoice_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoContractInvoiceInfo" >
+    insert into bpo_contract_invoice_info (id, contract_id, company_name,
+     artificial_person, tax_id, opening_bank, opening_bank_account, tax_rate, address,
+     phone, create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{contractId,jdbcType=INTEGER}, #{companyName,jdbcType=VARCHAR},
+     #{artificialPerson,jdbcType=VARCHAR}, #{taxId,jdbcType=VARCHAR}, #{openingBank,jdbcType=VARCHAR},
+     #{taxRate,jdbcType=VARCHAR}, #{openingBankAccount,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+     #{phone,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoContractInvoiceInfo" >
+    insert into bpo_contract_invoice_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="contractId != null" >
+        contract_id,
+      </if>
+      <if test="companyName != null" >
+        company_name,
+      </if>
+      <if test="artificialPerson != null" >
+        artificial_person,
+      </if>
+      <if test="taxId != null" >
+        tax_id,
+      </if>
+      <if test="openingBank != null" >
+        opening_bank,
+      </if>
+      <if test="openingBankAccount != null" >
+        opening_bank_account,
+      </if>
+      <if test="taxRate != null">
+        tax_rate,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="contractId != null" >
+        #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="companyName != null" >
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="artificialPerson != null" >
+        #{artificialPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="taxId != null" >
+        #{taxId,jdbcType=VARCHAR},
+      </if>
+      <if test="openingBank != null" >
+        #{openingBank,jdbcType=VARCHAR},
+      </if>
+      <if test="openingBankAccount != null" >
+        #{openingBankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null">
+        #{taxRate,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoContractInvoiceInfo" >
+    update bpo_contract_invoice_info
+    <set >
+      <if test="contractId != null" >
+        contract_id = #{contractId,jdbcType=INTEGER},
+      </if>
+      <if test="companyName != null" >
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="artificialPerson != null" >
+        artificial_person = #{artificialPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="taxId != null" >
+        tax_id = #{taxId,jdbcType=VARCHAR},
+      </if>
+      <if test="openingBank != null" >
+        opening_bank = #{openingBank,jdbcType=VARCHAR},
+      </if>
+      <if test="openingBankAccount != null" >
+        opening_bank_account = #{openingBankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null">
+        tax_rate = #{taxRate,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoContractInvoiceInfo" >
+    update bpo_contract_invoice_info
+    set contract_id = #{contractId,jdbcType=INTEGER},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      artificial_person = #{artificialPerson,jdbcType=VARCHAR},
+      tax_id = #{taxId,jdbcType=VARCHAR},
+      opening_bank = #{openingBank,jdbcType=VARCHAR},
+      opening_bank_account = #{openingBankAccount,jdbcType=VARCHAR},
+      tax_rate = #{taxRate,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

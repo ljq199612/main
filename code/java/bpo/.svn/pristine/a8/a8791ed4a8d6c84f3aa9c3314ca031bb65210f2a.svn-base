@@ -1,0 +1,440 @@
+package com.rz.iot.bpo.mina.service.impl;
+
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mina.mapper.*;
+import com.rz.iot.bpo.mina.model.*;
+import com.rz.iot.bpo.mina.model.param.MinaClassesGenerateParam;
+import com.rz.iot.bpo.mina.model.param.MinaClassesParam;
+import com.rz.iot.bpo.mina.model.param.MinaScheduleRuleParam;
+import com.rz.iot.bpo.mina.model.param.MinaUpdateClassesParam;
+import com.rz.iot.bpo.mina.model.show.MinaClassGenerateShow;
+import com.rz.iot.bpo.mina.model.show.MinaClassesShow;
+import com.rz.iot.bpo.mina.service.MinaScheduleService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+import java.util.Date;
+import java.util.List;
+
+import static com.rz.iot.bpo.common.constant.DictDataConstants.*;
+
+@Slf4j
+@Service("minaScheduleService")
+public class MinaScheduleServiceImpl implements MinaScheduleService {
+
+    @Resource
+    MinaScheduleRuleMapper scheduleRuleMapper;
+
+    @Resource
+    MinaClassesFromExternalMapper classesFromExternalMapper;
+
+    @Resource
+    MinaClassesGenerateMapper classesGenerateMapper;
+
+    @Resource
+    MinaScheduleToEmployeeMapper scheduleToEmployeeMapper;
+
+    @Resource
+    MinaBatchMapper minaBatchMapper;
+
+    @Resource
+    MinaProjectMapper minaProjectMapper;
+
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addClassFromExternal(MinaClassesParam minaClassesParam) {
+        Integer scheduleRuleId = minaClassesParam.getScheduleRuleId();
+        //添加批次信息 //FIXME @ljq 不清楚功用为何
+        MinaBatch minaBatch = new MinaBatch();
+        minaBatch.setStatus(NORMAL_STATUS);
+        minaBatch.setScheduleRuleId(scheduleRuleId);
+        minaBatchMapper.insertSelective(minaBatch);
+        //添加班次信息
+        List<MinaClassesFromExternal> minaClassesList = minaClassesParam.getMinaClassesList();
+        Integer id = minaBatch.getId();
+        for (MinaClassesFromExternal minaClasses : minaClassesList) {
+            minaClasses.setBatchId(id);
+            minaClasses.setStatus(NORMAL_STATUS);
+            classesFromExternalMapper.insert(minaClasses);
+        }
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result getClassList(MinaClassesParam minaClassesParam) {
+        String transferStationName = minaClassesParam.getTransferStationName();
+        Integer projectId = minaClassesParam.getProjectId();
+        MinaClassesShow classList = null;
+        if (StringUtils.isEmpty(transferStationName)) {
+            classList = classesFromExternalMapper.selectByProjectId(projectId);
+        } else {
+            //FIXME @ljq 场地选择未完成
+            classList = classesFromExternalMapper.selectByProjectId(projectId);
+        }
+        Result result = new Result(ResultConstants.REQUEST_SUCCESS);
+        result.setData(classList);
+        return result;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateClassFromExternal(MinaUpdateClassesParam bpoClassesParam) {
+        classesFromExternalMapper.updateByPrimaryKey(bpoClassesParam);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addScheduleRule(MinaScheduleRuleParam scheduleRuleParam) {
+        scheduleRuleMapper.insertSelective(scheduleRuleParam);
+        MinaScheduleRule scheduleRule = new MinaScheduleRule();
+        scheduleRule.setId(scheduleRuleParam.getId());
+        return Result.success(scheduleRule);
+    }
+
+    @Override
+    public Result<MinaClassGenerateShow> getClassGenerate(MinaClassesGenerateParam minaClassesGenerateParam) {
+        String transferStationName = minaClassesGenerateParam.getTransferStationName();
+        Integer projectId = minaClassesGenerateParam.getProjectId();
+        MinaClassGenerateShow classGenerateShow = null;
+        if (StringUtils.isEmpty(transferStationName)) {
+            classGenerateShow = classesGenerateMapper.selectByProjectId(projectId);
+        } else {
+            //FIXME @ljq 场地选择未完成
+            classGenerateShow = classesGenerateMapper.selectByProjectId(projectId);
+        }
+        Result<MinaClassGenerateShow> result = new Result<>(ResultConstants.REQUEST_SUCCESS);
+        result.setData(classGenerateShow);
+        return result;
+    }
+
+
+//    @Override
+//    public Result<BpoScheduleRuleShow> getScheduleRule(Integer projectId) {
+//        BpoScheduleRuleShow scheduleRuleShow = scheduleRuleMapper.selectByProjectId(projectId);
+//        Result<BpoScheduleRuleShow> result = new Result<>(ResultConstants.REQUEST_SUCCESS);
+//        result.setData(scheduleRuleShow);
+//        return result;
+//    }
+//    public static void main(String[] args) {
+//        Class<FeeRuleParam> bpoProjectClass = FeeRuleParam.class;
+//        Field[] fields = bpoProjectClass.getDeclaredFields();
+//        String className = "updateFeeRuleParam";
+//        for (Field field : fields) {
+//            String name = field.getName();
+//            Class<?> type = field.getType();
+//            String s = name.substring(0, 1).toUpperCase() + name.substring(1);
+//            switch (type.toString()) {
+//                case "class java.lang.Integer":
+//                    System.out.println("Integer " + name + " = " + className + ".get" + s + "();\n" +
+//                            "        if (" + name + " == null){\n" +
+//                            "            return Result.requestParamError(\"" + name + " is null\");\n" +
+//                            "        }");
+//                    break;
+//                case "class java.lang.String":
+//                    System.out.println("String " + name + " = " + className + ".get" + s + "();\n" +
+//                            "        if (StringUtils.isEmpty(" + name + ")){\n" +
+//                            "            return Result.requestParamError(\"" + name + " is null\");\n" +
+//                            "        }");
+//                    break;
+//                case "class java.util.Date":
+//                    System.out.println("Date " + name + " = " + className + ".get" + s + "();\n" +
+//                            "        if (" + name + " == null){\n" +
+//                            "            return Result.requestParamError(\"" + name + " is null\");\n" +
+//                            "        }");
+//
+//                    break;
+//            }
+//        }
+//    }
+//
+
+
+    //    private Result handleAddClassListParam(BpoClassesParam bpoClassesParam) {
+//        Integer scheduleRuleId = bpoClassesParam.getScheduleRuleId();
+//        if (scheduleRuleId == null) {
+//            return Result.requestParamError("scheduleRuleId is null");
+//        }
+//        Integer projectId = bpoClassesParam.getProjectId();
+//        if (projectId == null) {
+//            return Result.requestParamError("projectId is null");
+//        }
+//        List<BpoClassesFromExternal> bpoClassesList = bpoClassesParam.getBpoClassesList();
+//        for (BpoClassesFromExternal bpoClasses : bpoClassesList) {
+//            bpoClasses.setProjectId(projectId);
+//            bpoClasses.setId(null);
+//            String classSn = bpoClasses.getClassSn();
+//            if (StringUtils.isEmpty(classSn)) {
+//                return Result.requestParamError("classSn is null");
+//            }
+//            String className = bpoClasses.getClassName();
+//            if (StringUtils.isEmpty(className)) {
+//                return Result.requestParamError("className is null");
+//            }
+//            Date startDate = bpoClasses.getStartDate();
+//            if (startDate == null) {
+//                return Result.requestParamError("startDate is null");
+//            }
+//            Date endDate = bpoClasses.getEndDate();
+//            if (endDate == null) {
+//                return Result.requestParamError("endDate is null");
+//            }
+//            Date startTime = bpoClasses.getStartTime();
+//            if (startTime == null) {
+//                return Result.requestParamError("startTime is null");
+//            }
+//            Date endTime = bpoClasses.getEndTime();
+//            if (endTime == null) {
+//                return Result.requestParamError("endTime is null");
+//            }
+//            Date arriveTime = bpoClasses.getArriveTime();
+//            if (arriveTime == null) {
+//                return Result.requestParamError("arriveTime is null");
+//            }
+//            Integer peopleNumber = bpoClasses.getPeopleNumber();
+//            if (peopleNumber == null) {
+//                return Result.requestParamError("peopleNumber is null");
+//            }
+//            Integer source = bpoClasses.getSource();
+//            if (source == null) {
+//                return Result.requestParamError("source is null");
+//            }
+//        }
+//        return null;
+//    }
+//
+//
+//    @Override
+//    public Result<BpoProjectEmployeeShow> getEmployeeData(Integer projectId) {
+//        return null;
+//    }
+//
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result addClassGenerate(MinaClassesGenerateParam classesGenerateParam) {
+        List<MinaClassesGenerate> minaClasses = classesGenerateParam.getMinaClassesGenerateList();
+
+        if(minaClasses==null || minaClasses.size()==0){
+            classesGenerateMapper.insert(classesGenerateParam);
+        }else{
+            //FIXME @ljq xml 有问题, 用于 [复制客户班次] 功能
+            //classesGenerateMapper.insertBatch(minaClasses);
+            //暂且先用以下代码实现功能
+            for(MinaClassesGenerate item : minaClasses){
+                classesGenerateMapper.insert(item);
+            }
+        }
+        return Result.success();
+    }
+
+
+    //    private Result handelUpdateClassFromExternalParam(BpoUpdateClassesParam bpoClassesParam) {
+//        String classSn = bpoClassesParam.getClassSn();
+//        if (StringUtils.isEmpty(classSn)) {
+//            return Result.requestParamError("classSn is null");
+//        }
+//        String className = bpoClassesParam.getClassName();
+//        if (StringUtils.isEmpty(className)) {
+//            return Result.requestParamError("className is null");
+//        }
+//        Date startDate = bpoClassesParam.getStartDate();
+//        if (startDate == null) {
+//            return Result.requestParamError("startDate is null");
+//        }
+//        Date endDate = bpoClassesParam.getEndDate();
+//        if (endDate == null) {
+//            return Result.requestParamError("endDate is null");
+//        }
+//        Date startTime = bpoClassesParam.getStartTime();
+//        if (startTime == null) {
+//            return Result.requestParamError("startTime is null");
+//        }
+//        Date endTime = bpoClassesParam.getEndTime();
+//        if (endTime == null) {
+//            return Result.requestParamError("endTime is null");
+//        }
+//        Date arriveTime = bpoClassesParam.getArriveTime();
+//        if (arriveTime == null) {
+//            return Result.requestParamError("arriveTime is null");
+//        }
+//        Integer peopleNumber = bpoClassesParam.getPeopleNumber();
+//        if (peopleNumber == null) {
+//            return Result.requestParamError("peopleNumber is null");
+//        }
+//        Integer source = bpoClassesParam.getSource();
+//        if (source == null) {
+//            return Result.requestParamError("source is null");
+//        }
+//        Integer projectId = bpoClassesParam.getProjectId();
+//        if (projectId == null) {
+//            return Result.requestParamError("projectId is null");
+//        }
+//        return null;
+//    }
+//
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result updateClassGenerate(MinaClassesGenerateParam minaClassesGenerateParam) {
+        minaClassesGenerateParam.setUpdateUserId(SecurityUtils.getLoginUser().getUser().getUserId());
+        classesGenerateMapper.updateByPrimaryKey(minaClassesGenerateParam);
+        return Result.success();
+    }
+
+    //
+//    @Override
+//    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT)
+//    public Result updateScheduleRule(MinaScheduleRuleParam scheduleRuleParam) {
+//        Result result = handelScheduleRuleParam(scheduleRuleParam);
+//        Integer id = scheduleRuleParam.getId();
+//        if (id == null || id < 0) {
+//            return Result.requestParamError();
+//        }
+//        if (result != null) {
+//            return result;
+//        }
+//        scheduleRuleMapper.insertSelective(scheduleRuleParam);
+//        return Result.success();
+//    }
+//
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteClassFromExternal(MinaClassesParam minaClassesParam) {
+        MinaClassesFromExternal minaClassesFromExternal = new MinaClassesFromExternal();
+        minaClassesFromExternal.setStatus(DELETE_STATUS);
+        minaClassesFromExternal.setId(minaClassesParam.getClassId());
+        classesFromExternalMapper.updateByPrimaryKey(minaClassesFromExternal);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteClassGenerate(Integer scheduleId) {
+        if (scheduleId == null || scheduleId < 0) {
+            return Result.requestParamError("scheduleId is invalid");
+        }
+        MinaClassesGenerate classesGenerate = new MinaClassesGenerate();
+        classesGenerate.setStatus(DELETE_STATUS);
+        classesGenerate.setId(scheduleId);
+        classesGenerateMapper.updateByPrimaryKey(classesGenerate);
+        scheduleToEmployeeMapper.deleteStatusByScheduleId(scheduleId);
+        return Result.success();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public Result deleteScheduleRule(Integer scheduleRuleId) {
+        if (scheduleRuleId == null || scheduleRuleId < 0) {
+            return Result.requestParamError("scheduleRuleId is invalid");
+        }
+        MinaScheduleRule minaScheduleRule = new MinaScheduleRule();
+        minaScheduleRule.setStatus(DELETE_STATUS);
+        minaScheduleRule.setId(scheduleRuleId);
+        scheduleRuleMapper.updateByPrimaryKeySelective(minaScheduleRule);
+        return Result.success();
+    }
+
+    private Result handelClassGenerateParam(MinaClassesGenerate classesGenerate) {
+
+        classesGenerate.setId(null);
+        String classSn = classesGenerate.getClassSn();
+        if (StringUtils.isEmpty(classSn)) {
+            return Result.requestParamError("classSn is null");
+        }
+        String className = classesGenerate.getClassName();
+        if (StringUtils.isEmpty(className)) {
+            return Result.requestParamError("className is null");
+        }
+        Date startDate = classesGenerate.getStartDate();
+        if (startDate == null) {
+            return Result.requestParamError("startDate is null");
+        }
+        Date endDate = classesGenerate.getEndDate();
+        if (endDate == null) {
+            return Result.requestParamError("endDate is null");
+        }
+        Date startTime = classesGenerate.getStartTime();
+        if (startTime == null) {
+            return Result.requestParamError("startTime is null");
+        }
+        Date endTime = classesGenerate.getEndTime();
+        if (endTime == null) {
+            return Result.requestParamError("endTime is null");
+        }
+        Date arriveTime = classesGenerate.getArriveTime();
+        if (arriveTime == null) {
+            return Result.requestParamError("arriveTime is null");
+        }
+        Integer peopleNumber = classesGenerate.getPeopleNumber();
+        if (peopleNumber == null) {
+            return Result.requestParamError("peopleNumber is null");
+        }
+        Integer projectId = classesGenerate.getProjectId();
+        if (projectId == null) {
+            return Result.requestParamError("projectId is null");
+        }
+        Integer source = classesGenerate.getSource();
+        if (source == null) {
+            return Result.requestParamError("source is null");
+        }
+        Integer isSpecial = classesGenerate.getIsSpecial();
+        if (isSpecial == null) {
+            return Result.requestParamError("isSpecial is null");
+        }
+        String specialAllowance = classesGenerate.getSpecialAllowance();
+        if (StringUtils.isEmpty(specialAllowance)) {
+            return Result.requestParamError("specialAllowance is null");
+        }
+        String mealAllowance = classesGenerate.getMealAllowance();
+        if (StringUtils.isEmpty(mealAllowance)) {
+            return Result.requestParamError("mealAllowance is null");
+        }
+        String nightAllowance = classesGenerate.getNightAllowance();
+        if (StringUtils.isEmpty(nightAllowance)) {
+            return Result.requestParamError("nightAllowance is null");
+        }
+        Integer isAllowance = classesGenerate.getIsAllowance();
+        if (isAllowance == null) {
+            return Result.requestParamError("isAllowance is null");
+        }
+
+        return null;
+    }
+
+
+    private Result handelScheduleRuleParam(MinaScheduleRule scheduleRuleParam) {
+        scheduleRuleParam.setId(null);
+        Integer maxWorkHour = scheduleRuleParam.getMaxWorkHour();
+        if (maxWorkHour == null) {
+            return Result.requestParamError("maxWorkHour is null");
+        }
+        Integer minWorkHour = scheduleRuleParam.getMinWorkHour();
+        if (minWorkHour == null) {
+            return Result.requestParamError("minWorkHour is null");
+        }
+        Integer scheduleNumber = scheduleRuleParam.getScheduleNumber();
+        if (scheduleNumber == null) {
+            return Result.requestParamError("scheduleNumber is null");
+        }
+        Integer priorityWorkers = scheduleRuleParam.getPriorityWorkers();
+        if (priorityWorkers == null) {
+            return Result.requestParamError("priorityWorkers is null");
+        }
+        String deviationRate = scheduleRuleParam.getDeviationRate();
+        if (StringUtils.isEmpty(deviationRate)) {
+            return Result.requestParamError("deviationRate is null");
+        }
+        return null;
+    }
+
+
+}

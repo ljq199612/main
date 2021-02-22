@@ -1,0 +1,47 @@
+package com.rz.iot.bpo.model;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Data
+public class BpoBillPersonMonthDetail {
+
+    private Integer id;
+
+    private Integer monthBillId;
+
+    private BigDecimal hourlyWage;
+
+    private BigDecimal foodSubsidy;
+
+    private BigDecimal nightSubsidy;
+
+    private BigDecimal otherSubsidy;
+
+    private BigDecimal deduction;
+
+    private BigDecimal businessDeduction;
+
+    private BigDecimal socialSecurity;
+
+    private BigDecimal accumulationFund;
+
+    private BigDecimal personalIncomeTax;
+
+    private BigDecimal otherIncome;
+
+    private BigDecimal otherDeduction;
+
+    private BigDecimal receivableSalary;
+
+    private BigDecimal relSalary;
+
+    private Integer status;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+}

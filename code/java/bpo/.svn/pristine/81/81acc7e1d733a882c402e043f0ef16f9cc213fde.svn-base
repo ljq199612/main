@@ -1,0 +1,262 @@
+package com.rz.iot.bpo.framework.task;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.utils.DateUtils;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
+
+@Configuration
+@EnableScheduling
+public class BillTask {
+
+    @Resource
+    private BpoBillTimeMapper billTimeMapper;
+
+    @Resource
+    private BpoAttendanceInfoMapper attendanceInfoMapper;
+
+    @Resource
+    private BpoBillPersonMonthMapper billPersonMonthMapper;
+
+    @Resource
+    private BpoBillSupplierDayMapper billSupplierDayMapper;
+
+    @Resource
+    private BpoBillSupplierMonthMapper billSupplierMonthMapper;
+
+    //生成日账单，月账单
+    public void createBillTask() {
+        //获取昨天的已确认考勤信息。
+        String yesterday = DateUtils.getYesterdayDate();
+        List<BpoAttendanceInfo> infoList = attendanceInfoMapper.selectConfirmedByDate(yesterday);
+        Map<String,BillMapEntity> supplierDayMap = new HashMap<>();
+        Map<String,BillMapEntity> supplierMonthMap = new HashMap<>();
+        Map<String,BillMapEntity> personMonthMap = new HashMap<>();
+        for (BpoAttendanceInfo info : infoList) {
+            //获取该考勤记录项目下所有收款方付款方
+            String dateMonth = DateUtils.parseDateToStr("yyyy-MM",info.getAttendanceDate());
+            String date = DateUtils.parseDateToStr("yyyy-MM-dd",info.getAttendanceDate());
+            Integer payerId = 1;
+            Integer payeeId = 2;
+
+            String supplierDayMapKey = "projectId:" + info.getProjectId() + "date:" + date + "payerId:" + payerId + "payeeId:" + payeeId;
+            String supplierMonthMapKey = "projectId:" + info.getProjectId() + "dateMonth:" + dateMonth + "payerId:" + payerId + "payeeId:" + payeeId;
+            String personMonthMapKey = "projectId:" + info.getProjectId() + "dateMonth:" + dateMonth + "personId:" + info.getPersonId();
+
+            //生成计时账单明细
+            BpoBillTime billTime = createBillTime(info);
+
+            //个人月账单数据集合
+            if (!personMonthMap.containsKey(personMonthMapKey)) {
+                BillMapEntity mapEntity = new BillMapEntity();
+                mapEntity.setProjectId(info.getProjectId());
+                mapEntity.setDate(dateMonth);
+                mapEntity.setPayeeId(info.getPersonId());
+                mapEntity.getBillTimeList().add(billTime);
+                personMonthMap.put(personMonthMapKey,mapEntity);
+            } else {
+                personMonthMap.get(personMonthMapKey).getBillTimeList().add(billTime);
+            }
+
+            //供应商月账单数据集合
+            if (!supplierMonthMap.containsKey(supplierMonthMapKey)) {
+                BillMapEntity mapEntity = new BillMapEntity();
+                mapEntity.setProjectId(info.getProjectId());
+                mapEntity.setDate(dateMonth);
+                mapEntity.setPayerId(payerId);
+                mapEntity.setPayeeId(payeeId);
+                mapEntity.getBillTimeList().add(billTime);
+                supplierMonthMap.put(supplierMonthMapKey,mapEntity);
+            } else {
+                supplierMonthMap.get(supplierMonthMapKey).getBillTimeList().add(billTime);
+            }
+
+            //供应商日账单数据集合
+            if (!supplierDayMap.containsKey(supplierDayMapKey)) {
+                BillMapEntity mapEntity = new BillMapEntity();
+                mapEntity.setProjectId(info.getProjectId());
+                mapEntity.setDate(date);
+                mapEntity.setPayerId(payerId);
+                mapEntity.setPayeeId(payeeId);
+                mapEntity.getBillTimeList().add(billTime);
+                supplierDayMap.put(supplierDayMapKey,mapEntity);
+            } else {
+                supplierDayMap.get(supplierDayMapKey).getBillTimeList().add(billTime);
+            }
+        }
+
+        //供应商日账单
+        billSupplierDayHandler(supplierDayMap);
+
+        //个人月账单
+        billSupplierMonthHandler(supplierMonthMap);
+
+        //供应商月账单
+        billPersonMonthHandler(personMonthMap);
+    }
+
+    private void billSupplierDayHandler(Map<String,BillMapEntity> supplierDayMap) {
+        Collection<BillMapEntity> supplierDayValues = supplierDayMap.values();
+        for (BillMapEntity mapEntity:supplierDayValues) {
+            String date = mapEntity.getDate();
+            Integer payerId = mapEntity.getPayerId();
+            Integer payeeId = mapEntity.getPayeeId();
+            Integer projectId = mapEntity.getProjectId();
+
+            Integer totalPeople = billTimeMapper.getPeopleCount(date,projectId,payeeId);
+
+            Double totalHours = 0.0;
+            BigDecimal totalDeduction = BigDecimal.ZERO;
+            BigDecimal realBillAmount = BigDecimal.ZERO;
+
+            for (BpoBillTime billTime:mapEntity.getBillTimeList()) {
+                billTime.getSalaryStandard();
+
+                totalHours += billTime.getWageHours();
+                totalDeduction.add(billTime.getDeduction());
+                realBillAmount.add(billTime.getRealIncome());
+            }
+
+            //供应商日账单
+            BpoBillSupplierDay billSupplierDay = billSupplierDayMapper.selectDayBill(projectId,date,payerId,payeeId);
+            if (billSupplierDay == null) {
+                billSupplierDay = new BpoBillSupplierDay();
+                billSupplierDay.setProjectId(projectId);
+                billSupplierDay.setBillCycle(date);
+                billSupplierDay.setPayerId(payerId);
+                billSupplierDay.setPayeeId(payeeId);
+                billSupplierDay.setFeeRuleType(2);
+                billSupplierDay.setTotalHours(0.0);
+                billSupplierDay.setTotalPeople(0);
+                billSupplierDay.setTotalDeduction(BigDecimal.ZERO);
+                billSupplierDay.setRealBillAmount(BigDecimal.ZERO);
+                billSupplierDayMapper.insertSelective(billSupplierDay);
+                billSupplierDay = billSupplierDayMapper.selectDayBill(projectId,date,payerId,payeeId);
+            }
+            billSupplierDay.setTotalHours(billSupplierDay.getTotalHours() + totalHours);
+            billSupplierDay.setTotalPeople(billSupplierDay.getTotalPeople() + totalPeople);
+            billSupplierDay.setTotalDeduction(billSupplierDay.getTotalDeduction().add(totalDeduction));
+
+            billSupplierDayMapper.updateByPrimaryKeySelective(billSupplierDay);
+        }
+    }
+
+
+
+    private void billSupplierMonthHandler(Map<String,BillMapEntity> supplierMonthMap) {
+        Collection<BillMapEntity> supplierMonthValues = supplierMonthMap.values();
+        for (BillMapEntity mapEntity : supplierMonthValues) {
+            String date = mapEntity.getDate();
+            Integer payerId = mapEntity.getPayerId();
+            Integer payeeId = mapEntity.getPayeeId();
+            Integer projectId = mapEntity.getProjectId();
+
+            Integer totalPeople = billTimeMapper.getPeopleCount(date,projectId,payeeId);
+
+            Double totalHours = 0.0;
+            BigDecimal totalDeduction = BigDecimal.ZERO;
+            BigDecimal realBillAmount = BigDecimal.ZERO;
+
+            for (BpoBillTime billTime:mapEntity.getBillTimeList()) {
+                billTime.getSalaryStandard();
+
+                totalHours += billTime.getWageHours();
+                totalDeduction.add(billTime.getDeduction());
+                realBillAmount.add(billTime.getRealIncome());
+            }
+
+            //供应商月账单
+            BpoBillSupplierMonth billSupplierMonth = billSupplierMonthMapper.selectMonthBill(projectId,date,payerId,payeeId);
+            if (billSupplierMonth == null) {
+                billSupplierMonth = new BpoBillSupplierMonth();
+                billSupplierMonth.setProjectId(projectId);
+                billSupplierMonth.setBillCycle(date);
+                billSupplierMonth.setPayerId(payerId);
+                billSupplierMonth.setPayeeId(payeeId);
+                billSupplierMonth.setFeeRuleType(2);
+                billSupplierMonth.setTotalHours(0.0);
+                billSupplierMonth.setTotalPeople(0);
+                billSupplierMonth.setTotalDeduction(BigDecimal.ZERO);
+                billSupplierMonth.setRealBillAmount(BigDecimal.ZERO);
+                billSupplierMonthMapper.insertSelective(billSupplierMonth);
+                billSupplierMonth = billSupplierMonthMapper.selectMonthBill(projectId,date,payerId,payeeId);
+            }
+            billSupplierMonth.setTotalHours(billSupplierMonth.getTotalHours() + totalHours);
+            billSupplierMonth.setTotalPeople(billSupplierMonth.getTotalPeople() + totalPeople);
+            billSupplierMonth.setTotalDeduction(billSupplierMonth.getTotalDeduction().add(totalDeduction));
+
+            billSupplierMonthMapper.updateByPrimaryKeySelective(billSupplierMonth);
+        }
+    }
+
+    private void billPersonMonthHandler(Map<String,BillMapEntity> personMonthMap) {
+        Collection<BillMapEntity> personMonthValues = personMonthMap.values();
+        for (BillMapEntity mapEntity : personMonthValues) {
+            String date = mapEntity.getDate();
+            Integer personId = mapEntity.getPayeeId();
+            Integer projectId = mapEntity.getProjectId();
+
+            Double totalHours = 0.0;
+            BigDecimal totalDeduction = BigDecimal.ZERO;
+            BigDecimal realBillAmount = BigDecimal.ZERO;
+
+            for (BpoBillTime billTime:mapEntity.getBillTimeList()) {
+                billTime.getSalaryStandard();
+
+                totalHours += billTime.getWageHours();
+                totalDeduction.add(billTime.getDeduction());
+                realBillAmount.add(billTime.getRealIncome());
+            }
+
+            //供应商月账单
+            BpoBillPersonMonth billPersonMonth = billPersonMonthMapper.selectMonthBill(projectId,date,personId);
+            if (billPersonMonth == null) {
+                billPersonMonth = new BpoBillPersonMonth();
+                billPersonMonth.setProjectId(projectId);
+                billPersonMonth.setBillingCycle(date);
+                billPersonMonth.setPersonId(personId);
+                billPersonMonth.setFeeRuleType(2);
+                billPersonMonth.setTotalHours(0.0);
+                billPersonMonth.setDeduction(BigDecimal.ZERO);
+                billPersonMonthMapper.insertSelective(billPersonMonth);
+                billPersonMonth = billPersonMonthMapper.selectMonthBill(projectId,date,personId);
+            }
+            billPersonMonth.setTotalHours(billPersonMonth.getTotalHours() + totalHours);
+
+            billPersonMonthMapper.updateByPrimaryKeySelective(billPersonMonth);
+        }
+    }
+
+
+    private BpoBillTime createBillTime(BpoAttendanceInfo attendanceInfo) {
+        BpoBillTime billTime = new BpoBillTime();
+        billTime.setProjectId(attendanceInfo.getProjectId());
+        billTime.setSupplierInfoId(1);
+        billTime.setBillingCycle(DateUtils.parseDateToStr("yyyy-MM-dd",attendanceInfo.getAttendanceDate()));
+        billTime.setPersonId(attendanceInfo.getPersonId());
+        billTime.setFeeRuleType(2);
+        billTime.setAttendanceStartTime(attendanceInfo.getClockInTime());
+        billTime.setAttendanceEndTime(attendanceInfo.getClockOutTime());
+        billTime.setWageHours(attendanceInfo.getApprovalWageHours());
+        billTime.setSalaryStandard(BigDecimal.ZERO);
+        billTime.setFoodSubsidy(BigDecimal.ZERO);
+        billTime.setNightSubsidy(BigDecimal.ZERO);
+        billTime.setOtherSubsidy(BigDecimal.ZERO);
+        billTime.setDeduction(BigDecimal.ZERO);
+        billTime.setRealIncome(BigDecimal.ZERO);
+        return billTime;
+    }
+
+    public static void main(String[] args) {
+        String dateMonth = DateUtils.parseDateToStr("yyyy-MM",new Date());
+        String date = DateUtils.parseDateToStr("yyyy-MM-dd",new Date());
+        System.out.println(date);
+        System.out.println(dateMonth);
+    }
+}

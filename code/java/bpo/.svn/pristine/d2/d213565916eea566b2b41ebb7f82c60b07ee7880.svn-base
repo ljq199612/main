@@ -1,0 +1,97 @@
+package com.rz.iot.bpo.mina.model.show;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rz.iot.bpo.mina.model.MinaPerson;
+import com.rz.iot.bpo.mina.model.MinaScheduleToEmployee;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.sql.Time;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Description: 排班到个人 视图
+ * @Author: Liu Jiaqi
+ * @Create: 2020-07-29
+ */
+
+@Data
+public class MinaScheduleToEmployeeShow extends MinaClassGenerateShow {
+
+
+    // 排班到个人的关联表 id
+    private Integer ScheduleToEmployeeId;
+
+    //班次id
+    private Integer scheduleId;
+
+    //员工id
+    private Integer userId;
+
+    //工序id
+    private Integer processId;
+
+    //产品id
+    private Integer productId;
+
+    //工作小组id
+    private Integer groupId;
+
+    //最近修改人
+    private Integer updateUserId;
+
+
+    // 排班的信息
+    private List<MinaClassGenerateShow> minaClassGenerateShowList;
+
+
+/********/
+
+    // 项目 id
+    private Integer projectId;
+
+    //项目名称
+    private String projectName;
+
+    // 班次 id
+    private Integer classId;
+
+    // 班次名称
+    private String className;
+
+    // 班次类型  1: 工作日  2: 周末  3: 特殊日期
+    private Integer classType;
+
+    // 规划人数
+    private Integer rulePersonNum;
+
+    // 已分配人数
+    private Integer scheduledPersonNum;
+
+    // 班次开始时间
+    @DateTimeFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm", timezone = "GMT+8")
+    private Time startTime;
+
+    // 班次结束时间
+    @DateTimeFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm", timezone = "GMT+8")
+    private Time endTime;
+
+    // 工作小组 id (可多个)
+    private List<Integer> groupIds;
+
+    // 工作小组名称 (对应工作小组 id)
+    private List<String> groupNames;
+
+    // 人员列表
+    private List<MinaPerson> minaPersonList;
+
+
+
+
+
+}

@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoBillReconciliationTimeDetailedMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="bill_reconciliation_id" property="billReconciliationId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER" />
+    <result column="billing_cycle" property="billingCycle" jdbcType="VARCHAR" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="fee_rule_type" property="feeRuleType" jdbcType="INTEGER" />
+    <result column="attendance_start_time" property="attendanceStartTime" jdbcType="TIMESTAMP" />
+    <result column="attendance_end_time" property="attendanceEndTime" jdbcType="TIMESTAMP" />
+    <result column="wage_hours" property="wageHours" jdbcType="REAL" />
+    <result column="income" property="income" jdbcType="DECIMAL" />
+    <result column="deduction" property="deduction" jdbcType="DECIMAL" />
+    <result column="real_income" property="realIncome" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="appeal_status" property="appealStatus" jdbcType="INTEGER" />
+    <result column="appeal_reason" property="appealReason" jdbcType="VARCHAR" />
+    <result column="update_user_id" property="updateUserId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bill_reconciliation_id, project_id, supplier_info_id, billing_cycle, person_id, 
+    fee_rule_type, attendance_start_time, attendance_end_time, wage_hours, income, deduction, 
+    real_income, status, appeal_status, appeal_reason, update_user_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_bill_reconciliation_time_detailed
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_bill_reconciliation_time_detailed
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed" >
+    insert into bpo_bill_reconciliation_time_detailed (id, bill_reconciliation_id, project_id, 
+      supplier_info_id, billing_cycle, person_id, 
+      fee_rule_type, attendance_start_time, attendance_end_time, 
+      wage_hours, income, deduction, 
+      real_income, status, appeal_status, 
+      appeal_reason, update_user_id, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{billReconciliationId,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, 
+      #{supplierInfoId,jdbcType=INTEGER}, #{billingCycle,jdbcType=VARCHAR}, #{personId,jdbcType=INTEGER}, 
+      #{feeRuleType,jdbcType=INTEGER}, #{attendanceStartTime,jdbcType=TIMESTAMP}, #{attendanceEndTime,jdbcType=TIMESTAMP}, 
+      #{wageHours,jdbcType=REAL}, #{income,jdbcType=DECIMAL}, #{deduction,jdbcType=DECIMAL}, 
+      #{realIncome,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, #{appealStatus,jdbcType=INTEGER}, 
+      #{appealReason,jdbcType=VARCHAR}, #{updateUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed" >
+    insert into bpo_bill_reconciliation_time_detailed
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="billReconciliationId != null" >
+        bill_reconciliation_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id,
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle,
+      </if>
+      <if test="personId != null" >
+        person_id,
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type,
+      </if>
+      <if test="attendanceStartTime != null" >
+        attendance_start_time,
+      </if>
+      <if test="attendanceEndTime != null" >
+        attendance_end_time,
+      </if>
+      <if test="wageHours != null" >
+        wage_hours,
+      </if>
+      <if test="income != null" >
+        income,
+      </if>
+      <if test="deduction != null" >
+        deduction,
+      </if>
+      <if test="realIncome != null" >
+        real_income,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="appealStatus != null" >
+        appeal_status,
+      </if>
+      <if test="appealReason != null" >
+        appeal_reason,
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="billReconciliationId != null" >
+        #{billReconciliationId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceStartTime != null" >
+        #{attendanceStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceEndTime != null" >
+        #{attendanceEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="wageHours != null" >
+        #{wageHours,jdbcType=REAL},
+      </if>
+      <if test="income != null" >
+        #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realIncome != null" >
+        #{realIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="appealStatus != null" >
+        #{appealStatus,jdbcType=INTEGER},
+      </if>
+      <if test="appealReason != null" >
+        #{appealReason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUserId != null" >
+        #{updateUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed" >
+    update bpo_bill_reconciliation_time_detailed
+    <set >
+      <if test="billReconciliationId != null" >
+        bill_reconciliation_id = #{billReconciliationId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle = #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        person_id = #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type = #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceStartTime != null" >
+        attendance_start_time = #{attendanceStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceEndTime != null" >
+        attendance_end_time = #{attendanceEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="wageHours != null" >
+        wage_hours = #{wageHours,jdbcType=REAL},
+      </if>
+      <if test="income != null" >
+        income = #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        deduction = #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realIncome != null" >
+        real_income = #{realIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="appealStatus != null" >
+        appeal_status = #{appealStatus,jdbcType=INTEGER},
+      </if>
+      <if test="appealReason != null" >
+        appeal_reason = #{appealReason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id = #{updateUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoBillReconciliationTimeDetailed" >
+    update bpo_bill_reconciliation_time_detailed
+    set bill_reconciliation_id = #{billReconciliationId,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=INTEGER},
+      supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      billing_cycle = #{billingCycle,jdbcType=VARCHAR},
+      person_id = #{personId,jdbcType=INTEGER},
+      fee_rule_type = #{feeRuleType,jdbcType=INTEGER},
+      attendance_start_time = #{attendanceStartTime,jdbcType=TIMESTAMP},
+      attendance_end_time = #{attendanceEndTime,jdbcType=TIMESTAMP},
+      wage_hours = #{wageHours,jdbcType=REAL},
+      income = #{income,jdbcType=DECIMAL},
+      deduction = #{deduction,jdbcType=DECIMAL},
+      real_income = #{realIncome,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      appeal_status = #{appealStatus,jdbcType=INTEGER},
+      appeal_reason = #{appealReason,jdbcType=VARCHAR},
+      update_user_id = #{updateUserId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

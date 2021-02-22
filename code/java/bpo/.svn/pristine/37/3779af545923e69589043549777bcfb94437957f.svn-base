@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoBillTimeMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoBillTime" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="supplier_info_id" property="supplierInfoId" jdbcType="INTEGER" />
+    <result column="billing_cycle" property="billingCycle" jdbcType="VARCHAR" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="fee_rule_type" property="feeRuleType" jdbcType="INTEGER" />
+    <result column="attendance_start_time" property="attendanceStartTime" jdbcType="TIMESTAMP" />
+    <result column="attendance_end_time" property="attendanceEndTime" jdbcType="TIMESTAMP" />
+    <result column="wage_hours" property="wageHours" jdbcType="REAL" />
+    <result column="time_price" property="timePrice" jdbcType="DECIMAL" />
+    <result column="salary_standard" property="salaryStandard" jdbcType="DECIMAL" />
+    <result column="food_subsidy" property="foodSubsidy" jdbcType="DECIMAL" />
+    <result column="night_subsidy" property="nightSubsidy" jdbcType="DECIMAL" />
+    <result column="other_subsidy" property="otherSubsidy" jdbcType="DECIMAL" />
+    <result column="deduction" property="deduction" jdbcType="DECIMAL" />
+    <result column="real_income" property="realIncome" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, supplier_info_id, billing_cycle, person_id, fee_rule_type, attendance_start_time, 
+    attendance_end_time, wage_hours, time_price, salary_standard, food_subsidy, night_subsidy, 
+    other_subsidy, deduction, real_income, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_bill_time
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="selectByIdAndTime" resultType="com.rz.iot.bpo.model.show.bpoBill.BpoBillTimeShow">
+      SELECT
+      bill_time.id as id,person.person_name as name,person.station as station,
+      bill_time.attendance_start_time as startTime,bill_time.attendance_end_time as endTime,
+      bill_time.wage_hours as wageHours,bill_time.time_price as timePrice,
+      bill_time.salary_standard as salaryStandard,bill_time.deduction as deduction,
+      bill_time.real_income as realIncome
+      FROM bpo_bill_time bill_time
+      LEFT JOIN bpo_person person ON bill_time.person_id = person.id
+      LEFT JOIN sys_company company ON company.id = person.company_id
+      where company.id = 2 and bill_time.project_id = 3 and bill_time.billing_cycle = '2020-06-14'
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_bill_time
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoBillTime" >
+    insert into bpo_bill_time (id, project_id, supplier_info_id, 
+      billing_cycle, person_id, fee_rule_type, 
+      attendance_start_time, attendance_end_time, 
+      wage_hours, time_price, salary_standard, 
+      food_subsidy, night_subsidy, other_subsidy, 
+      deduction, real_income, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, #{supplierInfoId,jdbcType=INTEGER}, 
+      #{billingCycle,jdbcType=VARCHAR}, #{personId,jdbcType=INTEGER}, #{feeRuleType,jdbcType=INTEGER}, 
+      #{attendanceStartTime,jdbcType=TIMESTAMP}, #{attendanceEndTime,jdbcType=TIMESTAMP}, 
+      #{wageHours,jdbcType=REAL}, #{timePrice,jdbcType=DECIMAL}, #{salaryStandard,jdbcType=DECIMAL}, 
+      #{foodSubsidy,jdbcType=DECIMAL}, #{nightSubsidy,jdbcType=DECIMAL}, #{otherSubsidy,jdbcType=DECIMAL}, 
+      #{deduction,jdbcType=DECIMAL}, #{realIncome,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoBillTime" >
+    insert into bpo_bill_time
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id,
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle,
+      </if>
+      <if test="personId != null" >
+        person_id,
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type,
+      </if>
+      <if test="attendanceStartTime != null" >
+        attendance_start_time,
+      </if>
+      <if test="attendanceEndTime != null" >
+        attendance_end_time,
+      </if>
+      <if test="wageHours != null" >
+        wage_hours,
+      </if>
+      <if test="timePrice != null" >
+        time_price,
+      </if>
+      <if test="salaryStandard != null" >
+        salary_standard,
+      </if>
+      <if test="foodSubsidy != null" >
+        food_subsidy,
+      </if>
+      <if test="nightSubsidy != null" >
+        night_subsidy,
+      </if>
+      <if test="otherSubsidy != null" >
+        other_subsidy,
+      </if>
+      <if test="deduction != null" >
+        deduction,
+      </if>
+      <if test="realIncome != null" >
+        real_income,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceStartTime != null" >
+        #{attendanceStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceEndTime != null" >
+        #{attendanceEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="wageHours != null" >
+        #{wageHours,jdbcType=REAL},
+      </if>
+      <if test="timePrice != null" >
+        #{timePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="salaryStandard != null" >
+        #{salaryStandard,jdbcType=DECIMAL},
+      </if>
+      <if test="foodSubsidy != null" >
+        #{foodSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="nightSubsidy != null" >
+        #{nightSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="otherSubsidy != null" >
+        #{otherSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realIncome != null" >
+        #{realIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoBillTime" >
+    update bpo_bill_time
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierInfoId != null" >
+        supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="billingCycle != null" >
+        billing_cycle = #{billingCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="personId != null" >
+        person_id = #{personId,jdbcType=INTEGER},
+      </if>
+      <if test="feeRuleType != null" >
+        fee_rule_type = #{feeRuleType,jdbcType=INTEGER},
+      </if>
+      <if test="attendanceStartTime != null" >
+        attendance_start_time = #{attendanceStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceEndTime != null" >
+        attendance_end_time = #{attendanceEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="wageHours != null" >
+        wage_hours = #{wageHours,jdbcType=REAL},
+      </if>
+      <if test="timePrice != null" >
+        time_price = #{timePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="salaryStandard != null" >
+        salary_standard = #{salaryStandard,jdbcType=DECIMAL},
+      </if>
+      <if test="foodSubsidy != null" >
+        food_subsidy = #{foodSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="nightSubsidy != null" >
+        night_subsidy = #{nightSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="otherSubsidy != null" >
+        other_subsidy = #{otherSubsidy,jdbcType=DECIMAL},
+      </if>
+      <if test="deduction != null" >
+        deduction = #{deduction,jdbcType=DECIMAL},
+      </if>
+      <if test="realIncome != null" >
+        real_income = #{realIncome,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoBillTime" >
+    update bpo_bill_time
+    set project_id = #{projectId,jdbcType=INTEGER},
+      supplier_info_id = #{supplierInfoId,jdbcType=INTEGER},
+      billing_cycle = #{billingCycle,jdbcType=VARCHAR},
+      person_id = #{personId,jdbcType=INTEGER},
+      fee_rule_type = #{feeRuleType,jdbcType=INTEGER},
+      attendance_start_time = #{attendanceStartTime,jdbcType=TIMESTAMP},
+      attendance_end_time = #{attendanceEndTime,jdbcType=TIMESTAMP},
+      wage_hours = #{wageHours,jdbcType=REAL},
+      time_price = #{timePrice,jdbcType=DECIMAL},
+      salary_standard = #{salaryStandard,jdbcType=DECIMAL},
+      food_subsidy = #{foodSubsidy,jdbcType=DECIMAL},
+      night_subsidy = #{nightSubsidy,jdbcType=DECIMAL},
+      other_subsidy = #{otherSubsidy,jdbcType=DECIMAL},
+      deduction = #{deduction,jdbcType=DECIMAL},
+      real_income = #{realIncome,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getPeopleCount" resultType="int">
+    SELECT
+	count(1)
+    FROM
+        (
+        SELECT
+            bbt.person_id
+        FROM
+            bpo_bill_time bbt
+            LEFT JOIN bpo_person bp ON bbt.person_id = bp.id
+            LEFT JOIN sys_company sc ON sc.id = bp.company_id
+        WHERE
+            bbt.project_id = #{projectId,jdbcType=INTEGER}
+            AND bbt.billing_cycle = #{date,jdbcType=VARCHAR}
+            AND sc.id = #{payeeId,jdbcType=INTEGER}
+        GROUP BY
+        bbt.person_id
+        ) AS a
+  </select>
+
+  <resultMap id="findAllMap" type="com.rz.iot.bpo.model.show.BpoBillPayablePersonShow">
+    <result column="id" property="id"/>
+    <result column="person_name" property="personName"/>
+    <result column="project_name" property="projectName"/>
+    <result column="company_name" property="companyName"/>
+    <result column="billing_cycle" property="billingCycle"/>
+    <result column="totalSalaryStandard" property="salaryStandard"/>
+    <result column="time_price" property="timePrice"/>
+    <result column="totalNightSubsidy" property="nightSubsidy"/>
+    <result column="totalOtherSubsidy" property="otherSubsidy"/>
+    <result column="totalFoolSubsidy" property="foolSubsidy"/>
+    <result column="totalWageHours" property="wageHours"/>
+    <result column="totalIncome" property="income"/>
+    <result column="totalDeduction" property="deduction"/>
+  </resultMap>
+
+  <select id="findAllBillPerson" resultMap="findAllMap">
+    SELECT
+    person.id,
+    person.person_name,
+    bbt.fee_rule_type,
+    project.project_name,
+    company.company_name,
+    bbt.billing_cycle,
+    SUM(bbt.food_subsidy) AS totalFoolSubsidy,
+    SUM(bbt.night_subsidy) AS totalNightSubsidy,
+    SUM(bbt.other_subsidy) AS totalOtherSubsidy,
+    bbt.time_price,
+    SUM(bbt.salary_standard) AS totalSalaryStandard,
+    sum( bbt.wage_hours ) AS totalWageHours,
+    sum( bbt.real_income ) AS totalIncome,
+    sum( bbt.deduction ) AS totalDeduction
+    FROM bpo_bill_time bbt
+    LEFT JOIN bpo_project project ON project.id = bbt.project_id
+    LEFT JOIN bpo_person person ON person.id = bbt.person_id
+    LEFT JOIN bpo_transfer_station bts ON bts.id = project.transfer_station_id
+    LEFT JOIN sys_company company ON company.id = person.company_id
+    GROUP BY
+    bbt.person_id,
+    bbt.project_id,
+    bbt.billing_cycle,
+    bts.id,
+    person.id,
+    company.id
+    ORDER BY bbt.billing_cycle
+  </select>
+
+  <select id="billPersonDayDetail" resultType="com.rz.iot.bpo.model.show.bpoBill.BpoBillPersonDayDetail">
+    SELECT
+    person.id as id,
+    person.person_name as personName,
+    person.person_type as personType,
+    bts.`name` as transName,
+    bpw.pay_type as payType,
+    bbt.billing_cycle as billingCycle,
+    bbt.fee_rule_type as feeRuleType,
+    bbt.attendance_start_time as attendanceStartTime,
+    bbt.attendance_end_time as attendanceEndTime,
+    bbt.wage_hours as wageHours,
+    bbt.time_price as timePrice,
+    bbt.salary_standard as salaryStandard,
+    bbt.food_subsidy as foodSubsidy,
+    bbt.night_subsidy as nightSubsidy,
+    bbt.other_subsidy as otherSubsidy,
+    bbt.deduction as deduction,
+    bbt.real_income as realIncome
+    FROM bpo_bill_time bbt
+    LEFT JOIN bpo_project project ON project.id = bbt.project_id
+    LEFT JOIN bpo_person person ON person.id = bbt.person_id
+    LEFT JOIN bpo_transfer_station bts ON bts.id = project.transfer_station_id
+    LEFT JOIN sys_company company ON company.id = person.company_id
+    LEFT JOIN bpo_person_wage bpw ON bpw.id = person.wage_id
+    where
+    bbt.person_id = #{id}
+    AND bbt.billing_cycle = #{date}
+
+  </select>
+
+  <select id="getBillPersonTotal" resultType="com.rz.iot.bpo.model.show.bpoBill.BpoBillPersonDayTotal">
+    SELECT
+    person.id as id,
+    person.person_name as personName,
+    person.person_type as personType,
+    -- 		bts.`name` as transName,
+    bpw.pay_type as payType,
+    bbt.billing_cycle as billingCycle,
+    bbt.time_price as timePrice,
+    sum(bbt.salary_standard) AS totalSalaryStandard,
+    sum(bbt.night_subsidy) as totalNightSubsidy,
+    sum(bbt.food_subsidy) as totalFoodSubsidy,
+    sum(bbt.other_subsidy) as totalOtherSubsidy,
+    sum(bbt.wage_hours) AS totalWageHours,
+    sum(bbt.real_income ) AS totalRealSalary,
+    sum(bbt.deduction) AS totalDeduction
+    FROM bpo_bill_time bbt
+    LEFT JOIN bpo_project project ON project.id = bbt.project_id
+    LEFT JOIN bpo_person person ON person.id = bbt.person_id
+    LEFT JOIN bpo_transfer_station bts ON bts.id = project.transfer_station_id
+    LEFT JOIN sys_company company ON company.id = person.company_id
+    LEFT JOIN bpo_person_wage bpw ON bpw.id = person.wage_id
+    where
+    bbt.person_id = #{id}
+    AND bbt.billing_cycle = #{date}
+    GROUP BY
+    bbt.project_id,
+    bbt.billing_cycle,
+    bbt.person_id,
+    project.id,
+    bts.id,
+    company.id
+  </select>
+</mapper>

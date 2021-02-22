@@ -1,0 +1,312 @@
+<template>
+  <div>
+    <CfPanel title="组织管理" class="orgManage">
+      <el-form :inline="true" class="bpoFormInline">
+        <el-form-item label="组织类型：">
+          <el-select v-model="searchParam.orgType" filterable placeholder="请选择组织类型" class="cover">
+            <el-option
+              v-for="(item,index) in orgOptions"
+              :key="index"
+              :label="item.orgName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="组织名称：">
+          <el-input v-model="searchParam.companyName" placeholder="请输入组织名称" />
+        </el-form-item>
+        <el-form-item label="状态：">
+          <el-select v-model="searchParam.status" filterable placeholder="请选择状态" class="cover">
+            <el-option
+              v-for="(item,index) in stateOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="bpoBtn" @click="submit">搜索</el-button>
+          <el-button @click="reset">重置</el-button>
+        </el-form-item>
+      </el-form>
+
+      <el-button type="primary" icon="el-icon-plus" @click="addUser">新增</el-button>
+      <el-table
+        v-loading="listLoading"
+        :data="userList"
+        class="bpoTable"
+        fit
+        @sort-change="sortChange"
+        @cell-mouse-enter="currentRowChange"
+      >
+        <el-table-column align="center" label="编号" type="index" width="80" />
+        <el-table-column align="left" label="组织名称" min-width="120">
+          <template slot-scope="scope">{{ scope.row.companyName }}</template>
+        </el-table-column>
+        <el-table-column align="left" label="简称" min-width="80">
+          <template slot-scope="scope">{{ scope.row.companyName }}</template>
+        </el-table-column>
+        <el-table-column align="left" label="组织编码" min-width="80">
+          <template slot-scope="scope">{{ scope.row.companyCode }}</template>
+        </el-table-column>
+        <el-table-column align="left" label="组织类型" min-width="80">
+          <template slot-scope="scope">{{ scope.row.orgName }}</template>
+        </el-table-column>
+
+        <!--<el-table-column align="center" label="统一社会信用代码" min-width="120">
+          <template slot-scope="scope">{{ scope.row.creditCode }}</template>
+        </el-table-column>-->
+        <el-table-column align="center" label="创建时间" min-width="120">
+          <!-- 1.启用 2.禁用 -->
+          <template slot-scope="scope">{{ scope.row.createTime }}</template>
+        </el-table-column>
+        <el-table-column align="center" label="状态" width="80">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.status"
+              :active-value="1"
+              :inactive-value="2"
+              @change="statusChange"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="200">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              style="color:#4794F7"
+              size="mini"
+              @click="handleView(scope.row)"
+            >详情</el-button>
+            <el-button
+              type="text"
+              style="color:#19D185"
+              size="mini"
+              @click="handleUpdate(scope.row)"
+            >修改</el-button>
+            <el-button
+              v-if="scope.row.status!='deleted'"
+              size="mini"
+              type="text"
+              style="color:#F52222"
+              @click="handleDelete(scope.row,'deleted')"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        lang-type="zh"
+        :page.sync="listQuery.page"
+        :limit.sync="listQuery.limit"
+        @pagination="getList"
+      />
+    </CfPanel>
+  </div>
+</template>
+
+<script type="text/javascript">
+// import path from 'path'
+// import { deepClone } from '@/utils'
+import CfPanel from '@/components/Panel'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+// eslint-disable-next-line no-unused-vars
+import {
+  getAllItem,
+  deleteItem,
+  findOrgType,
+  /*   findAllComByKey, */
+  updateItem
+} from '@/api/orgnization'
+
+export default {
+  name: 'RoleManage',
+  components: { CfPanel, Pagination },
+  data() {
+    return {
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sortField: '',
+        sortType: ''
+      },
+      entity: {},
+      total: 0,
+      searchParam: {},
+      userList: [],
+      currentRow: {},
+      orgOptions: [],
+      orgMap: {},
+      stateOptions: [
+        { value: '1', label: '启用' },
+        { value: '2', label: '禁用' }
+      ],
+      detailDialogVisible: false,
+      dialogTitle: '新增角色'
+    }
+  },
+  computed: {},
+  created() {
+    this.getOrgType()
+  },
+  mounted() {
+    this.getList()
+  },
+  methods: {
+    submit() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    currentRowChange(row, column, cell, event) {
+      this.currentRow = row
+    },
+    statusChange(status) {
+      this.currentRow.status = status
+      updateItem(this.currentRow).then(res => {
+        this.$notify({
+          title: '成功',
+          duration: '2000',
+          message: '修改成功！',
+          type: 'success'
+        })
+      })
+    },
+    getOrgType() {
+      findOrgType()
+        .then(res => {
+          this.orgOptions = res.data.data
+          this.orgOptions.forEach(item => {
+            this.orgMap[item.id] = item.orgName
+          })
+          // eslint-disable-next-line handle-callback-err
+        })
+        .catch(() => {})
+    },
+    error() {
+      this.$notify({
+        title: '失败',
+        duration: '2000',
+        message: '操作失败！',
+        type: 'fail'
+      })
+    },
+    closeDetailDialog() {
+      this.detailDialogVisible = false
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      this.listQuery.sortField = prop
+      this.listQuery.sortType = order
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getList() {
+      this.searchParam.pageNum = this.listQuery.page
+      this.searchParam.pageSize = this.listQuery.limit
+      getAllItem(this.searchParam)
+        .then(res => {
+          this.userList = res.data.data.list
+          this.total = res.data.data.total
+          this.listLoading = false
+          // eslint-disable-next-line handle-callback-err
+        })
+        .catch(() => {
+          this.listLoading = false
+        })
+    },
+    addUser() {
+      this.$router.push({
+        name: 'orgInfo'
+      })
+    },
+    search() {},
+    reset() {
+      this.searchParam = {}
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleView(row) {
+      this.$router.push({
+        name: 'orgDetail',
+        params: {
+          primaryKey: row.id,
+          entity: JSON.stringify(row),
+          readonly: true
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.$router.push({
+        name: 'orgInfo',
+        params: { primaryKey: row.id, entity: JSON.stringify(row) }
+      })
+    },
+    handleDelete(row) {
+      this.$confirm('确定删除该组织？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      })
+        .then(() => {
+          deleteItem({ id: row.id }).then(() => {
+            this.$notify({
+              title: '成功',
+              duration: '2000',
+              message: '删除组织成功！',
+              type: 'success'
+            })
+            this.getList()
+          })
+        })
+        .catch(() => {})
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.orgManage {
+  .el-table th {
+    background-color: #e8e9f3;
+  }
+  /*.el-table {
+      /deep/ .cell{
+        white-space: nowrap;
+      }
+    }*/
+  .el-select {
+    width: 100%;
+  }
+  .searchForm {
+    .el-form-item__label {
+      padding: 0px;
+    }
+  }
+  .el-dialog__header {
+    background: #f6f7fb;
+  }
+  .cover {
+    width: 100%;
+  }
+  .half {
+    width: 50%;
+    min-width: 200px;
+  }
+  .cf-button-group {
+    margin-bottom: 0;
+    text-align: right;
+  }
+  .dialog-cover {
+    width: 300px;
+  }
+  .el-textarea__inner {
+    min-height: 54px !important;
+  }
+}
+</style>

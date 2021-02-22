@@ -1,0 +1,273 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.common.utils.SecurityUtils;
+import com.rz.iot.bpo.controller.BpoEvaluationResultParam;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.*;
+import com.rz.iot.bpo.model.*;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.BpoPerformanceEvaluationShow;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillReconciliationShow;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillDayShow;
+import com.rz.iot.bpo.service.BpoBillReceivableService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @program: bpo-preview
+ * @description: 财务管理 应收
+ * @author: YangShun
+ * @create: 2020-07-29 11:19
+ **/
+@Service
+public class BpoBillReceivableServiceImpl implements BpoBillReceivableService {
+
+    @Resource
+    private BpoBillSupplierDayMapper supplierDayMapper;
+
+    @Resource
+    private BpoPerformanceEvaluationMapper performanceEvaluationMapper;
+
+    @Resource
+    private BpoBillSupplierMonthMapper supplierMonthMapper;
+
+    @Resource
+    private BpoEvaluationResultMapper bpoEvaluationResultMapper;
+
+    @Resource
+    private BpoBillSupplierMonthDetailMapper bpoBillSupplierMonthDetailMapper;
+
+    @Resource
+    private BpoBillTimeMapper billTimeMapper;
+
+    @Resource
+    private BpoBillReconciliationMapper reconciliationMapper;
+
+    @Resource
+    private BpoBillReconciliationTimeDetailedMapper bpoBillReconciliationTimeDetailedMapper;
+
+    private ThreadLocal<BpoBillReconciliationShow> localshow = new ThreadLocal<> ();
+
+    @Override
+    public Result findAllMonth(BaseEntity entity,BillSelectParam param) {
+        return null;
+    }
+
+    /**
+     * 查询供应商所有日账单
+     * @param entity
+     * @param param
+     * @return
+     */
+    @Override
+    public Result finaAllDay(BaseEntity entity,BillSelectParam param) {
+        List<BpoBillDayShow> bpoBillDayShows = supplierDayMapper.selectAllDayAccount (entity,param);
+        Result<List<BpoBillDayShow>> result = new Result<> (ResultConstants.REQUEST_SUCCESS);
+        result.setData (bpoBillDayShows);
+        return result;
+    }
+
+    /**
+     * 根据供应商月账单表id，获取此供应商下的员工账单记录
+     * @param id
+     * @return
+     */
+    @Override
+    public Result findDetailDays(Integer id) {
+        BpoBillDayShow bpoBillDayShow = supplierDayMapper.selectDetailById (id);
+        Result<BpoBillDayShow> result = new Result<> (ResultConstants.REQUEST_SUCCESS);
+        result.setData (bpoBillDayShow);
+        return result;
+    }
+
+    /**
+     * 对账 应收
+     * 插入信息到对账供应商详情表
+     * 插入信息到对账表
+     * 插入信息到对账详情表
+     * @param monthId
+     * @return
+     */
+    @Override
+    public Result createCheck(Integer monthId) {
+        //获取供应商月账单信息
+        BpoBillSupplierMonth bpoBillSupplierMonth = supplierMonthMapper.selectByPrimaryKey (monthId);
+        if(bpoBillSupplierMonth == null){
+            return Result.requestParamError ("供应商账单信息获取失败");
+        }
+        //获取供应商ID和ParentID
+        BpoSupplierInfo bpoSupplierInfo = supplierMonthMapper.selectSupplierIdByCompanyId (bpoBillSupplierMonth.getPayeeId ());
+        if(bpoSupplierInfo == null){
+            return Result.requestParamError ("供应商信息获取失败");
+        }
+        //获取供应商当月的人员账单表信息
+        List<BpoBillTime> BpoBillTimes = billTimeMapper.findAllByCompanyAndTime (bpoBillSupplierMonth.getPayeeId (), bpoBillSupplierMonth.getProjectId (), bpoBillSupplierMonth.getBillCycle ());
+        if(BpoBillTimes == null || BpoBillTimes.size () == 0){
+            return Result.requestParamError ("没有查询到人员账单信息");
+        }
+        //新增对账表记录
+        BpoBillReconciliation reconciliation = new BpoBillReconciliation ();
+        reconciliation.setBillingCycle (bpoBillSupplierMonth.getBillCycle ());//周期
+        reconciliation.setBillType (DictDataConstants.MONTHEND);//账单类型
+        reconciliation.setPayeeId (bpoBillSupplierMonth.getPayeeId ());//收款方id
+        reconciliation.setPayerId (bpoBillSupplierMonth.getPayerId ());//付款方id
+        reconciliation.setProjectId (bpoBillSupplierMonth.getProjectId ());//项目ID
+        reconciliation.setMonthBillId (bpoBillSupplierMonth.getId ());//对应月账单ID
+        reconciliation.setReconciliationWay (DictDataConstants.RECIVEABLE);//对账方式  此设置为应收
+        if(bpoSupplierInfo.getParentId () == -1){
+            reconciliation.setReconciliationType (DictDataConstants.CUSTOMERTOMAINSUPPLIER);//对账类型为 客户-主体供应商
+        }else{
+            reconciliation.setReconciliationType (DictDataConstants.MAINSUPPLIERTOSUPPLIER);//对账类型为 主体供应商-供应商
+        }
+        reconciliation.setFeeRuleType (DictDataConstants.BY_TIME);//计价模式
+        reconciliation.setTotalHours (bpoBillSupplierMonth.getTotalHours ().floatValue ());//总时长
+//        reconciliation.setTotalOutput ();//总数量
+        reconciliation.setReconciliationStatus (DictDataConstants.NoRECONCILIATION);//对账状态 未对账
+        reconciliation.setStatus (DictDataConstants.NORMAL_STATUS);
+        reconciliationMapper.insertSelective (reconciliation);
+        //复制一份信息进入对账明细表
+        List<BpoBillReconciliationTimeDetailed> detaileds = new ArrayList<> ();
+        for (BpoBillTime bpoBillTime : BpoBillTimes) {
+            if(bpoBillTime.getStatus () == DictDataConstants.DELETE_STATUS){
+                continue;
+            }
+            BpoBillReconciliationTimeDetailed detailed = new BpoBillReconciliationTimeDetailed ();
+            detailed.setBillReconciliationId (reconciliation.getId ());//id
+            detailed.setProjectId (reconciliation.getProjectId ());//项目id
+            detailed.setBillingCycle (bpoBillTime.getBillingCycle ());//周期
+            detailed.setPersonId (bpoBillTime.getPersonId ());//人员id
+            detailed.setFeeRuleType (bpoBillTime.getFeeRuleType ());//计价模式
+            detailed.setAttendanceStartTime (bpoBillTime.getAttendanceStartTime ());//上班卡
+            detailed.setAttendanceEndTime (bpoBillTime.getAttendanceEndTime ());//下班卡
+            detailed.setWageHours (bpoBillTime.getWageHours ().floatValue ());//计薪工时
+            detailed.setIncome (bpoBillTime.getSalaryStandard ());//收入
+            detailed.setRealIncome (bpoBillTime.getRealIncome ());//实际收入
+            detailed.setStatus (bpoBillTime.getStatus ());//状态
+            detailed.setUpdateUserId (SecurityUtils.getLoginUser ().getUser ().getUserId ());//操作者
+            detaileds.add (detailed);
+        }
+        bpoBillReconciliationTimeDetailedMapper.insertSelectiveAll (detaileds);
+        //获取供应商考核标准
+        BpoPerformanceEvaluationShow info = performanceEvaluationMapper.selectBysupplierInfoId(bpoSupplierInfo.getId ());
+        //获取供应商考核信息
+        BpoEvaluationResultParam param = new BpoEvaluationResultParam ();
+        param.setSupplierInfoId (bpoSupplierInfo.getId ());
+        param.setEvaluationTime (bpoBillSupplierMonth.getBillCycle ());
+        BpoEvaluationResult result = bpoEvaluationResultMapper.getResult (param);
+        //插入信息到对账供应商详情表
+        BpoBillSupplierMonthDetail detail = new BpoBillSupplierMonthDetail ();
+        detail.setMonthBillId (bpoBillSupplierMonth.getId ());//月账单ID
+        detail.setSupplierSalary (bpoBillSupplierMonth.getSupplierSalary ());//薪资标准
+        detail.setDeduction (bpoBillSupplierMonth.getTotalDeduction ());//扣款
+        detail.setBillAmount (bpoBillSupplierMonth.getRealBillAmount ());//账单金额
+        detail.setPerformanceScore (param.getGrade ());//绩效得分
+        detail.setPerformanceScoreRate (info.getLinkRate ());//绩效考核挂钩比
+        detail.setPerformanceQuota (param.getAssessmentQuota ());//考核额度
+        BigDecimal billAmount = bpoBillSupplierMonth.getBillAmount ();//未扣款账单金额
+        //支付比例  1.获取绩效得分 2.获得支付比例
+        Double paymentRatio = new Double (0.00);
+        if(param.getGrade ()!=null) {
+            Double grade = Double.parseDouble (param.getGrade ());
+            if (grade>90){
+                paymentRatio = 1.00;
+            }else if(grade>50 && grade<=90){
+                paymentRatio = grade*0.01;
+            }else {
+                paymentRatio = 0.50;
+            }
+        }
+        //挂钩比例
+        Double hookRatio = 1-paymentRatio;
+        //考核后额度
+        Double afterAssessment = Double.parseDouble (param.getResultMoney ())
+                - (Double.parseDouble(billAmount.toString ())*(1-hookRatio));
+
+        detail.setPerformanceScoreQuota (afterAssessment.toString ());//考核后额度
+        //实际账单金额
+        Double actualBill = 0.00;
+        double agencySalary = bpoBillSupplierMonth.getAgencySalary ().doubleValue ();//代发薪资
+        actualBill = Double.parseDouble (param.getResultMoney ()) + agencySalary;
+        detail.setRealBillAmount (new BigDecimal (actualBill));//加上代发薪资的最终实际账单金额
+        bpoBillSupplierMonthDetailMapper.insertSelective (detail);
+        return Result.success ();
+    }
+
+    @Override
+    public BpoBillReconciliationShow getCheckMessage(Integer monthId) {
+        //账单表
+        BpoBillReconciliation reconciliation = reconciliationMapper.selectByMonthBillKey (monthId);
+        if(reconciliation == null){
+            createCheck(monthId);
+            reconciliation = reconciliationMapper.selectByMonthBillKey (monthId);
+        }
+        //供应商月账单
+        BpoBillReconciliationShow bpoBillMonthShow = supplierMonthMapper.selectReconciliationByKey (monthId);
+        //供应商月账单明细
+        BpoBillSupplierMonthDetail detail = bpoBillSupplierMonthDetailMapper.selectByMonthKey (monthId);
+        //账单对账明细 人员计时
+        List<BpoBillReconciliationTimeDetailed> detaileds = bpoBillReconciliationTimeDetailedMapper.selectByParam
+                (reconciliation.getPayeeId (), reconciliation.getProjectId (), reconciliation.getBillingCycle ());
+        bpoBillMonthShow.setDetaileds (detaileds);
+        bpoBillMonthShow.setOtherDeduction (detail.getOtherDeduction ().doubleValue ());
+        bpoBillMonthShow.setOtherIncome (detail.getOtherIncome ().doubleValue ());
+        bpoBillMonthShow.setPerformanceScore(detail.getPerformanceScore ());
+        bpoBillMonthShow.setPerformanceScoreRate(detail.getPerformanceScoreRate ());
+        bpoBillMonthShow.setPerformanceQuota(detail.getPerformanceQuota ());
+        bpoBillMonthShow.setPerformanceScoreQuota(detail.getPerformanceScoreQuota ());
+        bpoBillMonthShow.setBillReconciliationId (reconciliation.getId ());
+        if(localshow.get ()!=null){
+            localshow.remove ();
+        }
+        localshow.set (bpoBillMonthShow);
+        return bpoBillMonthShow;
+    }
+
+    @Override
+    public Result startCheck(BpoBillReconciliationShow bpoBillMonthShow) {
+        BpoBillReconciliationShow checkMessage = null;
+        if(localshow.get ()==null){
+            checkMessage = getCheckMessage (bpoBillMonthShow.getId ());
+        }
+        checkMessage = localshow.get ();
+        BpoBillReconciliation reconciliation = reconciliationMapper.selectByMonthBillKey (bpoBillMonthShow.getId ());
+        if(reconciliation.getStatus ()!=DictDataConstants.NoRECONCILIATION){
+            return Result.requestParamError ("账单已经开始对账，无法申请");
+        }
+        //供应商月账单参数设置
+        BpoBillSupplierMonth bpoBillSupplierMonth = new BpoBillSupplierMonth ();
+        bpoBillSupplierMonth.setId (bpoBillMonthShow.getId ());
+        bpoBillMonthShow.setTotalDeduction (bpoBillMonthShow.getTotalDeduction ());
+        bpoBillMonthShow.setBillAmount (bpoBillMonthShow.getBillAmount ());
+        supplierMonthMapper.updateByPrimaryKey (bpoBillSupplierMonth);
+        //供应商月账单详情参数设置
+        BpoBillSupplierMonthDetail bpoBillSupplierMonthDetail = new BpoBillSupplierMonthDetail ();
+        bpoBillSupplierMonthDetail.setOtherDeduction (new BigDecimal (bpoBillMonthShow.getOtherDeduction ()));
+        bpoBillSupplierMonthDetail.setOtherIncome (new BigDecimal (bpoBillMonthShow.getOtherIncome ()));
+        bpoBillSupplierMonthDetail.setRealBillAmount (bpoBillMonthShow.getRelBillMoney ());
+        bpoBillSupplierMonthDetail.setOtherDeductionExplain (bpoBillMonthShow.getOtherDeductionMessage ());
+        bpoBillSupplierMonthDetail.setOtherIncomeExplain (bpoBillMonthShow.getOtherIncomeMessage ());
+        bpoBillSupplierMonthDetail.setMonthBillId (bpoBillMonthShow.getId ());
+        bpoBillSupplierMonthDetailMapper.updateByPrimaryKeySelectiveByMonthId (bpoBillSupplierMonthDetail);
+        //修改账单表状态
+        BpoBillReconciliation bpoBillReconciliation = new BpoBillReconciliation ();
+        bpoBillReconciliation.setStatus (DictDataConstants.INRECONCILIATION);
+        bpoBillReconciliation.setTotalHours (bpoBillMonthShow.getTotalHours ().floatValue ());
+        bpoBillReconciliation.setId (localshow.get ().getBillReconciliationId ());
+        reconciliationMapper.updateByPrimaryKeySelective (bpoBillReconciliation);
+        return Result.success ();
+    }
+
+    @Override
+    public Result saveMessage(BpoBillReconciliationTimeDetailed detailed) {
+        bpoBillReconciliationTimeDetailedMapper.updateByPrimaryKeySelective (detailed);
+        return Result.success ();
+    }
+
+}

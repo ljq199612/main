@@ -1,0 +1,38 @@
+export default function mergeData({ tableData, key, mergeDataFunction }) {
+  const workModelsData = tableData
+  const len = workModelsData.length // 总数据长度
+  const mergeInfoMap = {}
+  let i = 0
+  while (i < len) {
+    const currentRow = workModelsData[i] // 基准单元格
+    const currentRowId = currentRow[key]
+    if (!currentRowId) {
+      // 没有值的字段不合并
+      break
+    }
+    const mergeInfo = {
+      rowStartIndex: i,
+      rowspan: 1
+    }
+    let j
+    for (j = i + 1; j < len; j++) {
+      const compareRow = workModelsData[j] // 比较单元格
+      const compareRowId = compareRow[key]
+      if (!compareRowId) {
+        // 没有值的字段不合并
+        break
+      }
+      if (mergeDataFunction(currentRow, compareRow)) {
+        // 单元格合并范围+1
+        mergeInfo.rowspan++
+      } else {
+        break
+      }
+    }
+    // 单元格合并结束
+    i = j
+    // 建立行合并map
+    mergeInfoMap[mergeInfo['rowStartIndex']] = mergeInfo
+  }
+  return mergeInfoMap
+}

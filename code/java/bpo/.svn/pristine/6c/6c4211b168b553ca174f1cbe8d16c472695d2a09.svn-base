@@ -1,0 +1,102 @@
+<template>
+  <CfPanel title="按钮范例" class="button main">
+    <h1>页面按钮组</h1>
+    <el-form>
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-plus">新增</el-button>
+        <el-button type="warning" plain icon="el-icon-search">搜索</el-button>
+      </el-form-item>
+    </el-form>
+    <h2>强制规范：</h2>
+    <p>按钮名称：通用型按钮名称应保持一致，需要添加修饰词，如：新增、删除、导入、导出</p>
+    <p>按钮名称：页面模块特有的按钮名称可以按UI设计稿来命名</p>
+    <p>按钮图标：所有页面按钮组内的按钮都要带有图标</p>
+    <p>主按钮个数：按钮组内有且仅有一个主按钮</p>
+    <p>
+      次按钮颜色：次按钮颜色采用警告色的朴素按钮
+      <mark>type="warning" plain</mark>
+    </p>
+    <hr>
+    <h1>搜索表单按钮</h1>
+    <el-form>
+      <el-form-item>
+        <el-button class="bpoBtn" @click="submit">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
+      </el-form-item>
+    </el-form>
+    <h2>强制规范：</h2>
+    <p>固定按钮名称：按钮固定搜索、重置俩名称，搜索为主按钮，在左边</p>
+    <p>
+      主按钮样式：搜索主按钮需要应用
+      <mark>.bpoBtn</mark>
+    </p>
+    <h2>建议规范：</h2>
+    <p>
+      统一函数命名：搜索按钮的执行函数命名建议统一为：
+      <mark>submit</mark>、重置执行函数名建议统一为：
+      <mark>sreset</mark>
+    </p>
+    <hr>
+    <h1>弹框表单按钮</h1>
+    <el-form>
+      <el-form-item class="bpoButtonGroup pull-right">
+        <el-button type="primary" @click="submit('form')">提交</el-button>
+        <el-button @click="backTo">关闭</el-button>
+      </el-form-item>
+    </el-form>
+    <h2>强制规范：</h2>
+    <p>按钮右对齐：弹框表单按钮统一右对齐</p>
+    <p>统一按钮大小：弹框表单按钮统一为正常大小</p>
+    <p>固定按钮文字：按钮固定提交、关闭俩名称，提交为主按钮，在左边</p>
+    <p>
+      主按钮样式：提交按钮type应为
+      <mark>primary</mark>
+    </p>
+    <h1>编辑表单按钮</h1>
+    <el-form>
+      <el-form-item class="bpoButtonGroup">
+        <el-button type="primary" size="medium" @click="submit('form')">提交</el-button>
+        <el-button size="medium" @click="backTo">关闭</el-button>
+      </el-form-item>
+    </el-form>
+    <div>
+      <h2>强制规范：</h2>
+      <p>固定按钮名称：按钮固定提交、关闭俩名称，提交为主按钮，在左边</p>
+      <p>
+        固定按钮大小：编辑表单按钮需要采用
+        <mark>size="medium"</mark>大小
+      </p>
+      <h2>建议规范：</h2>
+      <p>统一函数命名：提交按钮的执行函数命名建议统一为：submit、重置执行函数名建议统一为：backTo</p>
+    </div>
+  </CfPanel>
+</template>
+
+<script type="text/javascript">
+import CfPanel from '@/components/Panel'
+
+export default {
+  name: 'Button',
+  components: { CfPanel },
+  methods: {
+    submit() {},
+    reset() {},
+    backTo() {}
+  }
+}
+</script>
+<style lang="scss" scoped>
+
+.main {
+  height: 100%;
+  h1 {
+    font-size: 16px;
+  }
+  h2 {
+    font-size: 14px;
+  }
+  p {
+    font-size: 12px;
+  }
+}
+</style>

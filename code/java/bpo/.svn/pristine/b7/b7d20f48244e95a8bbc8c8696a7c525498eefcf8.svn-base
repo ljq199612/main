@@ -1,0 +1,183 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.OperatorType;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.param.BpoClassesGenerateParam;
+import com.rz.iot.bpo.model.param.BpoClassesParam;
+import com.rz.iot.bpo.model.param.BpoScheduleRuleParam;
+import com.rz.iot.bpo.model.param.BpoUpdateClassesParam;
+import com.rz.iot.bpo.model.show.BpoClassesShow;
+import com.rz.iot.bpo.model.show.BpoProjectEmployeeShow;
+import com.rz.iot.bpo.model.show.BpoClassGenerateShow;
+import com.rz.iot.bpo.model.show.BpoScheduleRuleShow;
+import com.rz.iot.bpo.service.ScheduleService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+/**
+ * 描述 : 排班管理
+ * 作者 : wangluyao
+ * 创建时间 : 2020/6/18 10:10
+ *
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@Api(tags = "排班管理")
+@RequestMapping("/schedule")
+@RestController
+public class ScheduleController {
+
+    @Resource
+    ScheduleService scheduleService;
+    /**
+     * 获取班次信息
+     * @return
+     */
+    @ApiOperation("获取班次列表")
+    @GetMapping("/getClassList")
+    @PreAuthorize("@ss.hasPermi('schedule:getClassList')")
+    @Log(title = "获取班次列表", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<BpoClassesShow> getClassList(Integer projectId) {
+        return scheduleService.getClassList(projectId);
+    }
+
+    /**
+     * 获取排班信息
+     * @return
+     */
+    @ApiOperation("获取排班列表")
+    @GetMapping("/getClassGenerate")
+  //  @PreAuthorize("@ss.hasPermi('schedule:getClassGenerate')")
+    @Log(title = "获取排班列表", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<BpoClassGenerateShow> getClassGenerate(Integer projectId) {
+        return scheduleService.getClassGenerate(projectId);
+    }
+    /**
+     * 获取排班信息
+     * @return
+     */
+    @ApiOperation("获取排班规则")
+    @GetMapping("/getScheduleRule")
+    @PreAuthorize("@ss.hasPermi('schedule:getScheduleRule')")
+    @Log(title = "获取排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<BpoScheduleRuleShow> getScheduleRule(Integer projectId) {
+        return scheduleService.getScheduleRule(projectId);
+    }
+    /**
+     * 获取人员数据
+     * @return
+     */
+    @ApiOperation("获取人员数据")
+    @GetMapping("/getEmployeeData")
+    @PreAuthorize("@ss.hasPermi('schedule:getEmployeeData')")
+    @Log(title = "获取人员数据", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result<BpoProjectEmployeeShow> getEmployeeData(Integer projectId) {
+        return scheduleService.getEmployeeData(projectId);
+    }
+    /**
+     * 添加班次信息
+     * @return
+     */
+    @ApiOperation("添加班次信息")
+    @PostMapping("/addClassFromExternal")
+//    @PreAuthorize("@ss.hasPermi('schedule:addClassFromExternal')")
+    @Log(title = "添加班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addClassFromExternal(@RequestBody BpoClassesParam bpoClassesParam) {
+        return scheduleService.addClassFromExternal(bpoClassesParam);
+    }
+    /**
+     * 添加班次信息
+     * @return
+     */
+    @ApiOperation("添加排班班次信息")
+    @PostMapping("/addClassGenerate")
+ //   @PreAuthorize("@ss.hasPermi('schedule:addClassGenerate')")
+    @Log(title = "添加排班班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addClassGenerate(@RequestBody BpoClassesGenerateParam bpoClassesGenerateParam) {
+        return scheduleService.addClassGenerate(bpoClassesGenerateParam);
+    }
+    /**
+     * 添加排班规则
+     * @return
+     */
+    @ApiOperation("添加排班规则")
+    @PostMapping("/addScheduleRule")
+//    @PreAuthorize("@ss.hasPermi('schedule:addScheduleRule')")
+    @Log(title = "添加排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result addScheduleRule(@RequestBody BpoScheduleRuleParam scheduleRuleParam) {
+        return scheduleService.addScheduleRule(scheduleRuleParam);
+    }
+    /**
+     * 修改班次信息
+     * @return
+     */
+    @ApiOperation("修改班次信息")
+    @PostMapping("/updateClassFromExternal")
+    @PreAuthorize("@ss.hasPermi('schedule:updateClassFromExternal')")
+    @Log(title = "修改班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result updateClassFromExternal(@RequestBody BpoUpdateClassesParam bpoClassesParam) {
+        return scheduleService.updateClassFromExternal(bpoClassesParam);
+    }
+    /**
+     * 修改班次信息
+     * @return
+     */
+    @ApiOperation("修改排班班次信息")
+    @PostMapping("/updateClassGenerate")
+    @PreAuthorize("@ss.hasPermi('schedule:updateClassGenerate')")
+    @Log(title = "修改排班班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result updateClassGenerate(@RequestBody BpoClassesGenerateParam bpoClassesGenerateParam) {
+        return scheduleService.updateClassGenerate(bpoClassesGenerateParam);
+    }
+    /**
+     * 修改排班规则
+     * @return
+     */
+    @ApiOperation("修改排班规则")
+    @PostMapping("/updateScheduleRule")
+    @PreAuthorize("@ss.hasPermi('schedule:updateScheduleRule')")
+    @Log(title = "修改排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result updateScheduleRule(@RequestBody BpoScheduleRuleParam scheduleRuleParam) {
+        return scheduleService.updateScheduleRule(scheduleRuleParam);
+    }
+    /**
+     * 删除班次信息
+     * @return
+     */
+    @ApiOperation("删除班次信息")
+    @GetMapping("/deleteClassFromExternal")
+    @PreAuthorize("@ss.hasPermi('schedule:deleteClassFromExternal')")
+    @Log(title = "删除班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result deleteClassFromExternal(@RequestBody Integer classId) {
+        return scheduleService.deleteClassFromExternal(classId);
+    }
+    /**
+     * 删除班次信息
+     * @return
+     */
+    @ApiOperation("删除排班班次信息")
+    @GetMapping("/deleteClassGenerate")
+ //   @PreAuthorize("@ss.hasPermi('schedule:deleteClassGenerate')")
+    @Log(title = "删除排班班次信息", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result deleteClassGenerate(@RequestBody Integer scheduleId) {
+        return scheduleService.deleteClassGenerate(scheduleId);
+    }
+    /**
+     * 删除排班规则
+     * @return
+     */
+    @ApiOperation("删除排班规则")
+    @GetMapping("/deleteScheduleRule")
+  //  @PreAuthorize("@ss.hasPermi('schedule:deleteScheduleRule')")
+    @Log(title = "删除排班规则", businessType = BusinessType.INSERT, operatorType = OperatorType.WEB, isSaveRequestData = true)
+    public Result deleteScheduleRule(@RequestBody Integer scheduleRuleId) {
+        return scheduleService.deleteScheduleRule(scheduleRuleId);
+    }
+}

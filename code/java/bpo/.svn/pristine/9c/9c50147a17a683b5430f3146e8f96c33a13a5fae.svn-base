@@ -1,0 +1,324 @@
+package com.rz.iot.bpo.common.constant;
+
+/**
+ * 用户常量信息
+ *
+ * @author ruoyi
+ */
+public class DictDataConstants {
+
+    /** 数据状态 **/
+    /**
+     * 未激活状态
+     */
+    public static final int NOT_VERIFY_STATUS = 0;
+    /**
+     * 正常状态
+     */
+    public static final int NORMAL_STATUS = 1;
+    /**
+     * 删除状态
+     */
+    public static final int DELETE_STATUS = 9;
+
+
+    /** 合同签署所属方 **/
+    /**
+     * 甲方
+     **/
+    public static final int ACCOUNT_TYPE_FIRST_PARTY = 1;
+    /**
+     * 乙方
+     **/
+    public static final int ACCOUNT_TYPE_SECOND_PARTY = 2;
+    /**
+     * 供应商
+     **/
+    public static final int ACCOUNT_TYPE_SUPPLIER = 3;
+    /**
+     * 个人
+     **/
+    public static final int ACCOUNT_TYPE_PERSON = 4;
+
+
+    /**
+     * 计价类型:1按工件,2按时间
+     */
+    public static final int BY_NUMBER = 1;
+    public static final int BY_TIME = 2;
+
+    /** 组织类型 **/
+    /**
+     * 管理员
+     **/
+    public static final int SYS_ORG_ADMIN = 1;
+    public static final String SYS_ORG_ADMIN_STRING = "admin";
+
+    /** 产量类型 */
+    //项目产量
+    public static final Byte OUTPUT_PROJECT = 1;
+
+    //供应商产量
+    public static final Byte OUTPUT_SUPPLIER = 2;
+
+
+    /**
+     * 甲方(客户)
+     **/
+    public static final int SYS_ORG_JF = 1;
+    public static final String SYS_ORG_JF_STRING = "client";
+    /**
+     * 乙方(主体供应商)
+     **/
+    public static final int SYS_ORG_YF = 3;
+    public static final String SYS_ORG_YF_STRING = "main_supplier";
+    /**
+     * 供应商
+     **/
+    public static final int SYS_ORG_PROVIDER = 2;
+    public static final String SYS_ORG_PROVIDER_STRING = "supplier";
+    /** 个人 **/
+   /* public static final int SYS_ORG_PERSON = 5;
+    public static final String SYS_ORG_PERSON_STRING = "person";*/
+
+    /** 计费规则类型 **/
+    /**
+     * 甲方给乙方
+     **/
+    public static final int FEE_RULE_JF_TO_YF = 1;
+    /**
+     * 乙方给供应商
+     **/
+    public static final int FEE_RULE_YF_TO_PROVIDER = 2;
+    /**
+     * 乙方给个人
+     **/
+    public static final int FEE_RULE_YF_TO_PERSON = 3;
+    /**
+     * 供应商给个人
+     **/
+    public static final int FEE_RULE_PROVIDER_TO_PERSON = 4;
+    /**
+     * 供应商给供应商
+     **/
+    public static final int FEE_RULE_PROVIDER_TO_PROVIDER = 5;
+
+    /** 计费规则方式 **/
+    /**
+     * 计价计费
+     **/
+    public static final int FEE_RULE_TYPE_NUM = 1;
+    /**
+     * 计时计费
+     **/
+    public static final int FEE_RULE_TYPE_TIME = 2;
+
+    /**
+     * 合同类型
+     */
+    public static final int COMPANY_COMPANY = 1;
+
+    public static final int EMPLOYEE_LABOUR = 2;
+
+    public static final int EMPLOYEE_PRACTICE = 3;
+
+    public static final int EMPLOYEE_DISPATCH = 4;
+
+    // 顶级类型,无上级
+    public static final Integer SYS_NO_PARENT = 0;
+    public static final Integer SYS_ROLE_ADMIN = 1;
+
+    // 是否是部门顶级
+    public static final Integer SYS_DEPT_IS_NOT_TOP = 0;
+    public static final Integer SYS_DEPT_IS_TOP = 1;
+
+    /**
+     * 用户与模块之间数据类型关联
+     */
+    // 1.项目
+    public static final Integer SYS_USER_MODULE_PRO = 1;
+
+    /**
+     * 工作模块工序工作小组类型
+     */
+    public static final byte SYS_GROUP = 3;
+    public static final byte SYS_MODULE = 1;
+    public static final byte SYS_PROCESS = 2;
+
+    /**
+     * 角色类型
+     */
+    //管理员
+    public static final String ROLE_ADMIN = "admin";
+
+    //管理人员
+    public static final String ROLE_MANAGER = "manager";
+
+    //项目人员
+    public static final String ROLE_PROJECT_PERSONNEL = "project_personnel";
+
+    /**
+     * 项目创建redis缓存数据 key值  例:PROJECT_BASIC_INFO_ + userToken
+     */
+    //项目基本信息
+    public static final String PROJECT_BASIC_INFO = "PROJECT_BASIC_INFO_";
+    //项目配置
+    public static final String PROJECT_CONFIG = "PROJECT_CONFIG_";
+    //甲方计价规则
+    public static final String PROJECT_FEE_RULE_A = "PROJECT_FEE_RULE_A_";
+    //供应商信息
+    public static final String PROJECT_SUPPLIER = "PROJECT_SUPPLIER_";
+    //乙方计价规则
+    public static final String PROJECT_FEE_RULE_B = "PROJECT_FEE_RULE_B_";
+    //项目当前序号PROJECT_NUMBER_YYYY  YYYY年
+    public static final String PROJECT_NUMBER = "PROJECT_NUMBER_";
+
+
+    /**
+     * 项目考核标准类型
+     */
+    //考核项目 一级
+    public static final int EVALUATION_ITEM = 1;
+    //考核内容 二级
+    public static final int EVALUATION_CONTENT = 2;
+    //考核标准 三级
+    public static final int EVALUATION_STANDARD = 3;
+
+
+    /**
+     * 人员类型
+     * 1.合同工
+     * 2.临时工
+     * 3.实习生
+     */
+    public static final Integer PERSON_TYPE_CONTRACT = 1;
+    public static final Integer PERSON_TYPE_TEMPORARY = 2;
+    public static final Integer PERSON_TYPE_TRAINEE = 3;
+
+    public static final String PERSON_TYPE_CONTRACT_NAME = "合同工";
+    public static final String PERSON_TYPE_TEMPORARY_NAME = "临时工";
+    public static final String PERSON_TYPE_TRAINEE_NAME = "实习生";
+
+    /***
+     * 薪资类型
+     * 1.固定薪资
+     * 2.时薪
+     */
+    public static final Integer PERSON_WAGE_REGULAR = 1;
+    public static final Integer PERSON_WAGE_HOUR = 2;
+
+    public static final String PERSON_WAGE_REGULAR_NAME = "固定薪资";
+    public static final String PERSON_WAGE_HOUR_NAME = "时薪";
+
+
+    /**
+     * 考勤状态类型
+     */
+    //正常
+    public static final Byte ATTENDANCE_NORMAL = 1;
+    //迟到
+    public static final Byte ATTENDANCE_LATE = 2;
+    //早退
+    public static final Byte ATTENDANCE_LEAVE_EARLY = 3;
+    //缺上班卡
+    public static final Byte ATTENDANCE_LACK_CLOCK_IN = 4;
+    //缺下班卡
+    public static final Byte ATTENDANCE_LACK_CLOCK_OUT = 5;
+    //工时过长
+    public static final Byte ATTENDANCE_OVERTIME_TOO_LONG = 6;
+    //旷工
+    public static final Byte ATTENDANCE_NEGLECT_WORK = 7;
+    //加班
+    public static final Byte ATTENDANCE_OVERTIME = 11;
+    //临时请假
+    public static final Byte ATTENDANCE_TEMPORARY_LEAVE = 12;
+    //休假
+    public static final Byte ATTENDANCE_HOLIDAY = 13;
+
+    /**
+     * 考勤记录审核状态
+     */
+    //待审核
+    public static final Byte PENDING_REVIEW = 1;
+
+    //待确认
+    public static final Byte PENDING_CONFIRM = 2;
+
+    //申诉中
+    public static final Byte COMPLAIN = 3;
+
+    //已确认
+    public static final Byte CONFIRMED = 4;
+
+    /**
+     * 流程状态
+     */
+    //等待中
+    public static final Byte WORKFLOW_STATUS_WAITING = 0;
+
+    //进行中
+    public static final Byte WORKFLOW_STATUS_ONGOING = 1;
+
+    //驳回
+    public static final Byte WORKFLOW_STATUS_REJECT = 2;
+
+    //已完成
+    public static final Byte WORKFLOW_STATUS_FINISHED = 3;
+
+    /**
+     * 流程审批类型
+     */
+    //审批
+    public static final Byte WORKFLOW_APPROVE_CONFIRM = 1;
+
+    //驳回
+    public static final Byte WORKFLOW_APPROVE_REJECT = 2;
+
+    //结束
+    public static final Byte WORKFLOW_APPROVE_FINISH = 3;
+
+    /**
+     * 流程类型
+     */
+    //考勤流程
+    public static final Byte WORKFLOW_ATTENDANCE = 1;
+
+    //应收款对账流程
+    public static final Byte WORKFLOW_ACCOUNT_RECEIVABLE = 2;
+
+    //客户类型
+    public static final String CUSTOM_TYPE = "custom_type";
+
+
+    /**
+     * 部门下属关系
+     **/
+    //客户
+    public static final Integer DEPT_SUB_REL_CUSTOM = 1;
+    //供应商
+    public static final Integer DEPT_SUB_REL_SUPPLIER = 2;
+    //场地
+    public static final Integer DEPT_SUB_REL_TRANSFERSTATION = 3;
+    /**
+     * 设备管理
+     */
+    //闸机模式
+    public static final String GATE_MODEL = "gate_model";
+    //上传方式
+    public static final String UPLOAD_MODEL = "upload_model";
+
+    // 用户类型: 1.web平台用户 2.微信用户
+    public static final Integer SYS_WEB_USER = 1;
+    public static final Integer SYS_WECHAT_USER = 2;
+    // 个人角色
+    public static final Integer SYS_ROLE_PERSONAL = 8;
+
+    /**
+     * 小程序的appid和appSecret
+     */
+    public static final String APPID = "wx86ba90f46a5955db";
+    public static final String APPSECRET = "1caf06439cbd7e387a87367294f8fe0f";
+    public static final String GRANT_TYPE = "authorization_code";
+    public static final String APPURL = "https://api.weixin.qq.com/sns/jscode2session?";
+
+}

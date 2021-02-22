@@ -1,0 +1,104 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.bpo.common.constant.DictDataConstants;
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.framework.web.entity.Page;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.SysDictTypeMapper;
+import com.rz.iot.bpo.model.SysDictData;
+import com.rz.iot.bpo.model.SysDictType;
+import com.rz.iot.bpo.service.SysDictTypeService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * @Description 系统字典类型业务实现
+ * @Author Rycony
+ * @Date 2020/6/17 10:43
+ */
+@Service
+public class SysDictTypeServiceImpl implements SysDictTypeService {
+    @Resource
+    private SysDictTypeMapper sysDictTypeMapper;
+
+    /**
+     * 新增字典类型
+     * @param sysDictType 字典类型
+     */
+    @Override
+    public Result insertSysDictType(SysDictType sysDictType) {
+        if (isExsitType(sysDictType.getDictId(),sysDictType.getDictType()))
+            return Result.error(ResultConstants.SYS_TYPE_SAME);
+        sysDictTypeMapper.insertSelective(sysDictType);
+        return Result.success(null,"字典类型新增成功");
+    }
+
+    /**
+     * 查询字典类型分页
+     * @param sysDictType 字典类型数据
+     * @return 结果集
+     */
+    @Override
+    public List<SysDictType> findAll(SysDictType sysDictType) {
+        List<SysDictType> list = sysDictTypeMapper.selectBySysDictType(sysDictType);
+        return list;
+    }
+
+    /**
+     * 更新字典类型数据
+     * @param sysDictType 字典类型数据
+     */
+    @Override
+    public Result update(SysDictType sysDictType) {
+        if(sysDictType.getDictType() != null && isExsitType(sysDictType.getDictId(),sysDictType.getDictType()))
+            return Result.error(ResultConstants.SYS_TYPE_SAME);
+        sysDictTypeMapper.updateByPrimaryKeySelective(sysDictType);
+        return Result.success(null,"更新成功");
+    }
+
+    /**
+     * 查询所有字典类型无分页
+     * @return 所有字典类型结果集
+     */
+    @Override
+    public List<SysDictType> findAllNoPage() {
+        List<SysDictType> list = sysDictTypeMapper.findAllNoPage();
+        return list;
+    }
+
+    /**
+     * 字典删除
+     * @param sysDictType
+     * @return
+     */
+    @Override
+    public Result delete(SysDictType sysDictType) {
+        sysDictType.setStatus((byte)DictDataConstants.DELETE_STATUS);
+        sysDictTypeMapper.updateByPrimaryKeySelective(sysDictType);
+        return Result.success(null,"字典删除成功");
+    }
+
+    /**
+     * 通过字典类型查询所有数据
+     * @param type 字典类型
+     * @return
+     */
+    @Override
+    public Result findDataByType(String type) {
+        List<SysDictData> list = sysDictTypeMapper.findDataByType(type);
+        return Result.success(list);
+    }
+
+    public boolean isExsitType(Long id,String dictType){
+        SysDictType sysDictType1 = sysDictTypeMapper.isExsitType(id,dictType);
+        boolean flag = false;
+        if(sysDictType1 != null){
+            flag = true;
+        }
+        return flag;
+    }
+}

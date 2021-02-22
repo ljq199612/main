@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaAbnormalMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaAbnormal" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="transfrer_station_id" property="transfrerStationId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="abnormal_tpye" property="abnormalTpye" jdbcType="INTEGER" />
+    <result column="abnormal_level" property="abnormalLevel" jdbcType="CHAR" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="generation_time" property="generationTime" jdbcType="TIMESTAMP" />
+    <result column="deduction" property="deduction" jdbcType="VARCHAR" />
+    <result column="punish_money" property="punishMoney" jdbcType="VARCHAR" />
+    <result column="is_person" property="isPerson" jdbcType="CHAR" />
+    <result column="person_money" property="personMoney" jdbcType="VARCHAR" />
+    <result column="person_liable" property="personLiable" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, transfrer_station_id, supplier_id, project_id, abnormal_tpye, abnormal_level, 
+    describe, generation_time, deduction, punish_money, is_person, person_money, person_liable, 
+    remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_abnormal
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="findAll" resultType="com.rz.iot.bpo.mina.model.show.MinaAbnormalShow">
+      select
+      project.project_name as projectName,transfer.`name` as transfer,
+      company.company_name as supplier,abnormal.generation_time as generationTime,
+      abnormal.abnormal_tpye as abnormalType,abnormal.abnormal_level as abnormalLevel
+      from bpo_abnormal abnormal
+      LEFT JOIN bpo_transfer_station transfer on transfer.id = abnormal.transfrer_station_id
+      LEFT JOIN bpo_project project on project.id = abnormal.project_id
+      LEFT JOIN bpo_supplier_info supplier on supplier.id = abnormal.supplier_id
+      LEFT JOIN sys_company company on company.id = supplier.org_id
+      LEFT JOIN bpo_person person on person.id = abnormal.person_id
+      LEFT JOIN sys_dept dept on dept.dept_id = person.dept_id
+      where 1=1
+      <if test="dataScope!=null">
+        and ${dataScope}
+      </if>
+    </select>
+  <select id="getDetail" resultType="com.rz.iot.bpo.mina.model.MinaAbnormal">
+      select
+      project.project_name as projectName,transfer.`name` as transfer,
+      company.company_name as supplier,abnormal.generation_time as generationTime,
+      abnormal.abnormal_tpye as abnormalType,abnormal.abnormal_level as abnormalLevel
+      from bpo_abnormal abnormal
+      LEFT JOIN bpo_transfer_station transfer on transfer.id = abnormal.transfrer_station_id
+      LEFT JOIN bpo_project project on project.id = abnormal.project_id
+      LEFT JOIN bpo_supplier_info supplier on supplier.id = abnormal.supplier_id
+      LEFT JOIN sys_company company on company.id = supplier.org_id
+      LEFT JOIN bpo_person person on person.id = abnormal.person_id
+      where abnormal.id = #{id}
+  </select>
+  <select id="getProject" resultType="com.rz.iot.bpo.model.BpoProject">
+      SELECT project.id as id,project.project_name as projectName from
+      bpo_project project
+      LEFT JOIN sys_user_module_rel module on module.module_id = project.id
+      and module.type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@SYS_USER_MODULE_PRO}
+      LEFT JOIN sys_dept_user_rel rel on rel.user_id = module.user_id
+      where 1=1
+      <if test="dataScope!=null">
+        and ${dataScope}
+      </if>
+  </select>
+  <select id="getTransfer" resultType="com.rz.iot.bpo.model.BpoTransferStation">
+    SELECT  trans.id as id,trans.`name` as name from
+    bpo_transfer_station trans
+    LEFT JOIN sys_dept_sub_rel sub_rel on sub_rel.sub_id = trans.id and sub_rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION}
+    <if test="dataScope!=null">
+      and ${dataScope}
+    </if>
+  </select>
+  <select id="getSupplier" resultType="com.rz.iot.bpo.model.SysCompany">
+    SELECT info.id as id,company.company_name as companyName from bpo_supplier_info info
+    LEFT JOIN sys_company company on company.id = info.org_id
+    LEFT JOIN sys_dept_sub_rel dept_sub_rel on company.id = dept_sub_rel.sub_id
+    and dept_sub_rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_SUPPLIER}
+    <if test="dataScope!=null">
+      and ${dataScope}
+    </if>
+  </select>
+  <select id="getPerson" resultType="com.rz.iot.bpo.model.BpoPerson">
+    SELECT
+    person.id as id,person.person_name as personName
+    from bpo_person person where person.project_id  = #{projectId}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_abnormal
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.MinaAbnormal" >
+    insert into bpo_abnormal (id, transfrer_station_id, supplier_id, 
+      project_id, abnormal_tpye, abnormal_level, 
+      describe, generation_time, deduction, 
+      punish_money, is_person, person_money, 
+      person_liable, remark)
+    values (#{id,jdbcType=INTEGER}, #{transfrerStationId,jdbcType=INTEGER}, #{supplierId,jdbcType=INTEGER}, 
+      #{projectId,jdbcType=INTEGER}, #{abnormalTpye,jdbcType=INTEGER}, #{abnormalLevel,jdbcType=CHAR}, 
+      #{describe,jdbcType=VARCHAR}, #{generationTime,jdbcType=TIMESTAMP}, #{deduction,jdbcType=VARCHAR}, 
+      #{punishMoney,jdbcType=VARCHAR}, #{isPerson,jdbcType=CHAR}, #{personMoney,jdbcType=VARCHAR}, 
+      #{personLiable,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.mina.model.MinaAbnormal" >
+    insert into bpo_abnormal
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="transfrerStationId != null" >
+        transfrer_station_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="abnormalTpye != null" >
+        abnormal_tpye,
+      </if>
+      <if test="abnormalLevel != null" >
+        abnormal_level,
+      </if>
+      <if test="describe != null" >
+        describe,
+      </if>
+      <if test="generationTime != null" >
+        generation_time,
+      </if>
+      <if test="deduction != null" >
+        deduction,
+      </if>
+      <if test="punishMoney != null" >
+        punish_money,
+      </if>
+      <if test="isPerson != null" >
+        is_person,
+      </if>
+      <if test="personMoney != null" >
+        person_money,
+      </if>
+      <if test="personLiable != null" >
+        person_liable,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="transfrerStationId != null" >
+        #{transfrerStationId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="abnormalTpye != null" >
+        #{abnormalTpye,jdbcType=INTEGER},
+      </if>
+      <if test="abnormalLevel != null" >
+        #{abnormalLevel,jdbcType=CHAR},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="generationTime != null" >
+        #{generationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deduction != null" >
+        #{deduction,jdbcType=VARCHAR},
+      </if>
+      <if test="punishMoney != null" >
+        #{punishMoney,jdbcType=VARCHAR},
+      </if>
+      <if test="isPerson != null" >
+        #{isPerson,jdbcType=CHAR},
+      </if>
+      <if test="personMoney != null" >
+        #{personMoney,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.mina.model.MinaAbnormal" >
+    update bpo_abnormal
+    <set >
+      <if test="transfrerStationId != null" >
+        transfrer_station_id = #{transfrerStationId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="abnormalTpye != null" >
+        abnormal_tpye = #{abnormalTpye,jdbcType=INTEGER},
+      </if>
+      <if test="abnormalLevel != null" >
+        abnormal_level = #{abnormalLevel,jdbcType=CHAR},
+      </if>
+      <if test="describe != null" >
+        describe = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="generationTime != null" >
+        generation_time = #{generationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deduction != null" >
+        deduction = #{deduction,jdbcType=VARCHAR},
+      </if>
+      <if test="punishMoney != null" >
+        punish_money = #{punishMoney,jdbcType=VARCHAR},
+      </if>
+      <if test="isPerson != null" >
+        is_person = #{isPerson,jdbcType=CHAR},
+      </if>
+      <if test="personMoney != null" >
+        person_money = #{personMoney,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        person_liable = #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaAbnormal" >
+    update bpo_abnormal
+    set transfrer_station_id = #{transfrerStationId,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      project_id = #{projectId,jdbcType=INTEGER},
+      abnormal_tpye = #{abnormalTpye,jdbcType=INTEGER},
+      abnormal_level = #{abnormalLevel,jdbcType=CHAR},
+      describe = #{describe,jdbcType=VARCHAR},
+      generation_time = #{generationTime,jdbcType=TIMESTAMP},
+      deduction = #{deduction,jdbcType=VARCHAR},
+      punish_money = #{punishMoney,jdbcType=VARCHAR},
+      is_person = #{isPerson,jdbcType=CHAR},
+      person_money = #{personMoney,jdbcType=VARCHAR},
+      person_liable = #{personLiable,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

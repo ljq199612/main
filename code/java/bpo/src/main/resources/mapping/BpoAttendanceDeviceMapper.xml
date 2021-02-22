@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoAttendanceDeviceMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoAttendanceDevice">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="device_name" property="deviceName" jdbcType="VARCHAR"/>
+        <result column="device_sn" property="deviceSn" jdbcType="VARCHAR"/>
+        <result column="device_no" property="deviceNo" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="network_status" property="networkStatus" jdbcType="TINYINT"/>
+        <result column="transfer_station_id" property="transferStationId" jdbcType="INTEGER"/>
+        <result column="manufactor" property="manufactor" jdbcType="VARCHAR"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="link_man" property="linkMan" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="gate_type" property="gateType" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="attendence_belong" property="attendenceBelong" jdbcType="VARCHAR"/>
+        <result column="company_id" property="companyId" javaType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    id, device_name, device_sn, device_no, status, network_status, transfer_station_id, attendence_belong,
+    manufactor, version, ip, link_man, phone, gate_type, remark,company_id, create_time, update_time
+  </sql>
+
+    <select id="selectByPrimaryKey" resultMap="MyBaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Column_List"/>,
+        dept.dept_id dept_id,trans.id trans_id
+        from bpo_attendance_device device LEFT JOIN bpo_transfer_station trans on trans.id = device.transfer_station_id
+        LEFT JOIN sys_dept_sub_rel rel on rel.sub_id = trans.id LEFT JOIN sys_dept dept on dept.dept_id = rel.dept_id
+        where  rel.sub_type = 3 and device.id = #{id}
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bpo_attendance_device
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+    insert into bpo_attendance_device (id, device_name, device_sn, 
+      device_no, status, network_status, 
+      transfer_station_id, manufactor, version, 
+      ip, link_man, phone, 
+      gate_type, remark, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{deviceName,jdbcType=VARCHAR}, #{deviceSn,jdbcType=VARCHAR}, 
+      #{deviceNo,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{networkStatus,jdbcType=TINYINT}, 
+      #{transferStationId,jdbcType=INTEGER}, #{manufactor,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{linkMan,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{gateType,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+        insert into bpo_attendance_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>,
+            <if test="attendence_belong != null">
+                attendence_belong,
+            </if>,
+            <if test="deviceName != null">
+                device_name,
+            </if>
+            <if test="deviceSn != null">
+                device_sn,
+            </if>
+            <if test="deviceNo != null">
+                device_no,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="networkStatus != null">
+                network_status,
+            </if>
+            <if test="transferStationId != null">
+                transfer_station_id,
+            </if>
+            <if test="manufactor != null">
+                manufactor,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+            <if test="ip != null">
+                ip,
+            </if>
+            <if test="linkMan != null">
+                link_man,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="gateType != null">
+                gate_type,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="companyId != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="deviceName != null">
+                #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceSn != null">
+                #{deviceSn,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceNo != null">
+                #{deviceNo,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="networkStatus != null">
+                #{networkStatus,jdbcType=TINYINT},
+            </if>
+            <if test="transferStationId != null">
+                #{transferStationId,jdbcType=INTEGER},
+            </if>
+            <if test="manufactor != null">
+                #{manufactor,jdbcType=VARCHAR},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="ip != null">
+                #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="linkMan != null">
+                #{linkMan,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="gateType != null">
+                #{gateType,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="companyId != null">
+                #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="attendenceBelong != null">
+                #{attendenceBelong,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+        update bpo_attendance_device
+        <set>
+            <if test="deviceName != null and deviceName!=''">
+                device_name = #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceNo != null and deviceNo!=''">
+                device_no = #{deviceNo,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null and status!=''">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="networkStatus != null and networkStatus!=''">
+                network_status = #{networkStatus,jdbcType=TINYINT},
+            </if>
+            <if test="transferStationId != null and transferStationId!=''">
+                transfer_station_id = #{transferStationId,jdbcType=INTEGER},
+            </if>
+            <if test="manufactor != null and manufactor !=null">
+                manufactor = #{manufactor,jdbcType=VARCHAR},
+            </if>
+            <if test="linkMan != null and linkMan!=''">
+                link_man = #{linkMan,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone!=''">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="gateType != null and gateType!=''">
+                gate_type = #{gateType,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark!=''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null ">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null ">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="companyId != null and companyId!=''">
+                company_id = #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="attendenceBelong != null and attendenceBelong!=''">
+                attendence_belong = #{attendenceBelong,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+    update bpo_attendance_device
+    set device_name = #{deviceName,jdbcType=VARCHAR},
+      device_sn = #{deviceSn,jdbcType=VARCHAR},
+      device_no = #{deviceNo,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      network_status = #{networkStatus,jdbcType=TINYINT},
+      transfer_station_id = #{transferStationId,jdbcType=INTEGER},
+      manufactor = #{manufactor,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      link_man = #{linkMan,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      gate_type = #{gateType,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <sql id="Column_List">
+        device.id, device.device_name, device.device_sn, device.device_no, device.status, device.network_status,
+        device.transfer_station_id, device.attendence_belong,
+        device.manufactor, device.version, device.ip, device.link_man, device.phone, device.gate_type,
+        device.remark,device.company_id, device.create_time, device.update_time
+    </sql>
+
+    <resultMap id="MyBaseResultMap" type="com.rz.iot.bpo.model.BpoAttendanceDevice" extends="BaseResultMap">
+        <association property="bpoTransferStation" column="trans_id" select="com.rz.iot.bpo.mapper.BpoTransferStationMapper.selectByPrimaryKey"/>
+        <collection property="dept" column="dept_id" select="com.rz.iot.bpo.mapper.SysDeptMapper.getByDeptId"/>
+    </resultMap>
+
+    <select id="getFuzzyDetails" resultMap="MyBaseResultMap" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+        select
+        <include refid="Column_List"/>
+        ,dept.dept_id dept_id,trans.id trans_id
+        from bpo_attendance_device device LEFT JOIN bpo_transfer_station trans on trans.id = device.transfer_station_id
+        LEFT JOIN sys_dept_sub_rel rel on rel.sub_id = trans.id LEFT JOIN sys_dept dept on dept.dept_id = rel.dept_id
+        where rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION}
+        and device.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+        <if test="param.dataScope!=null ">
+            and #{param.dataScope}
+        </if>
+        <if test="device.attendenceBelong!=null and device.attendenceBelong!=''">
+            and attendence_belong like concat('%',concat(#{device.attendenceBelong},'%'))
+        </if>
+        <if test="device.networkStatus!=null and device.networkStatus!=''">
+            and network_status = #{device.networkStatus}
+        </if>
+        <if test="device.deptId!=null">
+            and dept.dept_id = #{device.deptId}
+        </if>
+        <if test="device.transferStationId!=null">
+            and trans.id = #{device.transferStationId}
+        </if>
+    </select>
+
+    <select id="getOfflineInformation" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_attendance_device
+        where id=#{id}
+    </select>
+
+    <!--更新刷新的信息-->
+    <update id="updatefresh" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+            update bpo_attendance_device
+            <set>
+                <if test="ip!=null and ip!=''">
+                    ip = #{ip},
+                </if>
+                <if test="networkStatus!=null and networkStatus!=''">
+                    network_status = #{networkStatus},
+                </if>
+                <if test="updateTime!=null ">
+                    update_time = #{updateTime},
+                </if>
+            </set>
+            where device_sn = #{deviceSn}
+    </update>
+
+    <select id="getDetailBySn" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from bpo_attendance_device
+        where device_sn = #{deviceSn}
+    </select>
+
+    <select id="getTransferStationDevSns" resultType="java.lang.String">
+    SELECT device_sn FROM bpo_attendance_device
+    WHERE transfer_station_id = (SELECT transfer_station_id FROM bpo_attendance_device WHERE device_sn = #{sn,jdbcType=VARCHAR})
+  </select>
+
+    <select id="getAfterUpdate"  resultMap="MyBaseResultMap">
+        <foreach collection="deviceSn" item="sn" separator="union">
+            select
+            <include refid="Column_List"/>
+            ,dept.dept_id dept_id,trans.id trans_id
+            from bpo_attendance_device device LEFT JOIN bpo_transfer_station trans on trans.id = device.transfer_station_id
+            LEFT JOIN sys_dept_sub_rel rel on rel.sub_id = trans.id LEFT JOIN sys_dept dept on dept.dept_id = rel.dept_id
+            where rel.sub_type = ${@com.rz.iot.bpo.common.constant.DictDataConstants@DEPT_SUB_REL_TRANSFERSTATION}
+            and device.device_sn = #{sn}
+        </foreach>
+    </select>
+
+    <update id="updateDisonConnect" parameterType="com.rz.iot.bpo.model.BpoAttendanceDevice">
+        update bpo_attendance_device
+        <set>
+            <if test="updateTime!=null">
+                update_time = #{updateTime},
+            </if>
+            <if test="networkStatus!=null and networkStatus!=''">
+                network_status = #{networkStatus}
+            </if>
+        </set>
+        where device_sn = #{deviceSn}
+    </update>
+</mapper>

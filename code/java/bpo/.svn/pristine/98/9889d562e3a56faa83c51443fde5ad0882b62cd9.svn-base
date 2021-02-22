@@ -1,0 +1,175 @@
+package com.rz.iot.bpo.model;
+
+import java.util.Date;
+
+public class BpoBillReconciliation {
+    private Integer id;
+
+    private Integer supplierInfoId;
+
+    private String billingCycle;
+
+    private Integer billType;
+
+    private Integer payerId;
+
+    private Integer payeeId;
+
+    private Integer projectId;
+
+    private Integer monthBillId;
+
+    private Integer reconciliationWay;
+
+    private Integer reconciliationType;
+
+    private Integer feeRuleType;
+
+    private Integer totalOutput;
+
+    private Float totalHours;
+
+    private Integer reconciliationStatus;
+
+    private Integer status;
+
+    private Date createTime;
+
+    private Date updateTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getSupplierInfoId() {
+        return supplierInfoId;
+    }
+
+    public void setSupplierInfoId(Integer supplierInfoId) {
+        this.supplierInfoId = supplierInfoId;
+    }
+
+    public String getBillingCycle() {
+        return billingCycle;
+    }
+
+    public void setBillingCycle(String billingCycle) {
+        this.billingCycle = billingCycle == null ? null : billingCycle.trim();
+    }
+
+    public Integer getBillType() {
+        return billType;
+    }
+
+    public void setBillType(Integer billType) {
+        this.billType = billType;
+    }
+
+    public Integer getPayerId() {
+        return payerId;
+    }
+
+    public void setPayerId(Integer payerId) {
+        this.payerId = payerId;
+    }
+
+    public Integer getPayeeId() {
+        return payeeId;
+    }
+
+    public void setPayeeId(Integer payeeId) {
+        this.payeeId = payeeId;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public Integer getMonthBillId() {
+        return monthBillId;
+    }
+
+    public void setMonthBillId(Integer monthBillId) {
+        this.monthBillId = monthBillId;
+    }
+
+    public Integer getReconciliationWay() {
+        return reconciliationWay;
+    }
+
+    public void setReconciliationWay(Integer reconciliationWay) {
+        this.reconciliationWay = reconciliationWay;
+    }
+
+    public Integer getReconciliationType() {
+        return reconciliationType;
+    }
+
+    public void setReconciliationType(Integer reconciliationType) {
+        this.reconciliationType = reconciliationType;
+    }
+
+    public Integer getFeeRuleType() {
+        return feeRuleType;
+    }
+
+    public void setFeeRuleType(Integer feeRuleType) {
+        this.feeRuleType = feeRuleType;
+    }
+
+    public Integer getTotalOutput() {
+        return totalOutput;
+    }
+
+    public void setTotalOutput(Integer totalOutput) {
+        this.totalOutput = totalOutput;
+    }
+
+    public Float getTotalHours() {
+        return totalHours;
+    }
+
+    public void setTotalHours(Float totalHours) {
+        this.totalHours = totalHours;
+    }
+
+    public Integer getReconciliationStatus() {
+        return reconciliationStatus;
+    }
+
+    public void setReconciliationStatus(Integer reconciliationStatus) {
+        this.reconciliationStatus = reconciliationStatus;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+}

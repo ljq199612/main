@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaPersonCenterMapper">
+
+    <select id="getLinkMode" resultType="com.rz.iot.bpo.mina.model.show.PersonCenterShow">
+        SELECT station.link_man as transferManeger,station.phone as LinkPhone
+        from sys_user user
+        LEFT JOIN bpo_person person on user.user_id = person.user_id
+        LEFT JOIN bpo_project project on project.id = person.project_id
+        LEFT JOIN bpo_transfer_station station on station.id = project.transfer_station_id
+        where user.user_id = #{userId}
+    </select>
+
+    <select id="getWorkExperience" resultType="com.rz.iot.bpo.mina.model.show.WorkExperienceShow">
+        SELECT
+        area.city_name as area ,station.`name` as station,
+        person.station as jobs,concat(station.link_man,concat('  ',station.phone)) as LinkMan,
+        person.dimission_time as dimissiontime,person.create_time as createTime
+        from bpo_person person
+        LEFT JOIN sys_user users on users.user_id = person.user_id
+        LEFT JOIN bpo_project project on project.id = person.project_id
+        LEFT JOIN bpo_transfer_station station on station.id = project.transfer_station_id
+        LEFT JOIN sys_area_rel area on area.id = station.city_id
+        where users.user_id = #{userId}
+    </select>
+    <select id="getUserById" resultType="com.rz.iot.bpo.mina.model.param.MinaLoginParm">
+        select
+        users.user_id as userId,users.`password` as password
+        from sys_user users
+        where users.user_id = #{id}
+    </select>
+
+</mapper>

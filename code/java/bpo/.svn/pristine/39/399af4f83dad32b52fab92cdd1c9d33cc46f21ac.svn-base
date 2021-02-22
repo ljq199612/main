@@ -1,0 +1,32 @@
+<template>
+  <CfPanel title="日志管理" class="main">
+    <el-tabs v-model="activeName">
+      <el-tab-pane label="系统日志" name="SystemLog" />
+      <el-tab-pane label="操作日志" name="OperateLog" />
+      <el-tab-pane label="登录日志" name="LoginLog" />
+    </el-tabs>
+    <component :is="activeName" />
+  </CfPanel>
+</template>
+<script>
+import CfPanel from '@/components/Panel'
+import SystemLog from '@/views/systemManage/logMgt/systemLog'
+import OperateLog from '@/views/systemManage/logMgt/operateLog'
+import LoginLog from '@/views/systemManage/logMgt/loginLog'
+
+export default {
+  name: 'LogMgt',
+  components: {
+    CfPanel,
+    SystemLog,
+    OperateLog,
+    LoginLog
+  },
+  data() {
+    return {
+      activeName: 'SystemLog'
+    }
+  },
+  methods: {}
+}
+</script>

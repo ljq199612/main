@@ -1,0 +1,79 @@
+import request from '@/utils/request'
+import qs from 'qs'
+
+export function getAllItem(params) {
+  return request({
+    url: '/sysCompany/findAll',
+    method: 'get',
+    params: params
+  })
+}
+
+export function deleteItem(params) {
+  return request({
+    url: '/sysCompany/delete',
+    method: 'get',
+    params: params
+  })
+}
+
+export function insertItem(params) {
+  return request({
+    url: '/sysCompany/insert',
+    method: 'post',
+    data: { ...params }
+  })
+}
+
+export function updateItem(data) {
+  return request({
+    url: '/sysCompany/update',
+    method: 'post',
+    data
+  })
+}
+
+export function findOrgType() {
+  return request({
+    url: '/sysCompany/findOrgType',
+    method: 'get'
+  })
+}
+
+export function findAllComByKey() {
+  return request({
+    url: '/sysCompany/findAllComByKey',
+    method: 'get'
+  })
+}
+
+export function findBelongBusiness() {
+  return request({
+    url: '/sysCompany/findBelongBusiness',
+    method: 'get'
+  })
+}
+
+export function getOrgDetail(data) {
+  return request({
+    url: '/sysCompany/detail',
+    method: 'post',
+    data: qs.stringify(data)
+  })
+}
+
+export function downloadFileUrl(params) {
+  return request({
+    url: '/sysCompany/downloadFileUrl',
+    method: 'get',
+    params: params
+  })
+}
+
+export function deleteFileUrl(params) {
+  return request({
+    url: '/sysCompany/deleteFileUrl',
+    method: 'get',
+    params: params
+  })
+}

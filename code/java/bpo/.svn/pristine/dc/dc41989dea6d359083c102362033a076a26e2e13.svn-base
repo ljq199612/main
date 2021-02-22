@@ -1,0 +1,151 @@
+<template>
+  <div class="area-select">
+    <el-select v-model="province" placeholder="请选择省" @change="getCity">
+      <el-option
+        v-for="item in provinceData"
+        :key="item.code"
+        :label="item.name"
+        :value="item.code"
+      />
+    </el-select>
+    <el-select v-model="city" placeholder="请选择市" @change="getDistrict">
+      <el-option
+        v-for="item in cityData"
+        :key="item.code"
+        :label="item.name"
+        :value="item.code"
+      />
+    </el-select>
+    <el-select
+      v-model="district"
+      placeholder="请选择区"
+      @change="handlerDistrictChange"
+    >
+      <el-option
+        v-for="item in districtData"
+        :key="item.code"
+        :label="item.name"
+        :value="item.code"
+      />
+    </el-select>
+  </div>
+</template>
+
+<script type="text/javascript">
+import request from '@/utils/request'
+
+export default {
+  data() {
+    return {
+      province: '', // 省code
+      provinceName: '', // 省
+      provinceData: [], // 省数据
+      city: '', // 市code
+      cityName: '', // 市
+      cityData: [], // 市数据
+      district: '', // 区code
+      districtName: '', // 区
+      districtData: [] // 区数据
+    }
+  },
+  mounted() {
+    this.getAllProvince()
+  },
+  methods: {
+    // 获取所有省
+    getAllProvince() {
+      request({
+        url: '/province/getAllProvince',
+        method: 'get'
+      })
+        .then((res) => {
+          const result = res['data']
+          const provinces = result['data']
+          this.provinceData = provinces
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取省数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    // 获取市
+    getCity(code) {
+      // 设置省数据
+      this.provinceName = this.provinceData.find((item) => item.code === code)
+      // 清空城市和区域
+      this.city = ''
+      this.district = ''
+      request({
+        url: '/province/getCity',
+        method: 'get',
+        data: {
+          code: code
+        }
+      })
+        .then((res) => {
+          const result = res['data']
+          const cityDatas = result['data']
+          this.cityData = cityDatas
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取市数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    // 获取区
+    getDistrict(code) {
+      // 设置市数据
+      this.cityName = this.cityData.find((item) => item.code === code)
+      // 清空区数据
+      this.district = ''
+      request({
+        url: '/province/getDistrict',
+        method: 'get',
+        data: {
+          code: code
+        }
+      })
+        .then((res) => {
+          const result = res['data']
+          const districtData = result['data']
+          this.districtData = districtData
+        })
+        .catch((err) => {
+          this.$message({
+            type: 'error',
+            message: err.message || '获取市数据失败，服务端错误，请联系管理员'
+          })
+        })
+    },
+    /**
+     * 处理区变化
+     */
+    handlerDistrictChange(code) {
+      // 设置区数据
+      this.districtName = this.districtData.find((item) => item.code === code)
+      this.$emit('districtChange', {
+        provinceId: this.province,
+        provinceName: this.provinceName,
+        cityId: this.city,
+        cityName: this.cityName,
+        districtId: this.district,
+        districtName: this.districtName
+      })
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.area-select {
+  .el-select {
+    width: 102px;
+    & + .el-select {
+      margin-left: 6px;
+    }
+  }
+}
+</style>

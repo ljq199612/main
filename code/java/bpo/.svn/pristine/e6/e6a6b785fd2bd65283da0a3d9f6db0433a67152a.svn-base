@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mapper.BpoPersonContractInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.model.BpoPersonContractInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="contract_code" property="contractCode" jdbcType="VARCHAR" />
+    <result column="jia_id" property="jiaId" jdbcType="INTEGER" />
+    <result column="yi_id" property="yiId" jdbcType="INTEGER" />
+    <result column="is_social_security" property="isSocialSecurity" jdbcType="INTEGER" />
+    <result column="is_fixed_due_time" property="isFixedDueTime" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="file_path" property="filePath" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, type, contract_code, jia_id, yi_id, is_social_security, is_fixed_due_time, 
+    start_time, end_time, file_path, status, remark, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bpo_person_contract_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_person_contract_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.bpo.model.BpoPersonContractInfo" >
+    insert into bpo_person_contract_info (id, name, type, 
+      contract_code, jia_id, yi_id, 
+      is_social_security, is_fixed_due_time, start_time, 
+      end_time, file_path, status, 
+      remark, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT}, 
+      #{contractCode,jdbcType=VARCHAR}, #{jiaId,jdbcType=INTEGER}, #{yiId,jdbcType=INTEGER}, 
+      #{isSocialSecurity,jdbcType=INTEGER}, #{isFixedDueTime,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{filePath,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
+      #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.bpo.model.BpoPersonContractInfo" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into bpo_person_contract_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="contractCode != null" >
+        contract_code,
+      </if>
+      <if test="jiaId != null" >
+        jia_id,
+      </if>
+      <if test="yiId != null" >
+        yi_id,
+      </if>
+      <if test="isSocialSecurity != null" >
+        is_social_security,
+      </if>
+      <if test="isFixedDueTime != null" >
+        is_fixed_due_time,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="filePath != null" >
+        file_path,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="contractCode != null" >
+        #{contractCode,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaId != null" >
+        #{jiaId,jdbcType=INTEGER},
+      </if>
+      <if test="yiId != null" >
+        #{yiId,jdbcType=INTEGER},
+      </if>
+      <if test="isSocialSecurity != null" >
+        #{isSocialSecurity,jdbcType=INTEGER},
+      </if>
+      <if test="isFixedDueTime != null" >
+        #{isFixedDueTime,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="filePath != null" >
+        #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.bpo.model.BpoPersonContractInfo" >
+    update bpo_person_contract_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="contractCode != null" >
+        contract_code = #{contractCode,jdbcType=VARCHAR},
+      </if>
+      <if test="jiaId != null" >
+        jia_id = #{jiaId,jdbcType=INTEGER},
+      </if>
+      <if test="yiId != null" >
+        yi_id = #{yiId,jdbcType=INTEGER},
+      </if>
+      <if test="isSocialSecurity != null" >
+        is_social_security = #{isSocialSecurity,jdbcType=INTEGER},
+      </if>
+      <if test="isFixedDueTime != null" >
+        is_fixed_due_time = #{isFixedDueTime,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="filePath != null" >
+        file_path = #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.model.BpoPersonContractInfo" >
+    update bpo_person_contract_info
+    set name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      contract_code = #{contractCode,jdbcType=VARCHAR},
+      jia_id = #{jiaId,jdbcType=INTEGER},
+      yi_id = #{yiId,jdbcType=INTEGER},
+      is_social_security = #{isSocialSecurity,jdbcType=INTEGER},
+      is_fixed_due_time = #{isFixedDueTime,jdbcType=INTEGER},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      file_path = #{filePath,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectDetail" resultType="com.rz.iot.bpo.model.show.BpoPersonContractInfoShow">
+    select pci.*,cp.company_name as jiaName
+    from bpo_person_contract_info pci
+    left join sys_company cp on pci.jia_id = cp.id
+    where pci.jia_id = #{jiaId,jdbcType=INTEGER} and pci.yi_id = #{yiId,jdbcType=INTEGER}
+    and pci.status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    order by pci.create_time desc
+    limit 0,1
+  </select>
+
+  <update id="updateUrlByContractId">
+    UPDATE bpo_person_contract_info
+    SET url = #{url}
+    WHERE
+    id = #{id}
+  </update>
+
+  <select id="findFileNameByUrls" resultType="java.util.Map">
+    SELECT url as contractUrl,file_name as fileName FROM
+    bpo_file_upload
+    WHERE
+    status = ${@com.rz.iot.bpo.common.constant.DictDataConstants@NORMAL_STATUS}
+    <foreach collection="list" item="item" open="AND(" close=")" separator="OR">
+      url = #{item}
+    </foreach>
+  </select>
+</mapper>

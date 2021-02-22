@@ -1,0 +1,117 @@
+package com.rz.iot.bpo.controller;
+
+import com.rz.iot.bpo.framework.aspectj.lang.annotation.Log;
+import com.rz.iot.bpo.framework.aspectj.lang.enums.BusinessType;
+import com.rz.iot.bpo.framework.web.controller.BaseController;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.model.BpoTransferStation;
+import com.rz.iot.bpo.model.param.BpoTransferStationParam;
+import com.rz.iot.bpo.model.show.BpoTransferStationShow;
+import com.rz.iot.bpo.service.BpoTransferStationService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * 描述 : 场地controller
+ * 作者 : Rycony
+ * 创建时间 : 2020/6/17 14:32
+ *
+ * 修改原因 :
+ * 修改人 :
+ * 修改时间 ：
+ */
+@RestController
+@RequestMapping("/transferStation")
+public class BpoTransferStationController extends BaseController{
+    @Resource
+    private BpoTransferStationService bpoTransferStationService;
+
+    /**
+     * 新增场地
+     * @param param 场地数据
+     * @return
+     */
+    @RequestMapping("/insert")
+    @PreAuthorize("@ss.hasPermi('transferStation:insert')")
+    @Log(title = "系统新增场地",businessType = BusinessType.INSERT)
+    public Result insert(BpoTransferStationParam param){
+        return bpoTransferStationService.insert(param);
+    }
+
+    /**
+     * 更新场地
+     * @param param 场地数据
+     * @return
+     */
+    @RequestMapping("/update")
+    @PreAuthorize("@ss.hasPermi('transferStation:update')")
+    @Log(title = "系统更新场地",businessType = BusinessType.UPDATE)
+    public Result update(BpoTransferStationParam param){
+        return bpoTransferStationService.update(param);
+    }
+
+    /**
+     * 更改场地状态
+     */
+    @RequestMapping("/updateStatus")
+    @PreAuthorize("@ss.hasPermi('transferStation:updateStatus')")
+    @Log(title = "系统更改场地状态",businessType = BusinessType.UPDATE)
+    public Result updateStatus(BpoTransferStationParam param){
+        return bpoTransferStationService.updateStatus(param);
+    }
+
+    /**
+     * 分页查询场地
+     */
+    @RequestMapping("/findAll")
+    @PreAuthorize("@ss.hasPermi('siteManage:list')")
+    public Result findAll(BpoTransferStationParam bpoTransferStationParam){
+        startPage();
+        List<BpoTransferStationShow> list = bpoTransferStationService.findAll(bpoTransferStationParam);
+        return getDataTable(list);
+    }
+    /**
+     * 获取场地类型
+     */
+    @RequestMapping("/findStationType")
+    public Result findStationType(){
+        return bpoTransferStationService.findStationType();
+    }
+
+    @RequestMapping("/delete")
+    @Log(title = "删除场地",businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermi('transferStation:delete')")
+    public Result delete(BpoTransferStation bpoTransferStation){
+        return bpoTransferStationService.delete(bpoTransferStation);
+    }
+
+    @RequestMapping("/findDetail")
+    @PreAuthorize("@ss.hasPermi('siteManage:list')")
+    public Result findDetail(BpoTransferStation bpoTransferStation){
+        return bpoTransferStationService.findDetail(bpoTransferStation);
+    }
+
+    /**
+     * 获取当前登录用户所属部门及以下 所有的中转场信息
+     * @return
+     */
+    @GetMapping("/findAllByLoginUserId")
+    public Result<List<BpoTransferStation>> findAllByLoginUserId(BaseEntity param){
+        return bpoTransferStationService.findAllByLoginUserId (param);
+    }
+
+    /**
+     * 获取当前登录用户所属部门 的中转场信息
+     * @return
+     */
+    @GetMapping("/findAllInDepByLoginUserId")
+    public Result<List<BpoTransferStation>> findAllInDepByLoginUserId(BaseEntity param){
+        return bpoTransferStationService.findAllInDepByLoginUserId (param);
+    }
+}

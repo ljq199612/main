@@ -1,0 +1,108 @@
+package com.rz.iot.bpo.service.impl;
+
+import com.rz.iot.bpo.common.constant.ResultConstants;
+import com.rz.iot.bpo.controller.BpoEvaluationResultParam;
+import com.rz.iot.bpo.framework.web.domain.BaseEntity;
+import com.rz.iot.bpo.framework.web.entity.Result;
+import com.rz.iot.bpo.mapper.BpoBillSupplierDayMapper;
+import com.rz.iot.bpo.mapper.BpoBillSupplierMonthMapper;
+import com.rz.iot.bpo.mapper.BpoEvaluationResultMapper;
+import com.rz.iot.bpo.mapper.BpoPerformanceEvaluationMapper;
+import com.rz.iot.bpo.model.BpoBillSupplierMonth;
+import com.rz.iot.bpo.model.BpoBillSupplierMonthDetail;
+import com.rz.iot.bpo.model.BpoEvaluationResult;
+import com.rz.iot.bpo.model.param.bpoBill.BillSelectParam;
+import com.rz.iot.bpo.model.show.BpoPerformanceEvaluationShow;
+import com.rz.iot.bpo.model.show.bpoBill.BpoBillDayShow;
+import com.rz.iot.bpo.service.BpoBillReceivableService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * @program: bpo-preview
+ * @description: 财务管理 应收
+ * @author: YangShun
+ * @create: 2020-07-29 11:19
+ **/
+@Service
+public class BpoBillReceivableServiceImpl implements BpoBillReceivableService {
+
+    @Resource
+    private BpoBillSupplierDayMapper supplierDayMapper;
+
+    @Resource
+    BpoPerformanceEvaluationMapper performanceEvaluationMapper;
+
+    @Resource
+    private BpoBillSupplierMonthMapper supplierMonthMapper;
+
+    @Resource
+    private BpoEvaluationResultMapper bpoEvaluationResultMapper;
+
+    @Override
+    public Result findAllMonth(BaseEntity entity,BillSelectParam param) {
+        return null;
+    }
+
+    /**
+     * 查询供应商所有日账单
+     * @param entity
+     * @param param
+     * @return
+     */
+    @Override
+    public Result finaAllDay(BaseEntity entity,BillSelectParam param) {
+        List<BpoBillDayShow> bpoBillDayShows = supplierDayMapper.selectAllDayAccount (entity,param);
+        Result<List<BpoBillDayShow>> result = new Result<> (ResultConstants.REQUEST_SUCCESS);
+        result.setData (bpoBillDayShows);
+        return result;
+    }
+
+    /**
+     * 根据供应商月账单表id，获取此供应商下的员工账单记录
+     * @param id
+     * @return
+     */
+    @Override
+    public Result findDetailDays(Integer id) {
+        BpoBillDayShow bpoBillDayShow = supplierDayMapper.selectDetailById (id);
+        Result<BpoBillDayShow> result = new Result<> (ResultConstants.REQUEST_SUCCESS);
+        result.setData (bpoBillDayShow);
+        return result;
+    }
+
+    /**
+     * 对账
+     * 插入信息到对账供应商详情表
+     * 插入信息到对账表
+     * 插入信息到对账详情表
+     * @param monthId
+     * @return
+     */
+    @Override
+    public Result startCheck(Integer monthId) {
+        //获取供应商月账单信息
+        BpoBillSupplierMonth bpoBillSupplierMonth = supplierMonthMapper.selectByPrimaryKey (monthId);
+        //获取供应商ID
+        Integer supplierId = supplierMonthMapper.selectSupplierIdByCompanyId (bpoBillSupplierMonth.getPayeeId ());
+        //获取供应商考核标准
+        BpoPerformanceEvaluationShow info = performanceEvaluationMapper.selectBysupplierInfoId(supplierId);
+        //获取供应商考核信息
+        BpoEvaluationResultParam param = new BpoEvaluationResultParam ();
+        param.setSupplierInfoId (supplierId);
+        param.setEvaluationTime (bpoBillSupplierMonth.getBillCycle ());
+        BpoEvaluationResult result = bpoEvaluationResultMapper.getResult (param);
+        //插入信息到对账供应商详情表
+        BpoBillSupplierMonthDetail detail = new BpoBillSupplierMonthDetail ();
+        detail.setMonthBillId (bpoBillSupplierMonth.getId ());
+        detail.setSupplierSalary (bpoBillSupplierMonth.getSupplierSalary ());
+        detail.setDeduction (bpoBillSupplierMonth.getTotalDeduction ());
+        detail.setBillAmount (bpoBillSupplierMonth.getRealBillAmount ());
+        detail.setPerformanceScore (param.getGrade ());
+        detail.setPerformanceQuota (info.getLinkRate ());
+        return null;
+    }
+
+}

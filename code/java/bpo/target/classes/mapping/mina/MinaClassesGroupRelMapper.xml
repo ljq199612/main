@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.bpo.mina.mapper.MinaClassesGroupRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.bpo.mina.model.MinaClassesGroupRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="class_sn" property="classSn" jdbcType="VARCHAR" />
+    <result column="work_group_id" property="workGroupId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="class_generate_id" property="classGenerateId" jdbcType="INTEGER" />
+  </resultMap>
+
+  <resultMap id="MinaClassesGroupRelMap" type="com.rz.iot.bpo.mina.model.show.MinaClassesGroupRelShow" >
+    <result column="group_name" property="workGroupName" jdbcType="VARCHAR" />
+
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="class_sn" property="classSn" jdbcType="VARCHAR" />
+    <result column="work_group_id" property="workGroupId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="class_generate_id" property="classGenerateId" jdbcType="INTEGER" />
+  </resultMap>
+
+
+  <sql id="Selective_Column_Key">
+    <trim prefix="" suffix="" suffixOverrides="," >
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="classSn != null" >
+        class_sn,
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="classGenerateId != null" >
+        class_generate_id,
+      </if>
+    </trim>
+  </sql>
+  <sql id="Selective_Column_Value">
+    <trim prefix="" suffix="" suffixOverrides="," >
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="classSn != null" >
+        #{classSn,jdbcType=VARCHAR},
+      </if>
+      <if test="workGroupId != null" >
+        #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="classGenerateId != null" >
+        #{classGenerateId,jdbcType=INTEGER},
+      </if>
+    </trim>
+
+  </sql>
+  <sql id="Base_Column_Key_For_List" >
+    project_id, class_sn, work_group_id, status,class_generate_id
+  </sql>
+  <sql id="Base_Column_Value_For_List">
+    <trim prefix="" suffix="" suffixOverrides="," >
+        #{item.projectId,jdbcType=INTEGER},
+        #{item.classSn,jdbcType=VARCHAR},
+        #{item.workGroupId,jdbcType=INTEGER},
+        #{item.status,jdbcType=INTEGER},
+        #{item.classGenerateId,jdbcType=INTEGER},
+    </trim>
+  </sql>
+  <sql id="Selective_Column_Key_Value">
+    <trim prefix="" suffix="" suffixOverrides="," >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="classSn != null" >
+        class_sn = #{classSn,jdbcType=VARCHAR},
+      </if>
+      <if test="workGroupId != null" >
+        work_group_id = #{workGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="classGenerateId != null" >
+        class_generate_id = #{classGenerateId,jdbcType=INTEGER},
+      </if>
+    </trim>
+
+  </sql>
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select *
+    from bpo_classes_group_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectWorkGroupByClassesGenerateId" resultMap="MinaClassesGroupRelMap" parameterType="java.lang.Integer" >
+    SELECT
+      A.work_group_id, B.group_name
+    FROM
+      bpo_classes_group_rel A
+    JOIN bpo_work_group B
+      ON A.class_generate_id = #{classesId, jdbcType=INTEGER}
+      AND B.id = A.work_group_id
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bpo_classes_group_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.rz.iot.bpo.mina.model.MinaClassesGroupRel" >
+    insert into bpo_classes_group_rel <include refid="Selective_Column_Key"/>
+    values (<include refid="Selective_Column_Value"/>)
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into bpo_classes_group_rel
+    (<include refid="Base_Column_Key_For_List"/>)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (<include refid="Base_Column_Value_For_List"/>)
+    </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.bpo.mina.model.MinaClassesGroupRel" >
+    update bpo_classes_group_rel
+    <set>
+      <include refid="Selective_Column_Key_Value"/>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

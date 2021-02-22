@@ -1,0 +1,556 @@
+<template>
+  <CfPanel v-loading="pageLoading" title="新增规则" :back-to="backTo" class="main">
+    <el-form class="bpoForm" label-width="180px">
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="项目名称：">
+            <el-input v-model.trim="basicForm.productName" disabled class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="项目编号：">
+            <el-input v-model.trim="basicForm.projectSn" disabled class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="场地：">
+            <el-input v-model.trim="basicForm.transferStationName" disabled class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="供应商名称：">
+            <el-input v-model.trim="basicForm.companyName" disabled class="half" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="计费方式：">
+            <el-radio-group v-model="computationalType">
+              <el-radio :label="1">按工序计费</el-radio>
+              <el-radio :label="2">按小时计费</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <div>
+      <el-button type="primary" icon="el-icon-plus" @click="addFn">
+        新增计费规则
+      </el-button>
+      <el-button type="primary" plain @click="addProductFn">
+        添加产品
+      </el-button>
+      <el-button type="primary" plain @click="addFeeModeFn">
+        添加计价模式
+      </el-button>
+      <el-button type="primary" plain @click="addPriceFn">
+        添加价格
+      </el-button>
+    </div>
+    <div class="add-wrap">
+      <div v-for="(item, idx) in addList" :key="idx" class="add-box">
+        <span :class="[item.isOpen ? 'toggle-table-bar_isopen' : '']" class="toggle-table-bar" @click="toggleBoxTable(item)" />
+        <span class="delete-box-icon" @click="deleteBox(idx)" />
+        <el-form :ref="`addform-${idx}`" :model="item.form" :rules="formRules" class="addform">
+          <el-row>
+            <el-col style="width: 380px">
+              <el-form-item label-width="90px" label="规则名称：" prop="ruleName">
+                <el-input v-model.trim="item.form.ruleName" placeholder="请输入规则名称" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col style="width: 380px">
+              <el-form-item label-width="90px" label="优先级：" prop="priorityLevel">
+                <el-input v-model.number.trim="item.form.priorityLevel" placeholder="请输入数值(1-10)，数值越大优先级越高" class="half" />
+              </el-form-item>
+            </el-col>
+            <el-col style="width: 380px">
+              <el-form-item label-width="90px" label="生效日期：" prop="effectiveTime">
+                <el-date-picker
+                  v-model="item.form.effectiveTime"
+                  type="date"
+                  placeholder="请选择生效日期"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col style="width: 380px">
+              <el-form-item label-width="90px" label="失效日期：" prop="finishTime">
+                <el-date-picker
+                  v-model="item.form.finishTime"
+                  type="date"
+                  placeholder="请选择失效日期"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col v-if="item.form.computationalType === 2" v-show="item.isOpen" style="width: 400px">
+              <el-form-item label-width="90px" label="单价：" prop="unitPrice">
+                <el-input v-model.number.trim="item.form.unitPrice" placeholder="请输入价格" class="half" />
+                <span class="unit">元/小时</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+        <el-table
+          v-if="item.form.computationalType===1"
+          v-show="item.isOpen"
+          style="margin-top: 19px;"
+          :data="item.table"
+          class="bpoTable"
+          border
+          fit
+          :span-method="(rowObj) => {return arraySpanMethod(rowObj, idx)}"
+        >
+          <el-table-column align="center" type="index" label="序号" width="80" />
+          <el-table-column align="left" label="工作模块" min-width="80" prop="modelName" />
+          <el-table-column align="left" label="工作小组" min-width="80" prop="modelName" />
+          <el-table-column align="left" label="工序" min-width="80" prop="processName" />
+          <el-table-column align="left" label="产品名称" min-width="80" prop="productName" />
+          <el-table-column align="left" label="计价模式(件/票)" min-width="80" prop="priceMode" />
+          <el-table-column align="left" label="价格(元/包裹)" min-width="80" prop="unitPrice" />
+          <el-table-column align="center" label="操作" width="80">
+            <template slot-scope="scope">
+              <el-button v-if="scope.row.status!='deleted'" type="text" style="color:#F52222" @click="delAddForm(scope.row,'deleted')">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </div>
+    <!-- 添加产品弹框 -->
+    <addProductDialog ref="addProductDialog" :rule-name-list="ruleNameList" :list="addList" @comfirm="comfirmAddProduct" />
+    <!-- 添加计价模式弹框 -->
+    <addFeeModeDialog ref="addFeeModeDialog" :rule-name-list="ruleNameList" :list="addList" @comfirm="comfirmAddFeeMode" />
+    <!-- 添加价格弹框 -->
+    <addPriceDialog ref="addPriceDialog" :rule-name-list="ruleNameList" :list="addList" @comfirm="comfirmAddPrice" />
+    <div class="body-footer">
+      <el-button v-if="addList.length > 0" type="primary" size="medium" @click="submit">提交</el-button>
+      <el-button type="primary" size="medium" plain @click="backTo">关闭</el-button>
+    </div>
+  </CfPanel>
+</template>
+<script>
+import { getInfoForAddFeeRule, addFeeRule } from '@/api/supplierManage'
+import CfPanel from '@/components/Panel'
+import addProductDialog from './dialogs/addProductDialog'
+import addFeeModeDialog from './dialogs/addFeeModeDialog'
+import addPriceDialog from './dialogs/addPriceDialog'
+
+const bpoFeeRule = {
+  ruleName: '',
+  priorityLevel: '',
+  effectiveTime: '',
+  finishTime: ''
+}
+const bpoFeeRuleByTime = {
+  ruleName: '',
+  priorityLevel: '',
+  effectiveTime: '',
+  finishTime: '',
+  type: null, // 计价类型
+  unitPrice: null
+}
+export default {
+  name: 'AddRule',
+  components: {
+    CfPanel,
+    addProductDialog,
+    addFeeModeDialog,
+    addPriceDialog
+  },
+  data() {
+    return {
+      id: this.$route.query.id || 1,
+      basicForm: {
+        projectName: '',
+        projectId: '',
+        supplierInfoId: '', // 供应商id
+        companyName: '', // 供应商名称
+        transferStationName: '' // 场地名称
+      },
+      pageLoading: false,
+      rulePresetData: [], // 规则前置数据，页面初始化开始请求
+      computationalType: 1,
+      projectId: null, // 项目Id
+      supplierInfoId: null, // 供应商信息表Id
+      typeOptions: [
+        {
+          label: '按件计费',
+          value: 1
+        },
+        {
+          label: '按小时计费',
+          value: 2
+        }
+      ],
+      addList: [], // 新增计费规则数据的容器
+      contentModel: {
+        table: [],
+        form: {
+          ruleName: '',
+          priorityLevel: '',
+          effectiveTime: '',
+          finishTime: '',
+          id: ''
+        },
+        isOpen: true, // 默认展开
+        rowSpanV1: [], // 一级合并数据
+        rowSpanV2: [], // 二级合并数据
+        rowSpanV3: [], // 三级合并数据
+        rowSpanV4: [] // 四级合并数据
+      },
+      formRules: {
+        ruleName: { required: true, validator: this.validateRuleName, trigger: 'blur' },
+        priorityLevel: { required: true, message: '请输入优先级', trigger: 'change' },
+        effectiveTime: { required: true, message: '请输入生效日期', trigger: 'change' },
+        finishTime: { required: true, message: '请输入失效日期', trigger: 'change' },
+        unitPrice: { required: true, message: '请输入单价', trigger: 'change' }
+      }
+    }
+  },
+  computed: {
+    ruleNameList() {
+      const arr = []
+      this.addList.forEach((item, index) => {
+        const { ruleName, computationalType } = item.form
+        if (computationalType === 1 && ruleName) {
+          arr.push({
+            ruleName,
+            index
+          })
+        }
+      })
+      return arr
+    }
+  },
+  created() {
+    // 读取基础信息
+    this.setBasicForm()
+    this.getInfoForAddFeeRule()
+    setTimeout(() => {
+      this.addFn()
+    }, 1000)
+  },
+  methods: {
+    setBasicForm() {
+      const { query } = this.$route
+      Object.keys(this.basicForm).forEach((key) => {
+        this.basicForm[key] = query[key]
+      })
+    },
+    // 返回要加确认
+    backTo() {
+      this.$router.go(-1)
+    },
+    // 获取新增供应商计费规则前置数据
+    getInfoForAddFeeRule() {
+      this.pageLoading = true
+      getInfoForAddFeeRule({
+        id: this.id
+      }).then((res) => {
+        this.pageLoading = false
+        this.rulePresetData = res.data.data || []
+        console.log(this.rulePresetData)
+      }).catch((err) => {
+        this.pageLoading = false
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    selectType() {},
+    // 校验的规则名称是否已存在
+    validateRuleName(rule, value, callback) {
+      const flag = this.addList.filter((item) => {
+        return item.form.ruleName === value
+      }).length > 1
+      if (value === '') {
+        return callback(new Error('请输入规则名称'))
+      } else if (flag) {
+        return callback(new Error('该规则名称已存在'))
+      }
+      return callback()
+    },
+    addFn() {
+      const preForm = {
+        supplierInfoId: this.supplierInfoId,
+        projectId: this.projectId,
+        computationalType: this.computationalType
+      }
+      // 按工序计费
+      if (this.computationalType === 1) {
+        const addTable = this.iterateArr(this.rulePresetData)
+        const rowSpanV1 = this.calcRowSpan(addTable, 'modelId')
+        const rowSpanV2 = this.calcRowSpan(addTable, 'groupId')
+        const rowSpanV3 = this.calcRowSpan(addTable, 'processId')
+        const rowSpanV4 = this.calcRowSpan(addTable, 'priceId') || []
+        this.addList.push(JSON.parse(JSON.stringify({
+          isOpen: true,
+          form: {
+            ...preForm,
+            ...bpoFeeRule
+          },
+          table: addTable,
+          rowSpanV1,
+          rowSpanV2,
+          rowSpanV3,
+          rowSpanV4
+        })))
+        console.log(this.addList, 'list')
+      // 按小时计费
+      } else {
+        this.addList.push(JSON.parse(JSON.stringify({
+          isOpen: true,
+          form: {
+            ...preForm,
+            ...bpoFeeRuleByTime
+          }
+        })))
+      }
+    },
+    arraySpanMethod({ row, column, rowIndex, columnIndex }, idx) {
+      const indexRow = this.addList[idx] || {}
+      if (columnIndex < 2) {
+        const _row = indexRow.rowSpanV1[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      } else if (/2|8/.test(columnIndex)) {
+        const _row = indexRow.rowSpanV2[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      } else if (/3|7/.test(columnIndex)) {
+        const _row = indexRow.rowSpanV3[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return [_row, _col]
+      }
+    },
+    // 计算表格合并数据
+    calcRowSpan(list, key) {
+      let pos = 0
+      const rowSpan = []
+      list.forEach((item, index) => {
+        if (index === 0) {
+          rowSpan.push(1)
+          pos = 0
+        } else {
+          if (list[index][key] === list[index - 1][key]) {
+            rowSpan[pos] += 1
+            rowSpan.push(0)
+          } else {
+            rowSpan.push(1)
+            pos = index
+          }
+        }
+      })
+      return rowSpan
+    },
+    iterateArr(list) {
+      const arr = []
+      list.forEach((item) => {
+        const obj = {} // 每一级的数据容器
+        Object.keys(item).forEach((key) => {
+          if (Array.isArray(item[key])) {
+            if (item[key].length === 0 || !item[key]) {
+              const cacheObj = Object.assign({}, obj)
+              arr.push(cacheObj)
+            } else {
+              const childArr = this.iterateArr(item[key])
+              childArr.forEach((itm) => {
+                Object.keys(itm).forEach((key1) => {
+                  obj[key1] = itm[key1]
+                })
+                arr.push({
+                  ...obj
+                })
+              })
+            }
+          } else {
+            obj[key] = item[key]
+          }
+        })
+        // 如果对象属性都没有数组说明到达最后一级，保存到数组
+        const isLast = Object.values(item).every((v) => !Array.isArray(v))
+        if (isLast) {
+          const { lowerLimit = 0, upperLimit = 0 } = obj
+          // 新增价格模式属性
+          if (Reflect.has(obj, 'lowerLimit')) {
+            if (upperLimit > 50) {
+              obj.priceMode = '50以上'
+            } else {
+              obj.priceMode = `${lowerLimit}~${upperLimit}`
+            }
+          }
+          arr.push({
+            ...obj
+          })
+        }
+      })
+      return arr
+    },
+    // 切换表格展开收起
+    toggleBoxTable(item) {
+      console.log(item, 'item')
+      this.$set(item, 'isOpen', !item.isOpen)
+    },
+    // 删除规则框
+    deleteBox(index) {
+      console.log(index, 'index')
+      this.addList.splice(index, 1)
+    },
+    submit() {
+      console.log(this.addList, 'addList')
+      this.addList.forEach((item) => {
+        const { computationalType } = item.form
+        const params = {
+          ...item.form
+        }
+        // 按工序计费
+        if (computationalType === 1) {
+          params.bpoProcessParams = []
+          item.table.forEach((itm) => {
+            const data = {
+              bpoProductParams: [],
+              codeExist: true,
+              codeInvalid: true,
+              nameExist: true,
+              sysProcessCode: itm.processCode, // 工序编号
+              sysProcessId: item.processId, // 工序id
+              sysProcessName: itm.processName
+            }
+            params.bpoProcessParams.push(data)
+          })
+        }
+        this.postSubmit(params)
+      })
+    },
+    // 发送保存接口
+    postSubmit(params) {
+      addFeeRule({
+        ...params
+      }).then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        this.$message({
+          type: 'error',
+          message: err.message || '服务端错误，请稍后尝试'
+        })
+      })
+    },
+    addProductFn() {
+      this.checkRuleName('addProductDialog')
+    },
+    addFeeModeFn() {
+      this.checkRuleName('addFeeModeDialog')
+    },
+    addPriceFn() {
+      this.checkRuleName('addPriceDialog')
+    },
+    // 检查是否有规则名称
+    checkRuleName(refName) {
+      if (this.ruleNameList.length === 0) {
+        this.$message({
+          type: 'error',
+          message: '规则名称为空，不能添加产品'
+        })
+      } else {
+        this.$refs[refName].show()
+      }
+    },
+    comfirmAddProduct(data) {
+      console.log(data, 'addData')
+      // productName 为选择的产品数组
+      const { index, modelId, groupId, processId, productName } = data
+      const curTable = JSON.parse(JSON.stringify(this.addList[index].table))
+      let addIndex = 0 // 记录插入表格的位置
+      const tempArr = curTable.filter((item, index) => {
+        const flag = (item.modelId === modelId && item.groupId === groupId && item.processId === processId)
+        if (flag) {
+          addIndex = index
+        }
+        return flag
+      })
+      setTimeout(() => {
+        productName.forEach((item) => {
+          const tempObj = JSON.parse(JSON.stringify(tempArr[0])) // 复制对象
+          const addRowData = Object.assign(tempObj, {
+            productId: Date.now(),
+            productName: item
+          })
+          curTable.splice(addIndex += 1, 0, addRowData)
+        })
+        const rowSpanV1 = this.calcRowSpan(curTable, 'modelId')
+        const rowSpanV2 = this.calcRowSpan(curTable, 'groupId')
+        const rowSpanV3 = this.calcRowSpan(curTable, 'processId')
+        const rowSpanV4 = this.calcRowSpan(curTable, 'priceId') || []
+        this.$set(this.addList[index], 'table', curTable)
+        this.$set(this.addList[index], 'rowSpanV1', rowSpanV1)
+        this.$set(this.addList[index], 'rowSpanV2', rowSpanV2)
+        this.$set(this.addList[index], 'rowSpanV3', rowSpanV3)
+        this.$set(this.addList[index], 'rowSpanV4', rowSpanV4)
+      })
+    },
+    comfirmAddFeeMode(data) {
+      console.log(data)
+    },
+    comfirmAddPrice(data) {
+      console.log(data)
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.add-wrap{
+  margin-top: 30px;
+  .add-box{
+    position: relative;
+    padding: 20px;
+    background: #f5f6fb;
+    & + .add-box{
+      margin-top: 20px;
+    }
+    .bpo-table{
+      background: #fff;
+    }
+  }
+  .addform{
+    .el-input,
+    .el-select{
+      width: 245px;
+    }
+  }
+}
+.add-box{
+  &:hover{
+    .delete-box-icon{
+      display: block;
+    }
+  }
+  .delete-box-icon,
+  .toggle-table-bar{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 26px;
+    cursor: pointer;
+  }
+  .toggle-table-bar{
+    right: 120px;
+    z-index: 98;
+    background: url('../../../assets/toggleIcon.png') no-repeat center;
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+    &.toggle-table-bar_isopen{
+      transform: rotate(0deg);
+    }
+  }
+  .delete-box-icon{
+    display: none;
+    right: 20px;
+    background: url('../../../assets/deleteIcon.png') no-repeat center;
+    z-index: 99;
+  }
+}
+.body-footer{
+  margin-top: 26px;
+  padding-bottom: 20px;
+}
+</style>
